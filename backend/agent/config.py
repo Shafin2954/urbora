@@ -11,10 +11,15 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()  # backend/.env if present; no-op otherwise
+# Load backend/.env explicitly — a bare load_dotenv() from the repo root would look
+# for ./.env and miss it. Then fall back to the default search (repo-root .env /
+# real env vars); load_dotenv never overrides an already-set var.
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+load_dotenv()
 
 DEFAULT_MODEL = "gpt-4o-mini"       # tool-capable, cost-appropriate baseline; override via OPENAI_MODEL
 DEFAULT_MAX_TOKENS = 4000

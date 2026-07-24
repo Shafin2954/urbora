@@ -105,6 +105,11 @@ def run_turn(
 
 if __name__ == "__main__":
     # Live end-to-end smoke: one Bangla planning turn (needs OPENAI_API_KEY).
+    # Force UTF-8 stdout — Windows cp1252 can't encode Bangla tokens / arrows.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
+    except Exception:  # noqa: BLE001
+        pass
     history: list[dict[str, Any]] = [
         {"role": "user", "content": "রাজশাহীতে আমার জমির জন্য আবহাওয়া দেখে পরামর্শ দাও।"}
     ]
@@ -112,10 +117,10 @@ if __name__ == "__main__":
         if isinstance(ev, TokenEvent):
             print(ev.text, end="", flush=True)
         elif isinstance(ev, ToolCallEvent):
-            print(f"\n  → tool_call {ev.name}({ev.params})")
+            print(f"\n  -> tool_call {ev.name}({ev.params})")
         elif isinstance(ev, ToolResultEvent):
             keys = list(ev.result_raw)[:5] if isinstance(ev.result_raw, dict) else ev.result_raw
-            print(f"  ← tool_result {ev.name}: {keys}")
+            print(f"  <- tool_result {ev.name}: {keys}")
         elif isinstance(ev, ErrorEvent):
             print(f"\n[error] {ev.message}")
         elif isinstance(ev, DoneEvent):
