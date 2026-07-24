@@ -13,7 +13,9 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from ..tools.ask import ask_farmer
 from ..tools.crop_scorer import crop_scorer_tool
+from ..tools.farm_memory import remember_farm
 from ..tools.cropdb import cropdb_sql
 from ..tools.finance import finance_projection
 from ..tools.geocode import geocode
@@ -106,16 +108,14 @@ TOOL_DEFS: list[dict[str, Any]] = [
         "description": (
             "Deterministic crop ranking (you must NEVER rank crops yourself — "
             "call this tool and narrate its output). Ranks boro_rice, aman_rice, "
-            "potato, mustard, lentil for a farm. CURRENT LIMITATION: only the "
-            "'District track record' and 'Stability' components score real "
-            "points today (the curated soil/water/climate knowledge base and "
-            "B's finance engine don't exist yet) — 'Agronomic fit', 'Profit', and "
-            "'Climate fit' report as 'unavailable', and Season/Soil/Water/Budget "
-            "screening does not run (all supported crops are shown regardless of "
-            "fit). The result's 'degraded' list names exactly what's unavailable "
-            "and why — you MUST relay this honestly in Bangla before presenting "
-            "any ranking; never present the partial composite as a complete "
-            "recommendation."
+            "potato, mustard, lentil for a farm. Some components may be "
+            "unavailable depending on what data exists: 'Agronomic fit' and "
+            "'Climate fit' need the curated knowledge base, and 'Profit' plus "
+            "Budget screening need cited prices for EVERY candidate in "
+            "data/prices.md. The result's 'degraded' list names exactly what is "
+            "unavailable and why — you MUST relay it honestly in Bangla before "
+            "presenting any ranking, and never present a partial composite as a "
+            "complete recommendation."
         ),
         "input_schema": {
             "type": "object",
@@ -138,6 +138,99 @@ TOOL_DEFS: list[dict[str, Any]] = [
                 "budget_bdt": {"type": "number", "description": "farmer's budget in BDT"},
             },
             "required": ["district", "soil_type", "water_source", "season"],
+        },
+    },
+    {
+        "name": "ask_farmer",
+        "description": (
+            "Ask the farmer ONE missing intake detail and show them the right "
+            "input widget for it. Use this whenever you need a required field "
+            "you do not have: district, area, soil type, water source, budget, "
+            "season, land type. Prefer it over asking in plain prose — the "
+            "widget is far faster to answer on a phone. Only one question may "
+            "be open at a time, so call this at most once per turn and then END "
+            "YOUR TURN: do not answer your own question or assume a value. "
+            "Widget choice: 'dropdown' for district (options are filled in for "
+            "you — do not list them), 'chips' for a short fixed set like soil "
+            "type or water source, 'number_unit' for area (farmer picks "
+            "bigha/katha/decimal/acre), 'number' for budget, 'text' otherwise. "
+            "prompt_bn must be Bangla, and so must every option's label_bn."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string",
+                    "description": "what is being collected, e.g. district / area / soil_type",
+                },
+                "prompt_bn": {
+                    "type": "string",
+                    "description": "the question in Bangla, as the farmer will read it",
+                },
+                "input_kind": {
+                    "type": "string",
+                    "enum": ["chips", "dropdown", "number", "number_unit", "text"],
+                },
+                "options": {
+                    "type": "array",
+                    "description": "for chips/dropdown: [{value, label_bn}]. Omit for district.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "value": {"type": "string"},
+                            "label_bn": {"type": "string"},
+                        },
+                        "required": ["value", "label_bn"],
+                    },
+                },
+                "unit_options": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "for number_unit; defaults to the area units",
+                },
+            },
+            "required": ["field", "prompt_bn", "input_kind"],
+        },
+    },
+    {
+        "name": "remember_farm",
+        "description": (
+            "Save what you now know about this farmer's farm, so you can greet "
+            "them with it next session. Call this ONCE, after you have restated "
+            "the profile and the farmer has confirmed it — store what they "
+            "agreed to, not what you inferred mid-intake. Calls merge, so a "
+            "later call carrying only a budget will not erase the district. "
+            "Only promise to remember what the result's `profile` actually "
+            "contains."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "farm_id": {
+                    "type": "string",
+                    "description": "the farm id for this session",
+                },
+                "name": {"type": "string", "description": "farmer's name"},
+                "district": {"type": "string"},
+                "area": {"type": "number", "description": "farm size as stated"},
+                "area_unit": {
+                    "type": "string",
+                    "enum": ["bigha", "katha", "decimal", "acre", "hectare"],
+                },
+                "soil_type": {
+                    "type": "string",
+                    "enum": ["clay", "loam", "sandy_loam", "clay_loam", "silt", "sandy", "peat"],
+                },
+                "water_source": {
+                    "type": "string",
+                    "enum": ["rainfed", "tubewell", "canal", "irrigated"],
+                },
+                "budget_bdt": {"type": "number"},
+                "season": {"type": "string", "enum": ["rabi", "kharif1", "kharif2"]},
+                "land_type": {"type": "string", "description": "উঁচু / মাঝারি / নিচু"},
+                "last_crop": {"type": "string"},
+            },
+            "required": ["farm_id"],
         },
     },
     {
@@ -185,6 +278,8 @@ _DISPATCH: dict[str, Callable[..., dict]] = {
     "cropdb_sql": cropdb_sql,
     "crop_scorer": crop_scorer_tool,
     "finance_projection": finance_projection,
+    "ask_farmer": ask_farmer,
+    "remember_farm": remember_farm,
 }
 
 

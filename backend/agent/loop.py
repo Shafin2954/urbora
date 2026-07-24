@@ -39,6 +39,7 @@ from ..schemas import (
     ErrorEvent,
     FinanceProjection,
     FinanceUpdateEvent,
+    InputRequestEvent,
     PlanUpdateEvent,
     SeasonPlan,
     SSEEvent,
@@ -77,6 +78,11 @@ def _panel_event(tool_name: str, result: Any) -> SSEEvent | None:
             )
         if tool_name == "season_plan" and "plan" in result:
             return PlanUpdateEvent(plan=SeasonPlan.model_validate(result["plan"]))
+        # The intake widget (PRD §8 Tier0.1). The tool validates and shapes it;
+        # this is where it becomes the event the UI has been able to render
+        # since H2 but never received.
+        if tool_name == "ask_farmer" and "input_request" in result:
+            return InputRequestEvent.model_validate(result["input_request"])
     except Exception:  # noqa: BLE001 — a bad shape loses the panel, not the turn
         return None
     return None
@@ -190,10 +196,32 @@ async def run_turn(
     reimplemented here — CLAUDE.md rule 5); every other event is
     `.model_dump()`'d directly from its pydantic SSEEvent.
     """
-    from ..api import sse  # B's redacting constructors (import, not reimplement)
-    from ..memory.store import get_session_messages, save_session_messages
+    from ..api import sse  # the redacting constructors (import, not reimplement)
+    from ..memory.store import get_farm, get_session_messages, save_session_messages
 
     messages = get_session_messages(session_id)
+
+    # Memory recall (PRD §4, judged behaviour; PLAN §5 opens the demo on it).
+    # A stored farm is injected once, at the start of a fresh session, as a
+    # system note — not as words in the farmer's mouth. Only on a fresh session
+    # because the history already carries it after the first turn, and repeating
+    # it every turn burns tokens and drifts the context.
+    if farm_id and not messages:
+        remembered = get_farm(farm_id)
+        if remembered:
+            messages.append(
+                {
+                    "role": "system",
+                    "content": (
+                        "Known farm profile for this farmer, from memory of an "
+                        "earlier session. Greet them by acknowledging what you "
+                        "already know and do NOT re-ask these fields; confirm "
+                        "rather than interrogate. Ask only for what is missing.\n"
+                        f"{json.dumps(remembered, ensure_ascii=False)}"
+                    ),
+                }
+            )
+
     messages.append({"role": "user", "content": message})
 
     async for event in _sync_iter_to_async(run_turn_sync(messages, client=client)):

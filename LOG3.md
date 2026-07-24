@@ -153,3 +153,41 @@ The read clock is now frozen in that test.
 **Rejected:** A harness that emits a fake `finance_update` (a finance projection is inherently
 an agronomic claim — the dev button calls the real endpoint instead, and shows the real
 refusal when prices are missing).
+
+## [13:40] Phase 5 — the two judged behaviours that were wired but never fired
+**Did:** `backend/tools/ask.py` (`ask_farmer`), `backend/tools/farm_memory.py`
+(`remember_farm`), farm recall in `run_turn`, `InputRequestEvent` emission in the loop,
+prompt sections for intake widgets and returning farmers, and the Bangla-numerals fix.
+24 new tests; **352 green**.
+**The finding:** two Tier-0 behaviours existed on both sides and connected to nothing.
+(a) The five `input_request` widgets have been in the UI since H2 and the event in the
+frozen contract since H1 — but no code path ever emitted one, so in the real flow they were
+unreachable and the judged "each question ships with a widget" (PRD §8.1) simply did not
+happen. (b) `get_farm`/`save_farm` were built with the session store and never called, so a
+"returning farmer" could only ever be a row seeded by hand — and the demo opens on exactly
+that (PLAN §5 step 1).
+**Decision — the agent asks by calling a tool, not by writing a question.** `ask_farmer`
+takes field + prompt_bn + input_kind + typed options, validates them, and the loop turns the
+result into the SSE event. Inferring a widget from Bangla prose would be a guess in the one
+place PRD is explicit that at most one question may be open.
+**Decision — the 64 district options are filled in server-side**, not typed by the model.
+Sixty-four hand-written options is a transcription error waiting to happen, and the spellings
+have to match what geocode and crop.db accept. Added Bangla names for all 64 (a
+transliteration of proper nouns, not an agronomic claim) so a farmer is not asked to read
+Latin script to find their own district; a test asserts every label is actually in Bangla.
+**Decision — the remembered profile is injected as a system note, once, on a fresh session.**
+Not as words in the farmer's mouth, and not every turn: after turn one the history already
+carries it, and repeating it burns tokens and drifts context. An unknown farm injects
+nothing — a miss means proceeding without context, never inventing a farm.
+**Decision — `remember_farm` merges rather than replaces.** Intake is incremental, so a later
+call carrying only a budget must not erase the district learned three turns ago. It stores a
+JSON blob rather than typed columns because a half-known farm has to be storable;
+`FarmProfile` remains the shape for a complete profile reaching the UI.
+**Fixed the open prompt bug from LOG1 [04:00]:** the model was rendering weather figures in
+Bangla numerals (২৫.৫°C), violating rule 10 / NOTES #17. The instruction was one clause in a
+sentence about tables; it is now its own emphatic rule with worked examples, and says why —
+a judge checks a number on screen against the English trace panel, and Bangla digits make
+that check impossible.
+**Rejected:** Parsing the model's prose for questions (guesswork at the contract boundary).
+Saving the farm automatically on every turn (stores what the model inferred mid-intake rather
+than what the farmer confirmed — the prompt requires the restatement step first).
