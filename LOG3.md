@@ -191,3 +191,25 @@ that check impossible.
 **Rejected:** Parsing the model's prose for questions (guesswork at the contract boundary).
 Saving the farm automatically on every turn (stores what the model inferred mid-intake rather
 than what the farmer confirmed — the prompt requires the restatement step first).
+
+## [14:15] Phase 6a — README, seeded demo farm, farm wired through the UI
+**Did:** `README.md` (the judges' first artifact), `backend/memory/seed_demo.py`, and the
+frontend now sends a real `farm_id` instead of `null`. 352 green, lint + build clean.
+**Decision — the README leads with the honesty ledger, not the feature list.** The
+real-vs-mock table says plainly which tables are still empty, and a section explains why
+retail prices cannot become revenue with the actual numbers (retail coarse rice 50–60৳/kg
+vs paddy farm-gate roughly half). It carries the exact `AGRIBASE_CLEANING` disclosure
+wording so we never claim BBS-verified.
+**Why:** Q&A prep is half the score of the data-rules story, and a judge who reads that the
+price tables are empty *before* they see a refusal on screen reads the refusal as design
+rather than breakage.
+**Decision — the demo farm is seeded, and only the farm is seeded.** `seed_demo.py` writes
+one profile (Rajshahi, 2 bigha, clay loam, tubewell, ৳15000, rabi — PRD §3.3/§15 fix the
+district and season). No yields, no prices, no advice: everything the agent says at demo
+time still comes from live tools and cited data. What is seeded is only what a farmer would
+have told us in a previous conversation.
+**Decision — one farm per install** (`VITE_FARM_ID`, default `demo-rajshahi`). PRD §8 lists
+auth beyond farm profiles as a non-goal, so there is no picker and no login. The chat and
+the Finance tab now key on the SAME farm id — previously the tab used the session id, so a
+live area edit would have recomputed a projection the agent never made.
+**Verified:** seeded, then read back — `করিম উদ্দিন / Rajshahi / 2 bigha` recalls from SQLite.

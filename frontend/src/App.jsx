@@ -29,10 +29,9 @@ export default function App() {
   const [health, setHealth] = useState({ state: 'checking', text: 'checking…' })
   const [tab, setTab] = useState('chat')
   const [basket, setBasket] = useState(null)
-  // One farm per session until the seeded/returning farm lands. The recompute
-  // endpoint keys its remembered inputs on this, so it must be stable across
-  // re-renders — hence the session id rather than anything derived.
-  const farmId = chat.sessionId
+  // The chat and the Finance tab must key on the SAME farm, or the tab's area
+  // edit would recompute a projection the agent never made.
+  const farmId = chat.farmId
 
   useEffect(() => {
     const controller = new AbortController()

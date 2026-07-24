@@ -13,6 +13,17 @@ import { streamSSE } from '../api/sse.js'
 
 const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 
+/**
+ * Which farm this browser is talking about.
+ *
+ * One farm per install: PRD §8 lists auth beyond farm profiles as a non-goal,
+ * so there is no farm picker and no login. The default is the seeded demo farm
+ * (`backend/memory/seed_demo.py`), which is what makes the agent open by
+ * recalling a returning farmer instead of starting cold. Override with
+ * VITE_FARM_ID to talk to a different one.
+ */
+export const FARM_ID = import.meta.env.VITE_FARM_ID ?? 'demo-rajshahi'
+
 export function useChat() {
   const [messages, setMessages] = useState([])
   const [trace, setTrace] = useState([])
@@ -113,7 +124,7 @@ export function useChat() {
           method: 'POST',
           body: {
             session_id: sessionRef.current,
-            farm_id: null,
+            farm_id: FARM_ID,
             message: trimmed,
           },
           signal: controller.signal,
@@ -157,6 +168,7 @@ export function useChat() {
     streaming,
     error,
     sessionId: sessionRef.current,
+    farmId: FARM_ID,
     send,
     answerInput,
     stop,
