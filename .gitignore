@@ -49,3 +49,8 @@ Thumbs.db
 
 # NOTE (B): data/crop.db is deliberately NOT ignored here — PLAN.md §1 leaves
 # "gitignored or committed with meta timestamp" to A. A decides; B does not.
+
+# ── Session/farm memory store (A) — runtime state, not source, never committed ──
+backend/memory/memory.db
+backend/memory/memory.db-*
+
