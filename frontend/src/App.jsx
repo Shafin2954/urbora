@@ -2,15 +2,17 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { apiUrl, fetchHealth } from './api/client.js'
 import ChatPanel from './components/ChatPanel.jsx'
+import CheckoutPanel from './components/CheckoutPanel.jsx'
 import TracePanel from './components/TracePanel.jsx'
 import { useChat } from './state/useChat.js'
 
 /**
  * One responsive page (PRD.md §9): chat primary, with Trace alongside.
  *
- * Plan and Finance tabs land at H9-H12 when there is real data to put in them.
- * They are deliberately absent rather than present-and-empty — an empty tab
- * reads as a broken feature, and CLAUDE.md bans placeholder content.
+ * Tabs appear only when they have something real in them. An empty tab reads
+ * as a broken feature, and a tab that appears mid-conversation is itself a
+ * signal that the agent produced something. So Checkout shows up when there is
+ * a basket; Plan and Finance when the agent emits plan_update/finance_update.
  *
  * Layout: on a phone, Chat and Trace are tabs, because the farmer needs the
  * whole screen for the conversation. From 900px the trace becomes a side
@@ -25,6 +27,7 @@ export default function App() {
   const chat = useChat()
   const [health, setHealth] = useState({ state: 'checking', text: 'checking…' })
   const [tab, setTab] = useState('chat')
+  const [basket, setBasket] = useState(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -75,6 +78,16 @@ export default function App() {
         >
           কথা বলুন
         </button>
+        {basket && (
+          <button
+            role="tab"
+            aria-selected={tab === 'checkout'}
+            className={`tab ${tab === 'checkout' ? 'is-active' : ''}`}
+            onClick={() => setTab('checkout')}
+          >
+            কেনাকাটা
+          </button>
+        )}
         <button
           role="tab"
           aria-selected={tab === 'trace'}
@@ -97,6 +110,15 @@ export default function App() {
           />
         </main>
 
+        {basket && (
+          <section
+            className={`pane pane-checkout ${tab === 'checkout' ? 'is-active' : ''}`}
+            aria-label="Checkout"
+          >
+            <CheckoutPanel basket={basket} onDone={() => setTab('chat')} />
+          </section>
+        )}
+
         <aside
           className={`pane pane-trace ${tab === 'trace' ? 'is-active' : ''}`}
           aria-label="Agent trace"
@@ -106,9 +128,41 @@ export default function App() {
         </aside>
       </div>
 
-      {isDev && <DevBar chat={chat} />}
+      {isDev && <DevBar chat={chat} onBasket={setBasket} />}
     </div>
   )
+}
+
+/**
+ * A basket for exercising the checkout flow before the agent produces one.
+ *
+ * Visibly synthetic and in English, like the chat harness: it names itself a
+ * harness and makes no agronomic claim, because a plausible-looking Bangla
+ * fertiliser basket would be invented data (CLAUDE.md §2.2) and would
+ * eventually be mistaken for the real thing.
+ *
+ * Total is ৳2.00 on purpose — NOTES #22: only ৳2 test debits on the Robi SIM.
+ */
+const HARNESS_BASKET = {
+  label: 'UI harness basket — not a recommendation, no agronomic claim.',
+  farmId: 'harness-farm',
+  amount: 2.0,
+  items: [
+    { name: 'Harness item A', qty: 1, unit: 'unit', unit_price_bdt: 1.0 },
+    { name: 'Harness item B', qty: 1, unit: 'unit', unit_price_bdt: 1.0 },
+  ],
+}
+
+/**
+ * The E1326 drill (NOTES #4): a basket above the simulator's ৳100 balance, so
+ * the insufficient-balance recovery can be rehearsed on cue without draining
+ * an account fifty times or adding a back door to the API.
+ */
+const HARNESS_BASKET_OVER_BALANCE = {
+  ...HARNESS_BASKET,
+  label: 'UI harness basket — deliberately over the simulator balance (E1326 drill).',
+  amount: 500.0,
+  items: [{ name: 'Harness item A', qty: 1, unit: 'unit', unit_price_bdt: 500.0 }],
 }
 
 /**
@@ -120,7 +174,7 @@ export default function App() {
 // time is the only way to actually interact with any but the last.
 const WIDGET_KINDS = ['district', 'soil_type', 'budget_bdt', 'area', 'name']
 
-function DevBar({ chat }) {
+function DevBar({ chat, onBasket }) {
   const [kind, setKind] = useState(WIDGET_KINDS[0])
 
   return (
@@ -150,6 +204,15 @@ function DevBar({ chat }) {
         onClick={() => chat.send(kind, { endpoint: '/api/dev/harness/widgets' })}
       >
         Widget
+      </button>
+      <button className="secondary" onClick={() => onBasket(HARNESS_BASKET)}>
+        Basket
+      </button>
+      <button
+        className="secondary"
+        onClick={() => onBasket(HARNESS_BASKET_OVER_BALANCE)}
+      >
+        E1326
       </button>
       <span className="muted">
         contract-shaped events only — never farmer content

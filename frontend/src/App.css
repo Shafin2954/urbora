@@ -433,6 +433,169 @@
   color: var(--ink-faint);
 }
 
+/* --- checkout (bdapps) ---
+ *
+ * Spending money outdoors on a cheap phone: the amount is the biggest thing on
+ * the screen at the confirm step, and there is exactly one primary button per
+ * stage. No decoration — the hierarchy is doing the work.
+ */
+
+.checkout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 0 16px;
+  max-width: 34rem;
+}
+
+.checkout-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mode {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-sunk);
+  font-size: 0.78rem;
+}
+
+.mode-label {
+  color: var(--ink-faint);
+}
+
+/* Simulator is the honest default and reads calm; live spends real money and
+ * must not look like anything else on the page. */
+.mode-simulator {
+  border-color: var(--leaf);
+}
+
+.mode-live {
+  border-color: var(--clay);
+  color: var(--clay);
+  font-weight: 700;
+}
+
+.mode-unknown {
+  border-style: dashed;
+}
+
+.mode-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.mode-note {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  text-align: right;
+}
+
+.basket {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.basket td {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: baseline;
+}
+
+.basket .qty,
+.basket .money {
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 12px;
+}
+
+.basket .qty {
+  color: var(--ink-soft);
+}
+
+.basket-total td {
+  border-bottom: none;
+  border-top: 2px solid var(--ink);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* The one number the farmer must actually read before agreeing. */
+.confirm-amount {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.facts {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.facts div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.facts dt {
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+
+.facts dd {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.notice {
+  border-left: 4px solid var(--clay);
+  padding-left: 12px;
+  color: var(--clay);
+  font-weight: 600;
+}
+
+/* The receipt is shown as sent — monospace, preserved line breaks, no
+ * re-styling that would make the screen and the SMS look like different
+ * documents. */
+.receipt {
+  margin: 0;
+  padding: 14px;
+  background: var(--surface-sunk);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  white-space: pre-wrap;
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.field-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: -8px;
+}
+
+.detail {
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+.small {
+  font-size: 0.82rem;
+}
+
 /* --- dev harness bar (dev build only) --- */
 
 .devbar {

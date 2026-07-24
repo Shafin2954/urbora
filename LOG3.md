@@ -82,3 +82,37 @@ browser receives.
 **Rejected:** Deriving farm-gate from retail with a milling-ratio conversion (defensible only
 with a citation for the ratio; without one it is invented data). Shipping example rows in
 prices.md to make the tables look filled (placeholder content, banned).
+
+## [12:05] Phase 2 — checkout UI done; bdapps is demo-able end to end
+**Did:** `frontend/src/components/CheckoutPanel.jsx` + styles in `App.css`, wired into
+`App.jsx` as a tab that only exists once there is a basket. Two dev-harness baskets. The
+checkout route now returns `receipt_bn` additively. Verified in **real Chrome at 390px**:
+17/17 assertions on the happy path, 7/7 on the insufficient-balance path. Suite 328 green,
+lint + production build clean.
+**Decision — the on-screen receipt is the server's string, not a copy built in JS.**
+`POST /api/checkout` returns `receipt_bn` alongside the `CheckoutResult` fields (additive,
+same pattern as `redacted` on trace events), null unless the charge succeeded.
+**Why:** The farmer should see exactly what was texted to their phone. A second copy composed
+in the frontend would drift from the SMS the first time anyone edited either — and a receipt
+for a payment that did not happen is the one lie this module must never tell.
+**Decision — three stages are three views, not one form with a disabled button.** At the
+confirm step the only things on screen are the amount (1.6rem, the largest thing on the page),
+the masked number, the balance, and two choices.
+**Why:** This is the screen where money leaves, read outdoors on a cheap phone. One decision
+at a time is the whole design.
+**Decision — the mode badge reports `unknown` when the server did not answer**, rather than
+assuming simulator. Guessing "simulator" wrongly is exactly the failure CLAUDE.md §2.13
+exists to prevent; guessing it rightly buys nothing.
+**Design fixes made after looking at the rendered screen:** the honesty note ("সিমুলেটর — আসল
+টাকা কাটা হচ্ছে না।") was inside the mode pill and ran together with the mode name — it is now
+its own sentence below it. On the receipt screen the secondary action was leading; primary now
+comes first.
+**E1326 without a back door:** the drill basket is simply priced above the simulator's ৳100
+balance, so the insufficient-balance recovery can be rehearsed on cue without draining an
+account fifty times or adding a dev-only balance-setting endpoint to the API. Verified: warns
+*before* charging, then reports "টাকা কাটা হয়নি", names the status, shows no receipt, offers retry.
+**Verified in-browser, worth stating explicitly:** the full mobile number never appears on the
+confirmation screen — only `***678`. Every control clears the 44px floor. No page errors.
+**Rejected:** A dev endpoint to set the simulator balance (more API surface for something a
+basket amount already expresses). Committing the Playwright script — it ran from the scratch
+dir, so no browser test dependency enters the repo.
