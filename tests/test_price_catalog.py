@@ -262,10 +262,33 @@ def test_the_shipped_prices_file_parses(tmp_path):
 
 
 def test_the_shipped_retail_rows_are_not_reachable_as_revenue():
-    """The live file's retail rows exist; no crop may be priced from them."""
+    """The live file's retail rows exist; no crop may be priced from them.
+
+    data/prices.md now carries real farm-gate prices (agristats.db, 2026-07-24
+    curation), so "price is missing" is no longer the invariant to check.
+    Checking farm-gate price against the retail band numerically is unsound —
+    lentil's real farm-gate price (90.78, raw Masur) coincidentally falls inside
+    the unrelated retail split-dal band (90-100) despite being a different
+    commodity, so a numeric-overlap check can fail on a true positive. The
+    invariant that actually matters is structural: removing the retail section
+    entirely must not change any farm-gate price or cost-completeness result,
+    proving `price()`/`projection()` never reads `self.retail`.
+    """
     catalog = PriceCatalog(PRICES_MD)
     related = {row.related_crop for row in catalog.retail}
     assert related & {"boro_rice", "potato", "lentil"}, "retail covers real crops"
-    for crop in related:
-        if crop:
-            assert "farm-gate selling price" in catalog.missing_for(crop)
+
+    text = PRICES_MD.read_text(encoding="utf-8")
+    retail_heading = "## 3. Retail market context"
+    assert retail_heading in text
+    stripped_text = text[: text.index(retail_heading)]
+    stripped_path = PRICES_MD.parent / "_test_prices_no_retail.md"
+    stripped_path.write_text(stripped_text, encoding="utf-8")
+    try:
+        no_retail_catalog = PriceCatalog(stripped_path)
+        assert no_retail_catalog.retail == []
+        for crop in ("boro_rice", "aman_rice", "potato", "mustard", "lentil"):
+            assert no_retail_catalog.price(crop) == catalog.price(crop)
+            assert no_retail_catalog.missing_for(crop) == catalog.missing_for(crop)
+    finally:
+        stripped_path.unlink(missing_ok=True)

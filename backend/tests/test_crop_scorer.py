@@ -416,11 +416,22 @@ def test_every_component_and_exclusion_has_provenance():
 
 # ── agent tool wrapper ────────────────────────────────────────────────────────
 def test_crop_scorer_tool_returns_candidates_and_degraded_list():
+    # As of 2026-07-24, data/prices.md carries real prices+costs for all 5 crops,
+    # so the finance seam is live and only the KB (crop_facts) gaps remain
+    # degraded: season/soil/water screening, Agronomic fit, Climate fit.
     out = cs.crop_scorer_tool(district=RAJSHAHI, soil_type="clay_loam",
                               water_source="tubewell", season="rabi")
     assert "candidates" in out and len(out["candidates"]) == 5
-    assert "degraded" in out and len(out["degraded"]) == 4
+    assert "degraded" in out and len(out["degraded"]) == 3
+    assert not any("Profit" in d for d in out["degraded"])
     assert all(isinstance(d, str) for d in out["degraded"])
+    # Profit component itself must now be real, not "unavailable".
+    for c in out["candidates"]:
+        if c["excluded"]:
+            continue
+        profit = next(comp for comp in c["components"] if comp["name"] == "Profit")
+        assert profit["max"] == 25.0
+        assert profit["provenance"]["value"] != "unavailable"
 
 
 def test_crop_scorer_tool_never_raises_on_bad_input():
