@@ -3,6 +3,7 @@ import './App.css'
 import { apiUrl, fetchHealth } from './api/client.js'
 import ChatPanel from './components/ChatPanel.jsx'
 import CheckoutPanel from './components/CheckoutPanel.jsx'
+import FinancePanel from './components/FinancePanel.jsx'
 import TracePanel from './components/TracePanel.jsx'
 import { useChat } from './state/useChat.js'
 
@@ -28,6 +29,10 @@ export default function App() {
   const [health, setHealth] = useState({ state: 'checking', text: 'checking…' })
   const [tab, setTab] = useState('chat')
   const [basket, setBasket] = useState(null)
+  // One farm per session until the seeded/returning farm lands. The recompute
+  // endpoint keys its remembered inputs on this, so it must be stable across
+  // re-renders — hence the session id rather than anything derived.
+  const farmId = chat.sessionId
 
   useEffect(() => {
     const controller = new AbortController()
@@ -78,6 +83,16 @@ export default function App() {
         >
           কথা বলুন
         </button>
+        {chat.finance && (
+          <button
+            role="tab"
+            aria-selected={tab === 'finance'}
+            className={`tab ${tab === 'finance' ? 'is-active' : ''}`}
+            onClick={() => setTab('finance')}
+          >
+            হিসাব
+          </button>
+        )}
         {basket && (
           <button
             role="tab"
@@ -110,6 +125,20 @@ export default function App() {
           />
         </main>
 
+        {chat.finance && (
+          <section
+            className={`pane pane-finance ${tab === 'finance' ? 'is-active' : ''}`}
+            aria-label="Finance"
+          >
+            <h2 className="pane-title">হিসাব</h2>
+            <FinancePanel
+              finance={chat.finance}
+              farmId={farmId}
+              onFinance={chat.setFinance}
+            />
+          </section>
+        )}
+
         {basket && (
           <section
             className={`pane pane-checkout ${tab === 'checkout' ? 'is-active' : ''}`}
@@ -128,7 +157,31 @@ export default function App() {
         </aside>
       </div>
 
-      {isDev && <DevBar chat={chat} onBasket={setBasket} />}
+      {isDev && (
+        <DevBar
+          chat={chat}
+          onBasket={setBasket}
+          onFinance={async () => {
+            const response = await fetch(apiUrl('/api/finance/recompute'), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                farm_id: farmId,
+                overrides: {
+                  crop: 'boro_rice',
+                  district: 'Rajshahi',
+                  area: 2,
+                  area_unit: 'bigha',
+                },
+              }),
+            })
+            const body = await response.json()
+            if (response.ok) setTab('finance')
+            else window.alert(body.detail ?? `HTTP ${response.status}`)
+            if (response.ok) chat.setFinance(body.finance)
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -174,7 +227,7 @@ const HARNESS_BASKET_OVER_BALANCE = {
 // time is the only way to actually interact with any but the last.
 const WIDGET_KINDS = ['district', 'soil_type', 'budget_bdt', 'area', 'name']
 
-function DevBar({ chat, onBasket }) {
+function DevBar({ chat, onBasket, onFinance }) {
   const [kind, setKind] = useState(WIDGET_KINDS[0])
 
   return (
@@ -213,6 +266,13 @@ function DevBar({ chat, onBasket }) {
         onClick={() => onBasket(HARNESS_BASKET_OVER_BALANCE)}
       >
         E1326
+      </button>
+      {/* Not a harness projection — this calls the REAL /api/finance/recompute
+          for the demo farm, so whatever it shows is what the engine computed
+          from data/prices.md. With the price tables still empty it surfaces the
+          server's honest refusal, which is exactly what should be on screen. */}
+      <button className="secondary" onClick={onFinance}>
+        Finance
       </button>
       <span className="muted">
         contract-shaped events only — never farmer content

@@ -357,7 +357,17 @@ def test_risk_level_reflects_real_rajshahi_stability_spread():
 
 
 # ── determinism ────────────────────────────────────────────────────────────
-def test_determinism_same_inputs_same_output():
+def test_determinism_same_inputs_same_output(monkeypatch):
+    # `now=` fixes the scorer's own timestamps, but the provenance it derives
+    # from cropdb results carries THEIR read time, stamped to the second at
+    # each call. Two runs either side of a second boundary then differ on a
+    # field that has nothing to do with scoring — a flake that shows up only
+    # under a full suite, i.e. exactly at a merge gate. Freeze the read clock
+    # so the assertion stays about determinism of the ranking.
+    import backend.tools.cropdb as cropdb
+
+    monkeypatch.setattr(cropdb, "_now", lambda: "2026-07-24T00:00:00+00:00")
+
     kwargs = dict(district=RAJSHAHI, soil_type="clay_loam", water_source="tubewell",
                    season="rabi", candidates=ALL_5, now="2026-07-24T00:00:00+00:00")
     r1 = score_crops(**kwargs)

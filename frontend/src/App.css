@@ -433,6 +433,255 @@
   color: var(--ink-faint);
 }
 
+/* --- finance tab ---
+ *
+ * The two numbers a farmer came for (profit, cost) come before any table. The
+ * table below them is the audit trail, and it has to add up by eye — so line
+ * totals are right-aligned in a monospace column with a rule above the total.
+ */
+
+.finance {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 20px;
+}
+
+.scenario-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scenario {
+  min-height: 44px;
+  padding: 0 14px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  border: 1px solid var(--border);
+  font-size: 0.92rem;
+}
+
+.scenario.is-active {
+  background: var(--green-tint);
+  border-color: var(--green);
+  color: var(--green-dark);
+  font-weight: 700;
+}
+
+.headline {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.headline div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.headline-key {
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+
+.headline strong {
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.gain {
+  color: var(--green-dark);
+}
+
+/* A loss must not read like a profit at a glance. */
+.loss {
+  color: var(--clay);
+}
+
+.items {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.items th {
+  text-align: left;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  font-weight: 600;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.items td {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: baseline;
+}
+
+.items .num {
+  text-align: right;
+  padding-left: 12px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  width: 1%; /* shrink to content: the total column never gets clipped */
+}
+
+.items td {
+  position: relative;
+}
+
+/* An open provenance panel must overlay, not widen its column — inside a table
+ * cell it otherwise squeezes the item names down to a few characters each. */
+.items .prov-body {
+  position: absolute;
+  right: 0;
+  top: calc(100% - 4px);
+  z-index: 5;
+  box-shadow: 0 2px 0 0 var(--border);
+}
+
+.item-name {
+  display: block;
+}
+
+/* The multiplication that produces the total, so the row checks out by hand. */
+.item-calc {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+
+.items-total td {
+  border-bottom: none;
+  border-top: 2px solid var(--ink);
+  font-weight: 700;
+}
+
+.breakeven h3,
+.recompute h3,
+.assumptions h3 {
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.recompute {
+  padding: 14px;
+  background: var(--green-tint);
+  border-radius: 12px;
+}
+
+.assumptions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* --- provenance disclosure ---
+ *
+ * <details> not a tooltip: thumb-friendly, printable, and several can be open
+ * at once when a judge is comparing sources.
+ */
+
+.prov {
+  display: inline-block;
+}
+
+.prov > summary {
+  cursor: pointer;
+  list-style: none;
+  border-bottom: 1px dotted var(--ink-faint);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.prov > summary::-webkit-details-marker {
+  display: none;
+}
+
+.prov[open] > summary {
+  border-bottom-color: var(--green);
+  font-weight: 600;
+}
+
+.prov-unit {
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+}
+
+.prov-body {
+  margin-top: 6px;
+  padding: 10px 12px;
+  background: var(--surface-sunk);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  text-align: left;
+  /* Opened from a right-aligned number in a narrow cell, so it must be free to
+   * use the row's full width rather than inheriting the cell's. */
+  width: max-content;
+  max-width: min(32rem, 78vw);
+}
+
+.prov-body li {
+  flex-wrap: wrap;
+}
+
+.prov-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.prov-body ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prov-body li {
+  display: flex;
+  gap: 8px;
+}
+
+.prov-key {
+  flex: 0 0 6.5rem;
+  color: var(--ink-faint);
+}
+
+.prov-assumption > summary {
+  border-bottom: none;
+  color: var(--ink-soft);
+}
+
+.conf-high {
+  color: var(--green-dark);
+  font-weight: 600;
+}
+
+.conf-medium {
+  color: var(--soil);
+}
+
+/* Low confidence is stated, never hidden — NOTES #23. */
+.conf-low {
+  color: var(--clay);
+  font-weight: 600;
+}
+
+/* A number that arrived without provenance renders as "—". Make it obvious. */
+.unsourced {
+  color: var(--clay);
+}
+
 /* --- checkout (bdapps) ---
  *
  * Spending money outdoors on a cheap phone: the amount is the biggest thing on

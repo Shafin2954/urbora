@@ -27,6 +27,7 @@ Two refusals are deliberate and worth defending:
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -41,6 +42,18 @@ from .engine import CostLine, min_cost_per_ha, project
 CROPS = frozenset({"boro_rice", "aman_rice", "potato", "mustard", "lentil"})
 
 PRICES_MD = Path(__file__).resolve().parents[2] / "data" / "prices.md"
+
+
+def _prices_path() -> Path:
+    """Where prices come from. `AGRISENSE_PRICES_MD` overrides the default.
+
+    The override exists so a curated file can be swapped in — or exercised —
+    without editing the committed one. It is a path, not a set of values: there
+    is still no way to get a price into the system that is not a cited row in a
+    markdown table.
+    """
+    override = os.getenv("AGRISENSE_PRICES_MD", "").strip()
+    return Path(override) if override else PRICES_MD
 
 _SECTION_FARM_GATE = "1. Selling price"
 _SECTION_INPUT_COSTS = "2. Input costs"
@@ -149,7 +162,7 @@ def _confidence(raw: str) -> Confidence:
 
 class PriceCatalog:
     def __init__(self, path: Path | str | None = None) -> None:
-        self.path = Path(path) if path else PRICES_MD
+        self.path = Path(path) if path else _prices_path()
         text = self.path.read_text(encoding="utf-8") if self.path.exists() else ""
         self._prices = self._read_prices(text)
         self._costs = self._read_costs(text)

@@ -116,3 +116,40 @@ confirmation screen — only `***678`. Every control clears the 44px floor. No p
 **Rejected:** A dev endpoint to set the simulator balance (more API surface for something a
 basket amount already expresses). Committing the Playwright script — it ran from the scratch
 dir, so no browser test dependency enters the repo.
+
+## [12:50] Phase 3a — Finance tab + provenance on tap; season plan deferred to after the KB
+**Did:** `FinancePanel.jsx` (three scenarios, itemised costs, break-even, live area edit),
+`Provenance.jsx` (tap any number), styles, wired into `App.jsx` as a tab that appears only
+once a projection exists. Added an `AGRISENSE_PRICES_MD` env override so a curated price file
+can be swapped in without editing the committed one. Verified in Chrome at 390px: **15/15**.
+Suite 328 green ×3, lint + build clean.
+**Decision — the season plan waits for the KB, and is NOT built yet.** PRD §8.4 wants a dated
+calendar from BRRI/BARI crop calendars. Those documents are not curated yet (Phase 4), so
+generating task dates now would mean inventing them — rule 2, on the screen a farmer would
+actually act on. Phase 4 comes first and the plan follows it.
+**Why the Finance tab still shipped:** its inputs are real. Yields come from crop.db; money
+comes from cited rows or is refused. Nothing is invented, so it can ship ahead of the KB.
+**Decision — `<Value>` takes a number and its provenance together, and renders "—" if the
+provenance is missing.** You cannot print an unsourced figure by forgetting a prop; you have
+to pass one. That turns "a number without provenance must not render" (CLAUDE.md §2.3) from
+a review rule into a structural one.
+**Decision — no arithmetic in the frontend at all.** Item totals, the total, ROI, break-even
+and the recomputed values are all the server's. The area editor posts to
+`/api/finance/recompute` and re-renders the response, so the tab and the agent cannot show
+different numbers for the same farm.
+**Verified — the judged moment, in the rendered DOM, not just in the engine:** the cost column
+adds up to the paisa (2151189 vs 2151189 in cents), 2 bigha → 3 scales cost, revenue and
+profit by exactly 1.5, ROI stays 60.23%, and break-even price does not move.
+**Two layout bugs found by looking at the screenshot, not the tests:** (a) a four-column item
+table clipped the totals column off the right edge at 390px — the one column the farmer is
+there for; it is now two columns with `qty × rate` under the name, which also shows the
+multiplication that produces each total. (b) An open provenance panel widened its table
+column and squeezed item names to a few characters; it now overlays instead.
+**Fixed a pre-existing flake:** `test_determinism_same_inputs_same_output` compares two
+`score_crops` runs including provenance derived from cropdb results, whose `retrieved_at` is
+stamped per call at second precision. Two runs either side of a second boundary differed on a
+field unrelated to scoring — visible only under a full suite, i.e. exactly at a merge gate.
+The read clock is now frozen in that test.
+**Rejected:** A harness that emits a fake `finance_update` (a finance projection is inherently
+an agronomic claim — the dev button calls the real endpoint instead, and shows the real
+refusal when prices are missing).

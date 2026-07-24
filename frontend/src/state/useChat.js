@@ -148,10 +148,15 @@ export function useChat() {
     inputRequest,
     plan,
     finance,
+    // The Finance tab's live area edit replaces the projection with the one
+    // /api/finance/recompute returns — same engine, same shape, so the tab and
+    // the agent can never show different numbers for the same farm.
+    setFinance,
     alerts,
     usage,
     streaming,
     error,
+    sessionId: sessionRef.current,
     send,
     answerInput,
     stop,
