@@ -2,6 +2,9 @@
 .env
 *.env
 !.env.example
+.env.local
+*.pem
+*.key
 
 # ── Python ──
 __pycache__/
@@ -19,7 +22,10 @@ backend/.venv/
 # ── Node / frontend (Instance B) ──
 node_modules/
 dist/
+frontend/dev-dist/
 .vite/
+*.log
+npm-debug.log*
 
 # ── Local model / index caches (pre-cached, not committed) ──
 backend/kb/.chroma/
@@ -27,6 +33,10 @@ backend/kb/chroma_index/
 *.onnx
 .cache/
 
-# ── OS noise ──
+# ── OS / editor noise ──
 .DS_Store
 Thumbs.db
+*.swp
+
+# NOTE (B): data/crop.db is deliberately NOT ignored here — PLAN.md §1 leaves
+# "gitignored or committed with meta timestamp" to A. A decides; B does not.
