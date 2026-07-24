@@ -20,7 +20,7 @@ concern, not a Tier-0 one.
 
 from fastapi import APIRouter, HTTPException
 
-from backend.payments import CheckoutError, CheckoutService
+from backend.payments import CheckoutError, CheckoutService, receipt_bn
 from backend.payments.msisdn import InvalidMsisdnError, mask
 from backend.schemas import CheckoutRequest, CheckoutResult
 
@@ -80,10 +80,20 @@ async def checkout_quote(payload: CheckoutRequest) -> dict:
 
 
 @router.post("/api/checkout")
-async def checkout(payload: CheckoutRequest) -> CheckoutResult:
-    """Charge. Refuses with 409 unless the amount was confirmed via /quote."""
+async def checkout(payload: CheckoutRequest) -> dict:
+    """Charge. Refuses with 409 unless the amount was confirmed via /quote.
+
+    Returns every `CheckoutResult` field plus `receipt_bn` — additive, the same
+    pattern as `redacted` on the trace events. The receipt is included because
+    the screen must show the farmer *the text that was sent to their phone*,
+    and building a second copy of that wording in JavaScript is how the SMS and
+    the screen end up disagreeing about what was bought.
+
+    It is null unless the charge succeeded. A receipt for a payment that did
+    not happen is the one lie this module must never tell.
+    """
     try:
-        return _service.charge(
+        result: CheckoutResult = _service.charge(
             farm_id=payload.farm_id,
             mobile=payload.mobile,
             amount=payload.amount,
@@ -95,3 +105,12 @@ async def checkout(payload: CheckoutRequest) -> CheckoutResult:
         # 409: the request is well-formed but the required confirmation is
         # missing or stale. Distinct from 400 so the UI can re-prompt.
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    return {
+        **result.model_dump(),
+        "receipt_bn": (
+            receipt_bn(payload.amount, payload.items, result.trx_id)
+            if result.status == "success"
+            else None
+        ),
+    }
