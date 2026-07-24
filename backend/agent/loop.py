@@ -16,9 +16,9 @@ Two layers:
     redaction happens by construction (CLAUDE.md rule 5) — this file does not
     reimplement redaction.
 
-`farm_id` is accepted (matches the contract) but not yet used to seed context
-— returning-farmer memory injection is a Tier 1 follow-up, not built here;
-tracked honestly rather than half-wired.
+For a fresh session, `farm_id` is injected as an authoritative server note so
+tools that persist a plan cannot substitute a model-invented identifier. Returning
+farm-profile injection remains a later enhancement.
 
 Guards (rule 9 / NOTES #5): max_iterations per turn; token usage + cost
 accumulated across iterations -> `done` event + cost line.
@@ -77,7 +77,10 @@ def _panel_event(tool_name: str, result: Any) -> SSEEvent | None:
                 finance=FinanceProjection.model_validate(result["projection"])
             )
         if tool_name == "season_plan" and "plan" in result:
-            return PlanUpdateEvent(plan=SeasonPlan.model_validate(result["plan"]))
+            plan = SeasonPlan.model_validate(result["plan"])
+            from backend.memory.store import save_plan
+            save_plan(plan.farm_id, plan.model_dump())
+            return PlanUpdateEvent(plan=plan)
         # The intake widget (PRD §8 Tier0.1). The tool validates and shapes it;
         # this is where it becomes the event the UI has been able to render
         # since H2 but never received.
@@ -125,8 +128,33 @@ def run_turn_sync(
                 break  # natural end of turn
 
             for tc in res.tool_calls:
+                # Retrieval is a required evidence step, not a best-effort model
+                # habit. The model receives the cited passages before it sees
+                # the deterministic recommendation/calendar result, and both
+                # calls are visible in the judge trace.
+                retrieval_result: dict | None = None
+                if tc.name in {"crop_scorer", "season_plan"}:
+                    crop = tc.args.get("crop")
+                    if tc.name == "crop_scorer":
+                        query = (
+                            f"{tc.args.get('season', 'target')} season crop suitability "
+                            f"soil {tc.args.get('soil_type', '')} water {tc.args.get('water_source', '')}"
+                        )
+                    else:
+                        query = "crop calendar fertilizer irrigation weed pest checkpoints harvest"
+                    retrieval_id = f"retrieval-{tc.id}"
+                    retrieval_params = {"query": query, **({"crop": crop} if crop else {})}
+                    yield ToolCallEvent(id=retrieval_id, name="rag_query", params=retrieval_params, ts=_now())
+                    retrieval_result = dispatch("rag_query", retrieval_params)
+                    yield ToolResultEvent(
+                        id=retrieval_id, name="rag_query", result_raw=retrieval_result, ts=_now(),
+                    )
                 yield ToolCallEvent(id=tc.id, name=tc.name, params=tc.args, ts=_now())
                 result = dispatch(tc.name, tc.args)
+                if isinstance(result, dict) and isinstance(retrieval_result, dict):
+                    # The model receives the exact retrieved passages alongside
+                    # the deterministic result it is about to narrate.
+                    result["kb_evidence"] = retrieval_result.get("matches", [])
                 yield ToolResultEvent(id=tc.id, name=tc.name, result_raw=result, ts=_now())
                 # A costing is structured data, not just narration material: the
                 # Finance tab renders it from this event while the model is
@@ -207,20 +235,23 @@ async def run_turn(
     # because the history already carries it after the first turn, and repeating
     # it every turn burns tokens and drifts the context.
     if farm_id and not messages:
+        # The farm id is server-authored session context. Tool calls must carry
+        # this exact opaque value; the model must never invent or abbreviate it.
         remembered = get_farm(farm_id)
         if remembered:
-            messages.append(
-                {
-                    "role": "system",
-                    "content": (
-                        "Known farm profile for this farmer, from memory of an "
-                        "earlier session. Greet them by acknowledging what you "
-                        "already know and do NOT re-ask these fields; confirm "
-                        "rather than interrogate. Ask only for what is missing.\n"
-                        f"{json.dumps(remembered, ensure_ascii=False)}"
-                    ),
-                }
+            note = (
+                "Known farm profile for this farmer, from memory of an earlier "
+                "session. Greet them by acknowledging what you already know and "
+                "do NOT re-ask these fields; confirm rather than interrogate. Ask "
+                f"only for what is missing.\n{json.dumps(remembered, ensure_ascii=False)}\n"
             )
+        else:
+            note = ""
+        note += (
+            f"Authoritative farm_id for this session: {farm_id!r}. "
+            "When a tool requires farm_id, copy this value exactly."
+        )
+        messages.append({"role": "system", "content": note})
 
     messages.append({"role": "user", "content": message})
 

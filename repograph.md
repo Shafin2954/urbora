@@ -114,3 +114,26 @@ real names per BDAPPS-API-REFERENCE.md are `BDAPPS_APP_ID` / `BDAPPS_PASSWORD` (
 ## Docs
 - `PRD.md` `PLAN.md` `NOTES.md` `CLAUDE.md` — spec + schedule + caveats + rules.
 - `LOG1.md` (A) `LOG2.md` (B) — append-only work logs.
+# Task tracking
+
+- `TASKLIST.md` records the remaining scoped work, including Tier 0 completion,
+  demo hardening, and explicitly deferred work.
+- `LOG3.md` includes the local-area tool-contract fix and the required API reload
+  note for anyone running a long-lived development server.
+- `backend/requirements.txt` pins the PDF extraction and Bijoy-decoding helpers
+  used for Tier 0 knowledge-base curation.
+- `backend/kb/crop_facts.py` holds the source-backed agronomy facts used by the
+  deterministic scorer; it is not model knowledge.
+- `backend/tools/season_plan.py` produces source-cited task calendars; plan
+  persistence lives in `backend/memory/store.py`, and `backend/api/plans.py`
+  exposes the saved plan.
+- `backend/tests/test_season_plan.py` and `backend/tests/test_plan_persistence.py`
+  cover deterministic dates, provenance, persistence, and the plan API contract.
+- `backend/tests/test_loop_integration.py` pins the server-authoritative farm id
+  injected into a fresh session; `tests/test_intake_and_memory.py` covers its
+  coexistence with remembered-farm context. Current combined verification: 359
+  tests passed, plus the frontend production build.
+- `TIER0_ACCEPTANCE.md` is the current release gate: it records each of the
+  eight required capabilities and the remaining fresh-live-trace verification.
+- `backend/kb/retrieval.py` is the local source-cited retrieval layer used by
+  `rag_query`; its orchestration is covered in `test_loop_integration.py`.

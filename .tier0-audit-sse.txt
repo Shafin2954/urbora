@@ -1,0 +1,369 @@
+data: {"type":"tool_call","id":"call_ZQV9FbNC4yBZnNt2v2BofZiG","name":"crop_scorer","params":{"district":"Rajshahi","soil_type":"loam","water_source":"irrigated","season":"rabi","area":3,"area_unit":"bigha","budget_bdt":20000},"ts":"2026-07-24T18:05:54.362+00:00","redacted":[]}
+
+data: {"type":"tool_result","id":"call_ZQV9FbNC4yBZnNt2v2BofZiG","name":"crop_scorer","result_raw":{"candidates":[{"crop":"mustard","composite_score":68.76,"components":[{"name":"Agronomic fit","points":15.0,"max":25.0,"provenance":{"value":15.0,"unit":null,"source_type":"static_table","source_id":"ais_bamis_2026","source_title":"AIS e-Krishi and BAMIS crop guidance","locator":"AIS কৃষিকথা ‘তেলজাতীয় ফসল সরিষার গুরুত্ব এবং চাষাবাদ পদ্ধতি’: sandy-loam to clay-loam; sow late Oct–mid Nov","retrieved_at":"2026-07-24T18:05:58+00:00","formula":"soil 'loam' vs mustard: primary=25/secondary=15/marginal=8","confidence":"medium"}},{"name":"Profit","points":25.0,"max":25.0,"provenance":{"value":160039.76,"unit":"BDT/ha","source_type":"computed","source_id":"agristats_bbs2025","source_title":"BBS Yearbook of Agricultural Statistics 2025","locator":null,"retrieved_at":"2026-07-24T18:05:58+00:00","formula":"(2216.22 kg/ha x 78.53 BDT/kg) - 14000 BDT/ha input cost; min-max normalized within candidate set","confidence":"medium"}},{"name":"Climate fit","points":11.49,"max":20.0,"provenance":{"value":11.49,"unit":null,"source_type":"computed","source_id":"ais_bamis_2026","source_title":"AIS e-Krishi and BAMIS crop guidance","locator":"AIS কৃষিকথা ‘তেলজাতীয় ফসল সরিষার গুরুত্ব এবং চাষাবাদ পদ্ধতি’: sandy-loam to clay-loam; sow late Oct–mid Nov","retrieved_at":"2026-07-24T18:05:58+00:00","formula":"mean_tmax=26.98, total_rain=185.1 vs optimal temp=(15.0, 29.0), rain=(0.0, 100.0) over growing months","confidence":"medium"}},{"name":"District track record","points":7.99,"max":20.0,"provenance":{"value":7.99,"unit":null,"source_type":"computed","source_id":"crop_scorer","source_title":"AgriSense crop scorer","locator":null,"retrieved_at":"2026-07-24T18:05:58+00:00","formula":"percentile 33.3 -> 0-18 scale + Holt trend 'up' adjustment +2","confidence":"medium"}},{"name":"Stability","points":9.28,"max":10.0,"provenance":{"value":9.28,"unit":null,"source_type":"dataset","source_id":"agribase_clean","source_title":"Validated derivative of supplied district yield dataset","locator":null,"retrieved_at":"2026-07-24T18:05:58+00:00","formula":"10*(1-CV) of 3 yearly yields, CV=0.072","confidence":"medium"}}],"excluded":false,"exclusion_reason":null,"water_need":"low","risk_level":"low","est_profit_bdt":64230.54,"provenance":[{"value":33.3,"unit":null,"source_type":"dataset","source_id":"agribase_clean","source_title":"Validated derivative of supplied district yield dataset","locator":"agribase_clean.db :: latest_district_yields","retrieved_at":"2026-07-24T18:05:58+00:00","formula":null,"confidence":"medium"},{"value":2216.22,"unit":null,"source_type":"computed","source_id":"crop.db/holt_projections","source_title":"AgriSense damped-Holt projection (in-event)","locator":null,"retrieved_at":"2026-07-24T18:05:58+00:00","formula":"last_observed over Rajshahi mustard, n=3 years; base ± band (residual sd). Projection, not a guarantee.","confidence":"low"},{"value":3,"unit":null,"source_type":"dataset","source_id":"agribase_clean","source_title":"Validated derivative of supplied district yield dataset","locator":"agribase_clean.db :: recommendation_yields","retrieved_at":"2026-07-24T18:05:58+00:00","formula":null,"confidence":"medium"}]},{"crop":"lentil","composite_score":52.4,"components":[{"name":"Agronomic fit","points":25.0,"max":25.0,"provenance":{"value":25.0,"unit":null,"source_type":"static_table","source_id":"ais_bamis_2026","source_title":"AIS e-Krishi and BAMIS crop guidance","locator":"AIS e-Krishi ‘মসুর’: well-drained loam; sow late Oct–early Nov; light irrigation only if moisture is deficient","retrieved_at":"2026-07-24T18:05:58+00:00","formula":"soil 'loam' vs lentil: primary=25/secondary=15/marginal=8","confidence":"medium"}},{"name":"Profit","points":0.0,"max":25.0,"provenance":{"value":114218.97,"unit":"BDT/ha","source_type":"computed","source_id":"agristats_bbs2025","source_title":"BBS Yearbook of Agricultural Statistics 2025","locator":null,"retrieved_at":"2026-07-24T18:05:58+00:00","formula":"(1305.48 kg/ha x 90.78 BDT/kg) - 4292.5 BDT/ha input cost; min-max normalized within candidate set","confidence":"medium"}},{"name":"Climate fit","points":18.55,"max":20.0,"provenance":{"value":18.55,"unit":null,"source_type":"computed","source_id":"ais_bamis_2026","source_title":"AIS e-Krishi and BAMIS crop guidance","locator":"AIS e-Krishi ‘মসুর’: well-drained loam; sow late Oct–early Nov; light irrigation only if moisture is deficient","retrieved_at":"2026-07-24T18:05:58+00:00","formula":"mean_tmax=27.18, total_rain=67.1 vs optimal temp=(10.0, 25.0), rain=(0.0, 100.0) over growing months","confidence":"medium"}},{"name":"District track record","points":0.0,"max":20.0,"provenance":{"value":0.0,"unit":null,"source_type":"computed","source_id":"crop_scorer","source_title":"AgriSense crop scorer","locator":null,"retrieved_at":"2026-07-24T18:05:58+00:00","formula":"percentile 10.2 -> 0-18 scale + Holt trend 'down' adjustment -2","confidence":"medium"}},{"name":"Stability","points":8.85,"max":10.0,"provenance":{"value":8.85,"unit":null,"source_type":"dataset","source_id":"agribase_clean","source_title":"Validated derivative of supplied district yield dataset","locator":null,"retrieved_at":"2026-07-24T18:05:58+00:00","formula":"10*(1-CV) of 3 yearly yields, CV=0.115","confidence":"medium"}}],"excluded":false,"exclusion_reason":null,"water_need":"low","risk_level":"medium","est_profit_bdt":45840.77,"provenance":[{"value":10.2,"unit":null,"source_type":"dataset","source_id":"agribase_clean","source_title":"Validated derivative of supplied district yield dataset","locator":"agribase_clean.db :: latest_district_yields","retrieved_at":"2026-07-24T18:05:58+00:00","formula":null,"confidence":"medium"},{"value":1305.48,"unit":null,"source_type":"computed","source_id":"crop.db/holt_projections","source_title":"AgriSense damped-Holt projection (in-event)","locator":null,"retrieved_at":"2026-07-24T18:05:58+00:00","formula":"last_observed over Rajshahi lentil, n=3 years; base ± band (residual sd). Projection, not a guarantee.","confidence":"low"},{"value":3,"unit":null,"source_type":"dataset","source_id":"agribase_clean","source_title":"Validated derivative of supplied district yield dataset","locator":"agribase_clean.db :: recommendation_yields","retrieved_at":"2026-07-24T18:05:58+00:00","formula":null,"confidence":"medium"}]},{"crop":"boro_rice","composite_score":0.0,"components":[],"excluded":true,"exclusion_reason":"Minimum cost 38538 BDT (96023/ha x 0.4013411328 ha) exceeds budget 20000 BDT.","water_need":"high","risk_level":"low","est_profit_bdt":0.0,"provenance":[{"value":38537.8511656919,"unit":"BDT","source_type":"computed","source_id":"agristats_bbs2025","source_title":"BBS Yearbook of Agricultural Statistics 2025","locator":null,"retrieved_at":"2026-07-24T18:05:58+00:00","formula":"min_cost_per_ha * area_ha vs budget","confidence":"medium"}]},{"crop":"aman_rice","composite_score":0.0,"components":[],"excluded":true,"exclusion_reason":"Not sown in rabi; aman_rice is a kharif2 crop.","water_need":"medium","risk_level":"low","est_profit_bdt":0.0,"provenance":[{"value":"rabi","unit":null,"source_type":"static_table","source_id":"ais_bamis_2026","source_title":"AIS e-Krishi and BAMIS crop guidance","locator":"BRRI ‘ধানের বর্ষপঞ্জিকা (আমন)’ and BAMIS rice-water guidance","retrieved_at":"2026-07-24T18:05:58+00:00","formula":"season exclusion","confidence":"medium"}]},{"crop":"potato","composite_score":0.0,"components":[],"excluded":true,"exclusion_reason":"Minimum cost 63224 BDT (157532/ha x 0.4013411328 ha) exceeds budget 20000 BDT.","water_need":"medium","risk_level":"low","est_profit_bdt":0.0,"provenance":[{"value":63224.13153341952,"unit":"BDT","source_type":"computed","source_id":"agristats_bbs2025","source_title":"BBS Yearbook of Agricultural Statistics 2025","locator":null,"retrieved_at":"2026-07-24T18:05:58+00:00","formula":"min_cost_per_ha * area_ha vs budget","confidence":"medium"}]}],"degraded":[]},"ts":"2026-07-24T18:05:58.787+00:00","redacted":[]}
+
+data: {"type":"tool_call","id":"call_kjHk4T9OaHatJmG1Vpig0G1V","name":"get_forecast","params":{"lat":24.3748,"lon":88.6042},"ts":"2026-07-24T18:05:58.787+00:00","redacted":[]}
+
+data: {"type":"tool_result","id":"call_kjHk4T9OaHatJmG1Vpig0G1V","name":"get_forecast","result_raw":{"source_type":"forecast","source_id":"open-meteo-forecast","source_title":"Open-Meteo 16-day forecast","locator":"https://api.open-meteo.com/v1/forecast","lat":24.3748,"lon":88.6042,"daily":[{"date":"2026-07-25","tmax_c":32.9,"tmin_c":25.9,"precip_mm":2.0},{"date":"2026-07-26","tmax_c":33.4,"tmin_c":25.9,"precip_mm":1.4},{"date":"2026-07-27","tmax_c":32.6,"tmin_c":26.1,"precip_mm":5.3},{"date":"2026-07-28","tmax_c":32.7,"tmin_c":26.1,"precip_mm":7.8},{"date":"2026-07-29","tmax_c":31.1,"tmin_c":25.7,"precip_mm":11.1},{"date":"2026-07-30","tmax_c":31.2,"tmin_c":25.8,"precip_mm":6.4},{"date":"2026-07-31","tmax_c":31.5,"tmin_c":25.9,"precip_mm":7.6},{"date":"2026-08-01","tmax_c":32.2,"tmin_c":25.0,"precip_mm":14.1},{"date":"2026-08-02","tmax_c":31.4,"tmin_c":25.4,"precip_mm":10.4},{"date":"2026-08-03","tmax_c":32.0,"tmin_c":25.7,"precip_mm":6.9},{"date":"2026-08-04","tmax_c":31.0,"tmin_c":25.7,"precip_mm":8.3},{"date":"2026-08-05","tmax_c":31.0,"tmin_c":25.6,"precip_mm":13.3},{"date":"2026-08-06","tmax_c":30.8,"tmin_c":25.6,"precip_mm":12.6},{"date":"2026-08-07","tmax_c":30.0,"tmin_c":25.3,"precip_mm":16.6},{"date":"2026-08-08","tmax_c":32.5,"tmin_c":25.4,"precip_mm":24.65},{"date":"2026-08-09","tmax_c":null,"tmin_c":null,"precip_mm":null}],"retrieved_at":"2026-07-24T18:05:59+00:00","cached":false},"ts":"2026-07-24T18:05:59.932+00:00","redacted":[]}
+
+data: {"type":"token","text":"আপ"}
+
+data: {"type":"token","text":"নার"}
+
+data: {"type":"token","text":" জম"}
+
+data: {"type":"token","text":"ির"}
+
+data: {"type":"token","text":" জন্য"}
+
+data: {"type":"token","text":" দুই"}
+
+data: {"type":"token","text":"টি"}
+
+data: {"type":"token","text":" ফ"}
+
+data: {"type":"token","text":"সল"}
+
+data: {"type":"token","text":"ের"}
+
+data: {"type":"token","text":" প্র"}
+
+data: {"type":"token","text":"স্ত"}
+
+data: {"type":"token","text":"াব"}
+
+data: {"type":"token","text":" এসেছে"}
+
+data: {"type":"token","text":":\n\n"}
+
+data: {"type":"token","text":"১"}
+
+data: {"type":"token","text":"."}
+
+data: {"type":"token","text":" **"}
+
+data: {"type":"token","text":"সর"}
+
+data: {"type":"token","text":"িষ"}
+
+data: {"type":"token","text":"া"}
+
+data: {"type":"token","text":" ("}
+
+data: {"type":"token","text":"Must"}
+
+data: {"type":"token","text":"ard"}
+
+data: {"type":"token","text":")"}
+
+data: {"type":"token","text":"**\n"}
+
+data: {"type":"token","text":"  "}
+
+data: {"type":"token","text":" -"}
+
+data: {"type":"token","text":" স্ক"}
+
+data: {"type":"token","text":"োর"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" "}
+
+data: {"type":"token","text":"68"}
+
+data: {"type":"token","text":"."}
+
+data: {"type":"token","text":"76"}
+
+data: {"type":"token","text":"\n"}
+
+data: {"type":"token","text":"  "}
+
+data: {"type":"token","text":" -"}
+
+data: {"type":"token","text":" সম্ভ"}
+
+data: {"type":"token","text":"াব"}
+
+data: {"type":"token","text":"্য"}
+
+data: {"type":"token","text":" লাভ"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" ৳"}
+
+data: {"type":"token","text":"64"}
+
+data: {"type":"token","text":","}
+
+data: {"type":"token","text":"230"}
+
+data: {"type":"token","text":"."}
+
+data: {"type":"token","text":"54"}
+
+data: {"type":"token","text":"\n"}
+
+data: {"type":"token","text":"  "}
+
+data: {"type":"token","text":" -"}
+
+data: {"type":"token","text":" জল"}
+
+data: {"type":"token","text":" প্র"}
+
+data: {"type":"token","text":"য়োজন"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" কম"}
+
+data: {"type":"token","text":"\n"}
+
+data: {"type":"token","text":"  "}
+
+data: {"type":"token","text":" -"}
+
+data: {"type":"token","text":" ঝ"}
+
+data: {"type":"token","text":"ুঁ"}
+
+data: {"type":"token","text":"কি"}
+
+data: {"type":"token","text":" স্ত"}
+
+data: {"type":"token","text":"র"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" কম"}
+
+data: {"type":"token","text":"\n\n"}
+
+data: {"type":"token","text":"২"}
+
+data: {"type":"token","text":"."}
+
+data: {"type":"token","text":" **"}
+
+data: {"type":"token","text":"ম"}
+
+data: {"type":"token","text":"স"}
+
+data: {"type":"token","text":"ুর"}
+
+data: {"type":"token","text":" ("}
+
+data: {"type":"token","text":"L"}
+
+data: {"type":"token","text":"ent"}
+
+data: {"type":"token","text":"il"}
+
+data: {"type":"token","text":")"}
+
+data: {"type":"token","text":"**\n"}
+
+data: {"type":"token","text":"  "}
+
+data: {"type":"token","text":" -"}
+
+data: {"type":"token","text":" স্ক"}
+
+data: {"type":"token","text":"োর"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" "}
+
+data: {"type":"token","text":"52"}
+
+data: {"type":"token","text":"."}
+
+data: {"type":"token","text":"4"}
+
+data: {"type":"token","text":"\n"}
+
+data: {"type":"token","text":"  "}
+
+data: {"type":"token","text":" -"}
+
+data: {"type":"token","text":" সম্ভ"}
+
+data: {"type":"token","text":"াব"}
+
+data: {"type":"token","text":"্য"}
+
+data: {"type":"token","text":" লাভ"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" ৳"}
+
+data: {"type":"token","text":"45"}
+
+data: {"type":"token","text":","}
+
+data: {"type":"token","text":"840"}
+
+data: {"type":"token","text":"."}
+
+data: {"type":"token","text":"77"}
+
+data: {"type":"token","text":"\n"}
+
+data: {"type":"token","text":"  "}
+
+data: {"type":"token","text":" -"}
+
+data: {"type":"token","text":" জল"}
+
+data: {"type":"token","text":" প্র"}
+
+data: {"type":"token","text":"য়োজন"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" কম"}
+
+data: {"type":"token","text":"\n"}
+
+data: {"type":"token","text":"  "}
+
+data: {"type":"token","text":" -"}
+
+data: {"type":"token","text":" ঝ"}
+
+data: {"type":"token","text":"ুঁ"}
+
+data: {"type":"token","text":"কি"}
+
+data: {"type":"token","text":" স্ত"}
+
+data: {"type":"token","text":"র"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" মাঝ"}
+
+data: {"type":"token","text":"ারি"}
+
+data: {"type":"token","text":"\n\n"}
+
+data: {"type":"token","text":"**"}
+
+data: {"type":"token","text":"ব"}
+
+data: {"type":"token","text":"র্জ"}
+
+data: {"type":"token","text":"িত"}
+
+data: {"type":"token","text":" ফ"}
+
+data: {"type":"token","text":"সল"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":"**\n"}
+
+data: {"type":"token","text":"-"}
+
+data: {"type":"token","text":" ব"}
+
+data: {"type":"token","text":"োর"}
+
+data: {"type":"token","text":"ো"}
+
+data: {"type":"token","text":" ধ"}
+
+data: {"type":"token","text":"ান"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" বাজ"}
+
+data: {"type":"token","text":"েট"}
+
+data: {"type":"token","text":"ের"}
+
+data: {"type":"token","text":" বাইরে"}
+
+data: {"type":"token","text":"\n"}
+
+data: {"type":"token","text":"-"}
+
+data: {"type":"token","text":" আম"}
+
+data: {"type":"token","text":"ন"}
+
+data: {"type":"token","text":" ধ"}
+
+data: {"type":"token","text":"ান"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" র"}
+
+data: {"type":"token","text":"বি"}
+
+data: {"type":"token","text":" মৌ"}
+
+data: {"type":"token","text":"স"}
+
+data: {"type":"token","text":"ুম"}
+
+data: {"type":"token","text":"ে"}
+
+data: {"type":"token","text":" চ"}
+
+data: {"type":"token","text":"াষ"}
+
+data: {"type":"token","text":" হয়"}
+
+data: {"type":"token","text":" না"}
+
+data: {"type":"token","text":"\n"}
+
+data: {"type":"token","text":"-"}
+
+data: {"type":"token","text":" আল"}
+
+data: {"type":"token","text":"ু"}
+
+data: {"type":"token","text":":"}
+
+data: {"type":"token","text":" বাজ"}
+
+data: {"type":"token","text":"েট"}
+
+data: {"type":"token","text":"ের"}
+
+data: {"type":"token","text":" বাইরে"}
+
+data: {"type":"token","text":"\n\n"}
+
+data: {"type":"token","text":"আপ"}
+
+data: {"type":"token","text":"নি"}
+
+data: {"type":"token","text":" কোন"}
+
+data: {"type":"token","text":" ফ"}
+
+data: {"type":"token","text":"সল"}
+
+data: {"type":"token","text":" চ"}
+
+data: {"type":"token","text":"াষ"}
+
+data: {"type":"token","text":" করতে"}
+
+data: {"type":"token","text":" চান"}
+
+data: {"type":"token","text":"?"}
+
+data: {"type":"done","usage":{"in_tokens":10543,"out_tokens":277,"cost_usd":0.001488}}
+
+

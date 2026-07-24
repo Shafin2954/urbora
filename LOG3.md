@@ -224,3 +224,53 @@ live area edit would have recomputed a projection the agent never made.
 **Rejected:** Building an extraction script for a 5-row + 8-row table (NOTES #18b — hand-curate small tables, no pipeline). Inventing a seed price or fertilizer-price estimate to complete mustard/lentil more fully — left as an honest partial rather than guessed.
 **Flagged, not done (recommended next steps):** (a) re-instating wheat as a 6th crop — `agristats.db` now has real wheat price+cost+district production data, but this reopens a deliberate prior scope decision and needs its own pass (crop.db regen, `CANON_TO_KEY`/`catalog.CROPS` updates, retest). (b) Curating the `crop_facts` KB seam (season/soil/water/climate) from the 4 staged PDFs — still the only fully-unavailable component set (Agronomic fit, Climate fit, Season/Soil/Water screening); a separate research pass, different content than the fertilizer-dose lookup done here.
 **Impacts:** none outstanding — single operator.
+
+## [23:05] Fix local-area tool contract and stale-schema guard
+**Did:** Preserved the pending scorer fix that replaces the model-facing `area_ha` input with `area` + `area_unit`, and performs the one conversion server-side through `units.py`. Strengthened the system prompt and both relevant tool descriptions: a farmer's stated value and unit must be passed unchanged; the model must never send `area_ha` or calculate hectares. Added regression coverage that rejects the old Python argument and asserts the published `crop_scorer` schema cannot expose it. Changed the root development command to use Uvicorn `--reload`. Added `TASKLIST.md` for the remaining scoped work. Targeted scorer/import tests: 37 passed.
+**Decision:** Local-unit conversion remains exclusively at the server intake edge. The LLM carries the farmer's value and unit verbatim.
+**Why:** A tool call containing `area_ha: 1.2` proves the model was given the obsolete schema and had to do forbidden unit arithmetic. The current contract makes that field impossible to advertise; reload prevents an old in-memory process from continuing to serve it during development.
+**Rejected:** Teaching or correcting the bigha-to-hectare factor in the prompt — any LLM conversion violates rule 1 regardless of whether the result happens to be numerically correct.
+**Impacts other instance:** YES — restart any already-running API process once so it loads the changed tool definitions; subsequent `crop_scorer` calls must contain `area` and `area_unit`, never `area_ha`.
+
+## [23:40] Tier 0 KB source extraction unblocked
+**Did:** Tested the four staged PDFs for the Tier 0 crop-facts and calendar work. Added pinned `pypdf==6.14.2` and `bijoy2unicode==0.1.1` to `backend/requirements.txt`. The handbook's text extraction initially appeared unreadable because it uses legacy Bijoy encoding; decoding it produces readable Bangla and page-level crop guidance. Confirmed readable potato irrigation guidance and located the handbook's pulse section for lentil/mustard curation.
+**Decision:** Curate from decoded, page-cited source text rather than inventing facts or abandoning the staged documents.
+**Why:** The PDFs are usable primary sources once their encoding is handled. This keeps season, soil, water, and checkpoint data traceable to the supplied materials.
+**Rejected:** Treating the glyph output as evidence that the sources are scanned/unusable; replacing source-backed facts with uncited defaults.
+**Impacts other instance:** no.
+
+## [00:20] Tier 0 scorer facts and climatology activated
+**Did:** Added `backend/kb/crop_facts.py` with the five supported crops' season, conservative soil fit, water requirement, growth-month and climate-band data, based on AIS e-Krishi and BAMIS guidance. The scorer now applies season/soil/water exclusions and Agronomic Fit from those facts, and fetches district climatology itself for Climate Fit. Updated scorer tests; 33 pass.
+**Decision:** A crop is excluded when cited facts do not support the farm's season, soil or water source. Climate remains honestly unavailable only if the climatology request fails.
+**Why:** This moves all crop recommendation decisions from model narration into deterministic code, as required by rule 1.
+**Rejected:** Leaving screening disabled while the data exists; asking the LLM to interpret source facts per farmer.
+**Impacts other instance:** YES — the agent narration must now report scorer exclusions and should no longer say that soil/water/climate checks are universally unavailable.
+
+## [00:45] Tier 0 sourced season plans, persistence, and live audit
+**Did:** Added a deterministic `season_plan` tool with source-cited tasks for all five supported crops; registered it in the tool contract and prompt; emitted/persisted `plan_update` through SQLite; implemented `GET /api/plan/{farm_id}`; and added the frontend Plan tab with provenance disclosure. Added plan and persistence tests. Ran a live SSE intake/scoring turn and fixed two real prompt extraction defects: explicit Rabi season and Bangla `দোআঁশ` soil now map to their tool values rather than being re-asked or converted to clay. Full backend suite: 76 passed. Frontend production build: passed.
+**Decision:** The model must provide only the confirmed crop and planting/transplant date; calendar task dates and all unit calculations are server-generated.
+**Why:** Tier 0 plans must be inspectable, repeatable and source-cited rather than narrative dates invented by the LLM.
+**Rejected:** Rendering a plan from chat prose; allowing unsupported crops to receive a guessed calendar.
+**Impacts other instance:** YES — the Plan tab is now populated by `plan_update`, and `/api/plan/{farm_id}` returns the persisted exact plan.
+
+## [01:00] Tier 0 verification rehearsal and intake corrections
+**Did:** Ran the combined required suite (`tests/` + `backend/tests/`): 358 passed. Verified live `GET /api/plan/{farm_id}` returns tasks with provenance. Ran a live Bangla scorer flow and a crop-to-plan handoff; the latter emitted a persisted `plan_update`. Corrected the session context so tool calls receive the exact server-authoritative farm_id rather than an invented one. Rehearsed the judged live area change through `/api/finance/recompute`: 2 bigha cost ৳3745.85, 3 bigha cost ৳5618.78, exactly 1.5×, with ROI unchanged (1143.14%).
+**Decision:** The server supplies the opaque farm id to new agent sessions; tool calls copy it exactly.
+**Why:** A model-created farm identifier persists a plan under the wrong farm and breaks memory/plan integrity.
+**Rejected:** Trusting a model-generated id; accepting a plan event without validating persistence and provenance.
+**Impacts other instance:** yes — the frontend receives a stable plan for the same farm used by Chat and Finance.
+
+## [01:25] Tier 0 final contract and demo verification
+**Did:** Attached each curated crop fact's source locator to scorer provenance, corrected stale README/tool comments that incorrectly said agronomy was unavailable, and strengthened the date/farm-id prompt rules. Combined authoritative farm-id and remembered-profile context into one fresh-session note so memory recall remains one-time. Added a regression test for that server-authored id. The full suite now reports **359 passed**; `npm run build` passes. API rehearsal confirmed simulator mode, geocode confirmation, forced `E1326` insufficient balance, and the deterministic 2→3 bigha finance update (`৳3745.85` → `৳5618.78`, exactly `1.5×`).
+**Decision:** The server gives the model the opaque plan key, but never changes or invents a remembered farm profile. Agronomy evidence is carried to the UI through the same provenance object as every other rendered value.
+**Why:** A source locator that remains in a Python constant is not inspectable provenance, and a model-generated plan key silently breaks farm continuity.
+**Rejected:** Tagging the current Git `HEAD` as `tier0-stable`: the completed Tier 0 work is intentionally uncommitted alongside pre-existing user changes, so such a tag would point at stale code.
+**Verification limitation:** The local browser connector had no available browser surface in this session. API/SSE, frontend production build, and contract tests were used for the final verification instead.
+**Impacts other instance:** none outstanding.
+
+## [02:10] Tier 0 acceptance audit and evidence UI
+**Did:** Audited the eight Tier 0 acceptance capabilities against live SSE, API, unit tests and the UI. Added a deterministic, source-cited `rag_query` retrieval layer with tests; the orchestration retrieves evidence before scorer/calendar work and supplies it with the deterministic result. Added an Evidence tab that exposes per-turn intake/weather/retrieval/ranking/finance/plan status and compact source evidence; normalized assistant-rendered Bangla digits to Western digits. Updated the seeded demo farm to 1 bigha, irrigated, ৳20,000 so it yields three viable Rabi candidates (mustard, lentil, Boro rice). Full suite: 362 passed; frontend build passed.
+**Decision:** Advanced work remains blocked until the acceptance file's live-session checks are green.
+**Why:** A source-level test is not a substitute for a judge-visible fresh API trace.
+**Rejected:** Calling Tier 0 done simply because the test suite is green; the live Uvicorn session did not yet expose the required `rag_query` trace event.
+**Impacts other instance:** YES — use `TIER0_ACCEPTANCE.md` as the gate; the default demo profile changed and must be reseeded/used by the frontend.

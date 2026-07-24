@@ -31,11 +31,11 @@ DEMO_FARM_ID = "demo-rajshahi"
 DEMO_FARM = {
     "name": "করিম উদ্দিন",
     "district": "Rajshahi",
-    "area": 2,
+    "area": 1,
     "area_unit": "bigha",
     "soil_type": "clay_loam",
-    "water_source": "tubewell",
-    "budget_bdt": 15000,
+    "water_source": "irrigated",
+    "budget_bdt": 20000,
     "season": "rabi",
 }
 

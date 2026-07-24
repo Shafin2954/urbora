@@ -7,6 +7,8 @@ openai==2.48.0            # LLM backend (Chat Completions, function tools, strea
 pydantic==2.13.4          # schemas.py — the frozen H1 contract
 python-dotenv==1.2.2      # load .env (secrets never in git)
 httpx==0.28.1             # Open-Meteo forecast/climatology + geocoder (direct use as of H1–H3)
+pypdf==6.14.2             # inspect staged source PDFs for citable KB extraction (added during Tier 0 curation)
+bijoy2unicode==0.1.1      # decode legacy Bijoy text extracted from staged Bangla PDFs
 
 # ── Dev / test ──
 pytest==9.1.1             # tests (rule 12 — run before every merge to main)

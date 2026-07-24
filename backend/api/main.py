@@ -19,6 +19,7 @@ from . import config, sse
 from .chat import router as chat_router
 from .checkout import router as checkout_router
 from .finance import router as finance_router
+from .plans import router as plans_router
 
 app = FastAPI(
     title="AgriSense API",
@@ -40,6 +41,7 @@ app.add_middleware(
 app.include_router(chat_router)
 app.include_router(checkout_router)
 app.include_router(finance_router)
+app.include_router(plans_router)
 
 
 @app.get("/api/health")

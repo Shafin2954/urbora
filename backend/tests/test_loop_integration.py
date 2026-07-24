@@ -56,8 +56,10 @@ class _ScriptedClient(OpenAIClient):
         super().__init__(AgentConfig(model="gpt-4o-mini", api_key="x", max_iterations=5))
         self._scripts = list(scripts)
         self._calls = 0
+        self.messages_seen = []
 
     def stream(self, messages, system=None, tools=None):
+        self.messages_seen.append(list(messages))
         chunks = self._scripts[self._calls]
         self._calls += 1
         return TurnStream(_stream=iter(chunks), _model=self.config.model,
@@ -137,3 +139,32 @@ def test_run_turn_farm_id_none_is_accepted_without_error(tmp_path, monkeypatch):
     client = _ScriptedClient([_final_script("ok")])
     events = _collect(run_turn(session_id="s4", farm_id=None, message="hi", client=client))
     assert not any(e["type"] == "error" for e in events)
+
+
+def test_run_turn_injects_authoritative_farm_id_for_a_fresh_session(tmp_path, monkeypatch):
+    _use_temp_db(tmp_path, monkeypatch)
+    client = _ScriptedClient([_final_script("ok")])
+
+    _collect(run_turn(
+        session_id="s5", farm_id="demo-rajshahi", message="hi", client=client,
+    ))
+
+    system_notes = [m["content"] for m in client.messages_seen[0] if m["role"] == "system"]
+    assert any("Authoritative farm_id" in note and "demo-rajshahi" in note for note in system_notes)
+
+
+def test_calendar_call_is_preceded_by_visible_kb_retrieval(tmp_path, monkeypatch):
+    _use_temp_db(tmp_path, monkeypatch)
+    client = _ScriptedClient([
+        _tool_script("season_plan", json.dumps({
+            "farm_id": "farm-1", "crop": "mustard", "start_date": "2026-10-30",
+        })),
+        _final_script("done"),
+    ])
+
+    events = _collect(run_turn(session_id="s6", farm_id="farm-1", message="plan", client=client))
+
+    calls = [event["name"] for event in events if event["type"] == "tool_call"]
+    assert calls == ["rag_query", "season_plan"]
+    calendar = next(event for event in events if event["type"] == "tool_result" and event["name"] == "season_plan")
+    assert calendar["result_raw"]["kb_evidence"]

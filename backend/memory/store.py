@@ -6,8 +6,8 @@ process-level call with no shared Python object), so `backend.agent.loop.run_tur
 loads it here, appends the new turn, and saves it back.
 
 `farms` exists for the Tier 1 "returning farmer" memory feature (PRD §4/§8) —
-schema only for now; the loop does not yet inject a stored FarmProfile into
-context. Tracked honestly as not-yet-wired rather than half-built silently.
+the profile is schema-only for now. Plans are persisted separately by farm id;
+the loop also injects the request's authoritative farm id for fresh sessions.
 """
 
 from __future__ import annotations
@@ -31,6 +31,13 @@ def _connect() -> sqlite3.Connection:
         """CREATE TABLE IF NOT EXISTS sessions (
             session_id TEXT PRIMARY KEY,
             messages_json TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )"""
+    )
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS plans (
+            farm_id TEXT PRIMARY KEY,
+            plan_json TEXT NOT NULL,
             updated_at TEXT NOT NULL
         )"""
     )
@@ -94,5 +101,28 @@ def save_farm(farm_id: str, profile: dict) -> None:
             (farm_id, json.dumps(profile, ensure_ascii=False), _now()),
         )
         conn.commit()
+    finally:
+        conn.close()
+
+
+def save_plan(farm_id: str, plan: dict) -> None:
+    """Persist the deterministic plan exactly as emitted to the client."""
+    conn = _connect()
+    try:
+        conn.execute(
+            "INSERT INTO plans (farm_id, plan_json, updated_at) VALUES (?,?,?) "
+            "ON CONFLICT(farm_id) DO UPDATE SET plan_json=excluded.plan_json, updated_at=excluded.updated_at",
+            (farm_id, json.dumps(plan, ensure_ascii=False), _now()),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def get_plan(farm_id: str) -> dict | None:
+    conn = _connect()
+    try:
+        row = conn.execute("SELECT plan_json FROM plans WHERE farm_id=?", (farm_id,)).fetchone()
+        return json.loads(row[0]) if row else None
     finally:
         conn.close()

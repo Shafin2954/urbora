@@ -115,6 +115,11 @@
   letter-spacing: 0.06em;
 }
 
+.plan-list { display: grid; gap: 12px; }
+.plan-task { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.plan-task p { margin: 6px 0; }
+.task-category, .weather-note { display: block; color: var(--muted); font-size: .9rem; }
+
 /* --- chat --- */
 
 .chat {
@@ -162,8 +167,28 @@
 .msg-text {
   font-size: 1.05rem;
   line-height: 1.65;
-  white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+/* Compact block/list spacing — browser defaults are too loose inside a chat
+   bubble; a farmer scanning a ranked crop list needs it tight, not airy. */
+.msg-text .msg-block,
+.msg-text .msg-list {
+  margin: 0;
+}
+
+.msg-text .msg-block + .msg-block,
+.msg-text .msg-block + .msg-list,
+.msg-text .msg-list + .msg-block {
+  margin-top: 0.6em;
+}
+
+.msg-text .msg-list {
+  padding-left: 1.4em;
+}
+
+.msg-text .msg-list li + li {
+  margin-top: 0.25em;
 }
 
 .caret {
@@ -807,6 +832,15 @@
   margin: 0;
   font-size: 1.05rem;
 }
+
+.evidence { display: grid; gap: 12px; }
+.evidence-intro { margin: 0; color: var(--ink-soft); }
+.capability-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; }
+.capability { display: grid; gap: 4px; padding: 10px; border: 1px solid var(--border); background: var(--surface-sunk); color: var(--ink-soft); }
+.capability.is-done { border-color: var(--leaf); color: var(--ink); }
+.capability span, .evidence-card small { color: var(--ink-faint); font-size: .78rem; }
+.evidence-card { border-left: 4px solid var(--leaf); padding: 10px 12px; background: var(--surface-sunk); }
+.evidence-card h3, .evidence-card p { margin: 0 0 6px; }
 
 .notice {
   border-left: 4px solid var(--clay);

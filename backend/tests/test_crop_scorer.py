@@ -416,13 +416,11 @@ def test_every_component_and_exclusion_has_provenance():
 
 # ── agent tool wrapper ────────────────────────────────────────────────────────
 def test_crop_scorer_tool_returns_candidates_and_degraded_list():
-    # As of 2026-07-24, data/prices.md carries real prices+costs for all 5 crops,
-    # so the finance seam is live and only the KB (crop_facts) gaps remain
-    # degraded: season/soil/water screening, Agronomic fit, Climate fit.
+    # Finance, cited crop facts, and district climatology are live.
     out = cs.crop_scorer_tool(district=RAJSHAHI, soil_type="clay_loam",
                               water_source="tubewell", season="rabi")
     assert "candidates" in out and len(out["candidates"]) == 5
-    assert "degraded" in out and len(out["degraded"]) == 3
+    assert "degraded" in out and len(out["degraded"]) == 0
     assert not any("Profit" in d for d in out["degraded"])
     assert all(isinstance(d, str) for d in out["degraded"])
     # Profit component itself must now be real, not "unavailable".
@@ -438,3 +436,62 @@ def test_crop_scorer_tool_never_raises_on_bad_input():
     out = cs.crop_scorer_tool(district="Nowhere", soil_type="clay_loam",
                               water_source="tubewell", season="rabi")
     assert "error" in out or "candidates" in out  # degrades, never crashes
+
+
+def test_crop_scorer_tool_converts_area_unit_server_side():
+    # Regression for the 2026-07-24 bug: crop_scorer_tool used to take a bare
+    # area_ha, forcing the LLM to convert "3 bigha" itself (rule 1 violation).
+    # 3 bigha != 3 hectares — a 7.47x overstatement if the conversion is skipped.
+    from backend.units import to_hectares
+    from backend.tools.crop_scorer import _finance_for
+
+    district = "Rajshahi"
+    finance, _gap = _finance_for(list(ALL_5), district)
+    assert finance is not None, "all 5 crops are priced as of the 2026-07-24 curation"
+
+    out_bigha = cs.crop_scorer_tool(
+        district=district, soil_type="clay_loam", water_source="tubewell",
+        season="rabi", area=3, area_unit="bigha",
+    )
+    # Hold `finance` identical to isolate exactly the area-conversion behavior.
+    from backend.kb.crop_facts import CROP_FACTS
+
+    direct_bigha = score_crops(
+        district=district, soil_type="clay_loam", water_source="tubewell",
+        season="rabi", area_ha=to_hectares(3, "bigha"), finance=finance,
+        crop_facts=CROP_FACTS,
+    )
+    by_crop_tool = {c["crop"]: c for c in out_bigha["candidates"]}
+    by_crop_direct = {c.crop: c for c in direct_bigha}
+    for crop, direct_c in by_crop_direct.items():
+        assert by_crop_tool[crop]["est_profit_bdt"] == pytest.approx(
+            direct_c.est_profit_bdt, rel=1e-6
+        )
+
+    # 3 bigha (~0.4013 ha) must NOT be treated as 3 hectares — the exact bug.
+    direct_3ha = score_crops(
+        district=district, soil_type="clay_loam", water_source="tubewell",
+        season="rabi", area_ha=3.0, finance=finance, crop_facts=CROP_FACTS,
+    )
+    est_3ha_by_crop = {c.crop: c.est_profit_bdt for c in direct_3ha}
+    for crop, direct_c in by_crop_direct.items():
+        if direct_c.est_profit_bdt > 0:
+            assert by_crop_tool[crop]["est_profit_bdt"] < est_3ha_by_crop[crop]
+
+    # The old bare `area_ha` kwarg must no longer be silently accepted.
+    with pytest.raises(TypeError):
+        cs.crop_scorer_tool(  # type: ignore[call-arg]
+            district=district, soil_type="clay_loam", water_source="tubewell",
+            season="rabi", area_ha=0.4,
+        )
+
+
+def test_crop_scorer_tool_schema_never_exposes_hectare_input():
+    from backend.agent.tools_spec import TOOL_DEFS
+
+    tool = next(tool for tool in TOOL_DEFS if tool["name"] == "crop_scorer")
+    properties = tool["input_schema"]["properties"]
+    assert "area" in properties
+    assert "area_unit" in properties
+    assert "area_ha" not in properties
+    assert "NEVER convert" in properties["area"]["description"]

@@ -20,9 +20,34 @@ from ..tools.cropdb import cropdb_sql
 from ..tools.finance import finance_projection
 from ..tools.geocode import geocode
 from ..tools.weather import get_climatology, get_forecast
+from ..tools.season_plan import season_plan
+from ..kb.retrieval import rag_query
 
 # Anthropic tool definitions (input_schema = JSON Schema, English descriptions).
 TOOL_DEFS: list[dict[str, Any]] = [
+    {
+        "name": "rag_query",
+        "description": (
+            "Retrieve source-cited passages from the curated local agronomy knowledge base. "
+            "Use English queries. You MUST call it before explaining a crop recommendation "
+            "and again for the chosen crop's calendar/fertilizer/irrigation advice; narrate "
+            "only what its returned passages support."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "English agronomy query"},
+                "crop": {"type": "string", "enum": ["boro_rice", "aman_rice", "potato", "mustard", "lentil"]},
+                "limit": {"type": "integer", "description": "1–5 results; default 3"},
+            },
+            "required": ["query"],
+        },
+    },
+    {
+        "name": "season_plan",
+        "description": "Create a source-cited calendar for a confirmed crop and confirmed planting/transplant date. Never write dates yourself; call this tool and narrate its tasks.",
+        "input_schema": {"type": "object", "properties": {"farm_id": {"type": "string"}, "crop": {"type": "string", "enum": ["boro_rice", "aman_rice", "potato", "mustard", "lentil"]}, "start_date": {"type": "string", "description": "confirmed YYYY-MM-DD planting or transplant date"}}, "required": ["farm_id", "crop", "start_date"]},
+    },
     {
         "name": "geocode",
         "description": (
@@ -108,12 +133,11 @@ TOOL_DEFS: list[dict[str, Any]] = [
         "description": (
             "Deterministic crop ranking (you must NEVER rank crops yourself — "
             "call this tool and narrate its output). Ranks boro_rice, aman_rice, "
-            "potato, mustard, lentil for a farm. Some components may be "
-            "unavailable depending on what data exists: 'Agronomic fit' and "
-            "'Climate fit' need the curated knowledge base, and 'Profit' plus "
-            "Budget screening need cited prices for EVERY candidate in "
-            "data/prices.md. The result's 'degraded' list names exactly what is "
-            "unavailable and why — you MUST relay it honestly in Bangla before "
+            "potato, mustard, lentil for a farm. It uses cited crop facts for "
+            "season, soil, water and climate checks. 'Profit' plus Budget "
+            "screening need cited prices for EVERY candidate in data/prices.md. "
+            "The result's 'degraded' list names any live source failure or "
+            "missing finance evidence; you MUST relay it honestly in Bangla before "
             "presenting any ranking, and never present a partial composite as a "
             "complete recommendation."
         ),
@@ -134,7 +158,15 @@ TOOL_DEFS: list[dict[str, Any]] = [
                     "type": "array", "items": {"type": "string"},
                     "description": "subset of the 5 supported crops; omit for all 5",
                 },
-                "area_ha": {"type": "number", "description": "farm area in hectares"},
+                "area": {
+                    "type": "number",
+                    "description": "Exact number stated by the farmer; NEVER convert it to hectares",
+                },
+                "area_unit": {
+                    "type": "string",
+                    "enum": ["bigha", "katha", "decimal", "acre", "hectare"],
+                    "description": "The farmer's stated unit for `area`; the server converts it, never the model",
+                },
                 "budget_bdt": {"type": "number", "description": "farmer's budget in BDT"},
             },
             "required": ["district", "soil_type", "water_source", "season"],
@@ -245,7 +277,7 @@ TOOL_DEFS: list[dict[str, Any]] = [
             "has no cited price or cost yet the tool returns "
             "error='price_data_unavailable' listing what is missing — say that "
             "plainly in Bangla ('তথ্য যথেষ্ট নয়') and do NOT estimate a number. "
-            "Pass the farmer's area in the unit they said it in; the tool converts. "
+            "Pass the farmer's exact area number and stated unit unchanged; the tool converts. "
             "If you pass budget_bdt it also returns whether the plan is affordable "
             "and the largest area that would fit — use that for a reduced-area "
             "replan instead of calculating one."
@@ -258,11 +290,14 @@ TOOL_DEFS: list[dict[str, Any]] = [
                     "description": "boro_rice | aman_rice | potato | mustard | lentil",
                 },
                 "district": {"type": "string", "description": "canonical district name"},
-                "area": {"type": "number", "description": "farm size as the farmer stated it"},
+                "area": {
+                    "type": "number",
+                    "description": "Exact number stated by the farmer; NEVER convert it to hectares",
+                },
                 "area_unit": {
                     "type": "string",
                     "enum": ["bigha", "katha", "decimal", "acre", "hectare"],
-                    "description": "unit for `area`; defaults to hectare",
+                    "description": "The farmer's stated unit for `area`; the server converts it, never the model",
                 },
                 "budget_bdt": {"type": "number", "description": "farmer's budget in BDT"},
             },
@@ -272,12 +307,14 @@ TOOL_DEFS: list[dict[str, Any]] = [
 ]
 
 _DISPATCH: dict[str, Callable[..., dict]] = {
+    "rag_query": rag_query,
     "geocode": geocode,
     "get_forecast": get_forecast,
     "get_climatology": get_climatology,
     "cropdb_sql": cropdb_sql,
     "crop_scorer": crop_scorer_tool,
     "finance_projection": finance_projection,
+    "season_plan": season_plan,
     "ask_farmer": ask_farmer,
     "remember_farm": remember_farm,
 }

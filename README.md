@@ -39,7 +39,8 @@ to you. That honesty is the product, not a limitation of it.
 | Selling prices (farm-gate) | `data/prices.md` | **Not yet curated.** Tables are empty; every consumer refuses rather than estimating |
 | Input costs (seed, fertiliser, labour) | `data/prices.md` | **Not yet curated.** Same |
 | Retail market prices | TCB daily bulletin, Dhaka, 24-07-2026 | **Real, cited, dated** — and deliberately *unreachable* from any revenue calculation. See below |
-| Crop calendars, fertiliser doses, soil/water suitability | BARC / BRRI / BARI documents | **Not curated.** The scorer reports these components "unavailable" rather than guessing |
+| Crop calendars and soil/water suitability for the five supported crops | AIS e-Krishi, BAMIS and BRRI guidance | **Curated and cited.** The scorer deterministically screens season, soil, water and district climatology; a failed source lookup is disclosed in its degraded list. |
+| Fertiliser doses | — | **Not yet curated.** The app does not invent dose recommendations. |
 | bdapps payments | Simulator matching the documented API shapes | **Simulated, labelled everywhere.** Live path exists and is config-gated |
 
 ### Why retail prices cannot become revenue
@@ -100,7 +101,7 @@ cd frontend && npm ci && cd ..
 # .env at the REPO ROOT (both halves read it from there)
 cp .env.example .env      # then fill in OPENAI_API_KEY
 
-.venv/Scripts/python -m uvicorn backend.api.main:app --port 8000
+.venv/Scripts/python -m uvicorn backend.api.main:app --reload --port 8000
 cd frontend && npm run dev        # http://localhost:5173, proxies /api to :8000
 ```
 

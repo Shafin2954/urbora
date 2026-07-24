@@ -8,21 +8,14 @@ this module's output (CLAUDE.md rule 1). Dependency status:
     exclusion and the Profit component — but only once a crop actually has a
     cited price and cost row. While prices.md's farm-gate table is empty, this
     still reports unavailable, for a data reason rather than a code reason.
-  * Curated BARC/BRRI/BARI KB markdown -> blocks the Season/Soil/Water
-    exclusions and the Agronomic fit + Climate fit components.
-
-Human decision (2026-07-24, logged LOG1.md): do NOT fabricate placeholder
-agronomy facts to fake the KB. Ship what's genuinely computable today —
-District track record + Stability, both straight from crop.db/agribase_clean.db
-via cropdb.py — and mark everything else honestly "unavailable" (never faked,
-never silently dropped). `crop_facts` / `finance` are typed, unpopulated seams:
-once B builds finance or real KB citations exist, supplying data through these
-same parameters activates the already-implemented, already-tested logic below —
-no rewrite needed.
+  * The cited AIS/BAMIS/BRRI facts in `backend/kb/crop_facts.py` drive the
+    Season/Soil/Water exclusions and Agronomic fit + Climate fit components.
+  * A component remains explicitly unavailable only when its live input (for
+    example district climatology or a cited finance row) cannot be retrieved.
 
 Pure core = no network, no DB writes. Reads crop.db/agribase_clean.db only via
-cropdb.py's existing read-only functions. Climatology (when the KB seam is
-eventually filled) is injected by the caller, never fetched inside this module.
+cropdb.py's existing read-only functions. Climatology is injected by the caller,
+never fetched inside the pure scoring core.
 """
 
 from __future__ import annotations
@@ -52,6 +45,8 @@ from .cropdb import (
     yield_track_record,
 )
 from .districts import lookup_district
+from .districts import DISTRICTS
+from backend.units import to_hectares
 
 DEFAULT_CANDIDATES: tuple[str, ...] = ("boro_rice", "aman_rice", "potato", "mustard", "lentil")
 
@@ -61,10 +56,7 @@ WATER_RANK: dict[str, int] = {"rainfed": 0, "tubewell": 1, "canal": 2, "irrigate
 
 @dataclass(frozen=True)
 class CropFacts:
-    """The KB seam. No production data is written here yet — deliberately
-    deferred (human decision, LOG1.md 2026-07-24). Populate once BARC/BRRI/BARI
-    crop calendar + soil + water + climate-band citations are curated; nothing
-    else in this module needs to change when that happens."""
+    """A cited, deterministic agronomy record for one supported crop."""
 
     crop: str
     seasons: frozenset[str]          # Season literals this crop is sown in
@@ -76,6 +68,9 @@ class CropFacts:
     temp_opt_c: tuple[float, float]  # (lo, hi) optimal mean tmax over growing months
     rain_opt_mm: tuple[float, float] # (lo, hi) optimal total rain over growing months
     growing_months: frozenset[int]   # 1-12
+    source_id: str = "crop_facts"
+    source_title: str = "AgriSense crop agronomy facts"
+    locator: str | None = None
 
 
 class CropFinance(TypedDict):
@@ -212,8 +207,9 @@ def _agronomic_fit(soil_type: str, facts: CropFacts | None, now: str) -> ScoreCo
         provenance=_prov(
             points,
             source_type="static_table",
-            source_id="crop_facts",
-            source_title="AgriSense crop agronomy facts",
+            source_id=facts.source_id,
+            source_title=facts.source_title,
+            locator=facts.locator,
             formula=f"soil '{soil_type}' vs {facts.crop}: primary=25/secondary=15/marginal=8",
             retrieved_at=now,
         ),
@@ -295,8 +291,9 @@ def _climate_fit(facts: CropFacts | None, climatology: dict | None, now: str) ->
         provenance=_prov(
             points,
             source_type="computed",
-            source_id="crop_scorer",
-            source_title="AgriSense crop scorer",
+            source_id=facts.source_id,
+            source_title=facts.source_title,
+            locator=facts.locator,
             formula=(
                 f"mean_tmax={mean_tmax}, total_rain={total_rain} vs optimal "
                 f"temp={facts.temp_opt_c}, rain={facts.rain_opt_mm} over growing months"
@@ -405,8 +402,8 @@ def score_crops(
                     f"Not sown in {season}; {crop} is a "
                     f"{'/'.join(sorted(facts.seasons))} crop."
                 )
-                notes = [_prov(season, source_type="static_table", source_id="crop_facts",
-                               source_title="AgriSense crop agronomy facts",
+                notes = [_prov(season, source_type="static_table", source_id=facts.source_id,
+                               source_title=facts.source_title, locator=facts.locator,
                                formula="season exclusion", retrieved_at=ts)]
                 excluded[crop] = (reason, notes)
                 continue
@@ -416,8 +413,8 @@ def score_crops(
                     f"{soil_type} soil is unsuitable for {crop} "
                     f"(suited to: {sorted(allowed_soil)})."
                 )
-                notes = [_prov(soil_type, source_type="static_table", source_id="crop_facts",
-                               source_title="AgriSense crop agronomy facts",
+                notes = [_prov(soil_type, source_type="static_table", source_id=facts.source_id,
+                               source_title=facts.source_title, locator=facts.locator,
                                formula="soil exclusion", retrieved_at=ts)]
                 excluded[crop] = (reason, notes)
                 continue
@@ -426,13 +423,11 @@ def score_crops(
                     f"{crop} needs at least water rank {facts.water_min_rank}; "
                     f"farm has '{water_source}' (rank {WATER_RANK.get(water_source, 0)})."
                 )
-                notes = [_prov(water_source, source_type="static_table", source_id="crop_facts",
-                               source_title="AgriSense crop agronomy facts",
+                notes = [_prov(water_source, source_type="static_table", source_id=facts.source_id,
+                               source_title=facts.source_title, locator=facts.locator,
                                formula="water exclusion", retrieved_at=ts)]
                 excluded[crop] = (reason, notes)
                 continue
-        # else: season/soil/water screening deferred — KB not yet curated (rule 2:
-        # never silently treat "no data" as "passes screening").
 
         if finance and area_ha is not None and budget_bdt is not None and crop in finance:
             total_cost = finance[crop]["min_cost_per_ha"] * area_ha
@@ -448,7 +443,7 @@ def score_crops(
                                formula="min_cost_per_ha * area_ha vs budget", retrieved_at=ts)]
                 excluded[crop] = (reason, notes)
                 continue
-        # else: budget check skipped — finance engine not yet built, or inputs missing.
+        # Otherwise the budget check is skipped because a needed finance input is absent.
 
         survivors.append(crop)
 
@@ -549,10 +544,19 @@ def crop_scorer_tool(
     water_source: str,
     season: str,
     candidates: list[str] | None = None,
-    area_ha: float | None = None,
+    area: float | None = None,
+    area_unit: str = "hectare",
     budget_bdt: float | None = None,
 ) -> dict:
     """Agent tool entrypoint.
+
+    `area`/`area_unit`, not `area_ha`: the caller (the LLM) passes the farmer's
+    area in whatever unit they stated it in, and this function converts once,
+    server-side, via units.to_hectares — mirroring finance_projection's pattern
+    exactly. CLAUDE.md rule 1 forbids the model from ever doing unit arithmetic
+    itself; a bare `area_ha` param silently required exactly that (bug found
+    2026-07-24: 3 bigha was passed straight through as if it were 3 hectares,
+    a 7.47x profit overstatement — logged in LOG3.md).
 
     `finance` is supplied from `data/prices.md` when — and only when — every
     candidate has a cited price and cost (see `PriceCatalog.scorer_finance`).
@@ -567,8 +571,22 @@ def crop_scorer_tool(
     since Climate fit needs both — fetching it now would spend an API call for
     nothing.
     """
+    # Delayed import avoids a type-definition cycle: the KB data is expressed
+    # as CropFacts instances defined in this module.
+    from backend.kb.crop_facts import CROP_FACTS
+
     crops = candidates or DEFAULT_CANDIDATES
     finance, finance_gap = _finance_for(crops, district)
+    area_ha = to_hectares(area, area_unit) if area is not None else None
+    canonical = lookup_district(district)
+    climate: dict[str, dict] | None = None
+    if canonical and canonical[0] in DISTRICTS:
+        from .weather import get_climatology
+
+        _division, lat, lon = DISTRICTS[canonical[0]]
+        climate_result = get_climatology(lat, lon)
+        if not climate_result.get("error") and climate_result.get("normals"):
+            climate = {crop: climate_result for crop in crops}
 
     try:
         results = score_crops(
@@ -580,19 +598,18 @@ def crop_scorer_tool(
             area_ha=area_ha,
             budget_bdt=budget_bdt,
             finance=finance,
-            climatology_by_crop=None,
-            crop_facts=None,
+            climatology_by_crop=climate,
+            crop_facts=CROP_FACTS,
         )
     except Exception as e:  # noqa: BLE001 — never crash the agent turn
         return {"error": f"crop_scorer failed: {e}"}
 
-    degraded = [
-        "Season/soil/water suitability screening: not yet available (KB not "
-        "curated) — all candidates with yield data are shown regardless of "
-        "fit; confirm manually.",
-        "Agronomic fit component: unavailable (KB not curated).",
-        "Climate fit component: unavailable (KB not curated).",
-    ]
+    degraded = []
+    if climate is None:
+        degraded.append(
+            "Climate fit component: unavailable because district climatology could not be retrieved; "
+            "season/soil/water screening and Agronomic fit use cited crop facts."
+        )
     if finance is None:
         degraded.append(f"Profit component and Budget screening: unavailable — {finance_gap}")
 

@@ -12,6 +12,7 @@ import { streamSSE } from '../api/sse.js'
  */
 
 const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+const westernDigits = (text) => String(text).replace(/[০-৯]/g, (digit) => '0123456789'['০১২৩৪৫৬৭৮৯'.indexOf(digit)])
 
 /**
  * Which farm this browser is talking about.
@@ -55,7 +56,9 @@ export function useChat() {
     (event) => {
       switch (event.type) {
         case 'token':
-          appendToken(event.text)
+          // The trace remains raw; farmer-facing assistant prose is normalized
+          // so it can be compared with the Western-number tool values.
+          appendToken(westernDigits(event.text))
           break
 
         case 'tool_call':

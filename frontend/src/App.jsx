@@ -4,6 +4,8 @@ import { apiUrl, fetchHealth } from './api/client.js'
 import ChatPanel from './components/ChatPanel.jsx'
 import CheckoutPanel from './components/CheckoutPanel.jsx'
 import FinancePanel from './components/FinancePanel.jsx'
+import PlanPanel from './components/PlanPanel.jsx'
+import EvidencePanel from './components/EvidencePanel.jsx'
 import TracePanel from './components/TracePanel.jsx'
 import { useChat } from './state/useChat.js'
 
@@ -92,6 +94,14 @@ export default function App() {
             হিসাব
           </button>
         )}
+        {chat.plan && (
+          <button role="tab" aria-selected={tab === 'plan'} className={`tab ${tab === 'plan' ? 'is-active' : ''}`} onClick={() => setTab('plan')}>
+            পরিকল্পনা
+          </button>
+        )}
+        <button role="tab" aria-selected={tab === 'evidence'} className={`tab ${tab === 'evidence' ? 'is-active' : ''}`} onClick={() => setTab('evidence')}>
+          প্রমাণ
+        </button>
         {basket && (
           <button
             role="tab"
@@ -137,6 +147,16 @@ export default function App() {
             />
           </section>
         )}
+        {chat.plan && (
+          <section className={`pane pane-plan ${tab === 'plan' ? 'is-active' : ''}`} aria-label="Season plan">
+            <h2 className="pane-title">মৌসুম পরিকল্পনা</h2>
+            <PlanPanel plan={chat.plan} />
+          </section>
+        )}
+        <section className={`pane pane-evidence ${tab === 'evidence' ? 'is-active' : ''}`} aria-label="Tier 0 evidence">
+          <h2 className="pane-title">Tier 0 প্রমাণ</h2>
+          <EvidencePanel trace={chat.trace} plan={chat.plan} finance={chat.finance} />
+        </section>
 
         {basket && (
           <section

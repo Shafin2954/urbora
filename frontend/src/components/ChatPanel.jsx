@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import InputRequest from './InputRequest.jsx'
+import MarkdownLite from '../lib/markdownLite.jsx'
 
 /**
  * The chat surface: transcript, the open input_request (if any), composer.
@@ -51,8 +52,8 @@ export default function ChatPanel({
           )
           .map((message, index, visible) => (
             <article key={message.id} className={`msg msg-${message.role}`}>
-              <p className="msg-text">
-                {message.text}
+              <div className="msg-text">
+                <MarkdownLite text={message.text} />
                 {/* Caret only on the message actually being written to, so
                     "thinking" is visible without a spinner that lies. */}
                 {streaming &&
@@ -60,7 +61,7 @@ export default function ChatPanel({
                   index === visible.length - 1 && (
                     <span className="caret" aria-label="উত্তর আসছে" />
                   )}
-              </p>
+              </div>
             </article>
           ))}
 

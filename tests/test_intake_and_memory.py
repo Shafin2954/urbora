@@ -205,13 +205,17 @@ def test_a_remembered_farm_is_handed_to_the_model(store):
     assert "do NOT re-ask" in note
 
 
-def test_an_unknown_farm_injects_nothing(store):
-    """Never fabricate a farm — a miss means the agent proceeds without context."""
+def test_an_unknown_farm_injects_only_the_authoritative_identifier(store):
+    """A miss must not fabricate a profile, but plan tools still need their key."""
     from backend.agent.loop import run_turn
 
     client = scripted_client()
     collect(run_turn(session_id="s2", farm_id="nobody", message="হ্যালো", client=client))
-    assert not [m for m in client.seen[0] if m["role"] == "system"]
+    notes = [m["content"] for m in client.seen[0] if m["role"] == "system"]
+    assert notes == [
+        "Authoritative farm_id for this session: 'nobody'. "
+        "When a tool requires farm_id, copy this value exactly."
+    ]
 
 
 def test_the_profile_is_injected_once_not_every_turn(store):
