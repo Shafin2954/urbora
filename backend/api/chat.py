@@ -5,15 +5,15 @@ routes are B's). The loop is imported lazily, so the API still boots and every
 other route still works if A's module is missing or broken — in that case the
 endpoint degrades honestly with an `error` event rather than pretending.
 
-Three things about A's actual `run_turn` shape the code below (LOG2 [04:45]):
+`run_turn(session_id, farm_id, message)` is an async generator yielding wire
+dicts. It owns the conversation history (backend/memory/store.py, SQLite WAL)
+and runs its own blocking work on a worker thread, so this route stays a thin
+transport wrapper — which is the whole point of the seam.
 
-  1. It takes `(messages, client=None, system=...)` — a conversation history,
-     not `(session_id, farm_id, message)`. B holds the history (sessions.py).
-  2. It is a **synchronous** generator doing blocking I/O, so it runs on a
-     worker thread (agent_bridge.py) rather than on the event loop.
-  3. It yields **raw** pydantic event models, including unredacted `tool_call`
-     / `tool_result` — by design, per schemas.py. `sse.format_sse` masks them
-     on the way out.
+Trace redaction happens twice on purpose: the loop builds tool events through
+`sse.tool_call` / `sse.tool_result`, and `sse.format_sse` masks anything that
+arrives unmasked anyway. Belt and braces, because a leaked bdapps password in
+the judge-facing trace panel is not a recoverable mistake.
 
 /api/dev/harness exists because the chat UI has to be built before the agent
 lands. Its events are contract-shaped but its content is deliberately, visibly
@@ -34,8 +34,7 @@ from fastapi import APIRouter, Request
 # of the request shape is how the two halves silently diverge.
 from backend.schemas import ChatRequest
 
-from . import sessions, sse
-from .agent_bridge import stream_sync_generator
+from . import sse
 
 router = APIRouter()
 
@@ -69,22 +68,21 @@ async def chat(payload: ChatRequest, request: Request):
             yield sse.done()
             return
 
-        session = sessions.get_session(payload.session_id, payload.farm_id)
-
-        async with session.lock:
-            session.messages.append({"role": "user", "content": payload.message})
-            try:
-                async for event in stream_sync_generator(
-                    lambda: run_turn(session.messages)
-                ):
-                    yield sse.from_agent_event(event)
-            except Exception as exc:  # noqa: BLE001
-                # A's loop catches its own failures and still emits `done`; this
-                # catches the ones it cannot — a bad call signature, an import
-                # that half-worked. Naming the exception beats a stream that
-                # just stops, which is indistinguishable from a dead network.
-                yield sse.error(f"agent turn failed: {type(exc).__name__}: {exc}")
-                yield sse.done()
+        try:
+            async for event in run_turn(
+                session_id=payload.session_id,
+                farm_id=payload.farm_id,
+                message=payload.message,
+            ):
+                yield sse.from_agent_event(event)
+        except Exception as exc:  # noqa: BLE001
+            # The loop catches its own in-turn failures and still emits `done`.
+            # This catches the ones it cannot: anything raised before the first
+            # yield — a missing OPENAI_API_KEY surfacing at client construction,
+            # a bad call signature. Naming the exception beats a stream that
+            # simply stops, which is indistinguishable from a dead network.
+            yield sse.error(f"agent turn failed: {type(exc).__name__}: {exc}")
+            yield sse.done()
 
     return sse.sse_response(events(), request)
 

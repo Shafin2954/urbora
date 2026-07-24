@@ -154,3 +154,41 @@ Append-only. Format defined in CLAUDE.md §1. Newest entry at the bottom.
 **Decision:** none beyond what's already logged (KB-deferral decision, prior entry).
 **Rejected:** none new.
 **Impacts other instance:** B — `crop_scorer` tool is live in the agent; until `backend/finance/` exists, every ranking will show Profit "unavailable" and the agent will disclose this — expected. No schema changes.
+
+## [10:23] Session store + async run_turn — entry reconstructed after the fact
+**Written by:** the single-operator takeover, not by Instance A. Commit `5581afc`
+("FASTAPI works unfinished", 24 Jul 19:23) shipped without a log entry, which
+CLAUDE.md §1 requires. Reconstructed from the diff so the record is complete;
+everything below is what the commit does, not a plan.
+**Did:** Split `agent/loop.py` in two — `run_turn_sync(messages, client, system)` is
+the unchanged pure engine, and a new `async def run_turn(session_id, farm_id, message)`
+is the real entrypoint `backend/api/chat.py` imports. It loads the session's history,
+appends the message, bridges the blocking generator onto a worker thread
+(`_sync_iter_to_async`, one `asyncio.to_thread` per `next()`), saves the history back,
+and yields **plain dicts** — building tool events via B's `sse.tool_call`/`sse.tool_result`
+so redaction stays structural. Added `backend/memory/store.py` (SQLite WAL: `sessions`
+and `farms` tables) + `backend/memory/__init__.py`. Added `tests/test_loop_integration.py`
+(scripted fake ChatBackend, no network) and `tests/test_memory_store.py`. Gitignored
+`backend/memory/memory.db*`.
+**Decision:** The agent owns conversation history, in SQLite rather than in memory.
+**Why:** Each POST is a fresh call with no shared Python object, so a session's history
+has to be persisted somewhere; SQLite means it also survives a restart, which the demo's
+returning-farmer opener needs (PLAN §5 step 1). The integration tests exist because the
+earlier "live verified" claim covered a hand-rolled script calling the sync engine
+directly — **not** B's actual API contract, which is what the demo runs on.
+**Rejected:** Keeping `run_turn` synchronous and making the API adapt (B had already
+built exactly that adapter — see below).
+**Incomplete, and now tracked rather than lost:**
+1. **`farm_id` is accepted and then ignored.** The `farms` table is created but nothing
+   ever reads or writes it, so a returning farmer is not actually recalled. That is a
+   judged behavior (PRD §4 Memory) and the demo's opening 20 seconds.
+2. **`Dhaka retail price.xlsx` was committed to the repo root** with no entry explaining
+   it. It is a TCB **retail** bulletin (Dhaka markets, dated 24-07-2026): milled rice,
+   split lentil dal, potato — no paddy, no mustard. Retail is roughly double farm-gate,
+   so using it as a farmer's selling price would overstate every revenue figure. It is
+   market context, not a revenue source, and prices.md now says so.
+3. `data/crop_schema.sql` still is not committed, though PRD §5 freezes it at H1.
+**Impacts other instance:** superseded — A and B merged into one operator at this point.
+The duplicate seam this created (B had independently built `api/sessions.py` +
+`api/agent_bridge.py` for the same job) was resolved in favour of this commit's version;
+see LOG3.md.
