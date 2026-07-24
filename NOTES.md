@@ -42,7 +42,9 @@ Ranked by kill-probability. Each has a mitigation. Hit one without a mitigation 
 
 17. **Bangla numerals in math tables.** → Western numerals in tables/trace/computed values; Bangla text around them. Trace panel English.
 
-18. **Market prices.** No reliable free live BD price API; inventing one = fake grounding. → data/prices.md, every row source + URL + date. No placeholders anywhere — real link or delete the row.
+18. **Market prices.** No reliable free live BD price API; inventing one = fake grounding. → SOLVED by BBS Yearbook Ch.10: harvest-time + wholesale prices 2023–24, hand-curated in-event into data/prices.md, each row table/page cited. Labor costs from Yearbook Ch.7.5 wages. Remaining input prices (seed, fertilizer) cited with URL + date or deleted. No placeholders anywhere.
+
+18b. **Yearbook extraction is mangled.** The PDF→markdown dump has broken tables. Do NOT write a general yearbook parser — 6-hour trap. Hand-curate ONLY the needed small tables (prices for demo crops, demo-region AEZ soil rows, wages, crop calendar) into clean CSV/markdown during the event. Programmatic parsing is only for the big yield/area tables via parse_agribase.py.
 
 19. **Trace leaking secrets.** bdapps auth rides in request bodies. → Redacting emitter: password/appId/key/token/secret → `***`; phone/subscriberId → last 3 digits. Unit-tested with fake bdapps payload.
 

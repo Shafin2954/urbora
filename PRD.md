@@ -72,7 +72,7 @@ Gate rule: items marked [GATED] may not be started until the `tier0-stable` tag 
 2. **Live weather grounding** — `get_forecast` (Open-Meteo 16-day, real, actionable) + `get_climatology` (Open-Meteo historical normals, real, planning assumption). Every weather claim labeled `source_type: forecast|climatology`. Bangla wording reflects it: forecast → "পূর্বাভাস অনুযায়ী"; climatology → "গত বছরের গড় অনুযায়ী, ভিন্ন হতে পারে". Climatology presented as predicted future rainfall = bug. No invented weather, ever.
 3. **Crop recommendation** — §4 scorer, ≥3 ranked candidates.
 4. **Season plan** — dated calendar land prep → harvest, tasks flagged `depends_on_weather`, each task with source.
-5. **Financial projection** — itemized costs; yield = damped-Holt base; three scenarios (conservative = base−band & price−10%, base, optimistic = base+band & price+10%); revenue, net profit, ROI, break-even yield AND break-even price. Prices from `data/prices.md`: every row cited with source name + URL + date collected — no placeholders, real link or delete the row. Computed only in `backend/finance/` pure functions with consistency unit tests. LLM never does arithmetic.
+5. **Financial projection** — itemized costs; yield = damped-Holt base; three scenarios (conservative = base−band & price−10%, base, optimistic = base+band & price+10%); revenue, net profit, ROI, break-even yield AND break-even price. Selling prices from BBS Yearbook Ch.10 (harvest-time + wholesale 2023–24) and labor costs from Yearbook Ch.7.5 wages, hand-curated in-event into `data/prices.md`: every row cited with source + table/page + date — no placeholders. Other input prices (seed, fertilizer) cited from BARC/DAE/market sources with URL + date, or the row is deleted. Computed only in `backend/finance/` pure functions with consistency unit tests. LLM never does arithmetic.
 6. **Explained reasoning** — §3 table + §5 provenance.
 7. **Knowledge base with RAG** — curated markdown from BARC/DAE guides + FAO-56 Kc table, written during the event from public sources; Chroma index generated in-event by `ingest.py`. Plus structured crop.db (see §8 data rules) via SQL tool. RAG queries formulated in English (cross-lingual fix), conversation stays Bangla.
 8. **Visible agent trace** — live panel streaming every tool call: name, params, raw results, timestamp. English. Redacted (§9). Any number in the plan traceable to an entry.
@@ -88,7 +88,7 @@ Gate rule: items marked [GATED] may not be started until the `tier0-stable` tag 
 ### Tier 2 (bonus, gated except payments)
 
 1. **bdapps CaaS checkout** (10 pts, treated as near-required, NOT gated): portal blocked pre-event (needs receiving URLs), so simulator is the primary path, built H3–H6 with exact request/response shapes from BDAPPS-API-REFERENCE.md including error paths (E1326 insufficient balance). Flow: confirmation step ("৳X কাটা হবে — নিশ্চিত?") → balance query → direct debit → Bengali SMS receipt (encoding 16). All-outbound; no public callback URL. `mode: live|simulator` labeled in UI + README. If portal unblocks before H15: whitelist venue IP, test real ৳2 debit on Robi SIM at H15–18; on-stage failure → one rehearsed click back to simulator.
-2. [GATED] SoilGrids REST cross-check of farmer-stated soil (second live external API, ~30 min).
+2. AEZ soil cross-check (NOT gated — cheap, offline): farmer-stated soil compared against BBS Yearbook Ch.1 AEZ district soil profile; disagreement → agent asks farmer to confirm (recovery moment #3). Replaces the earlier SoilGrids idea — local official data beats a live foreign API here. [GATED] SoilGrids stays available only as an extra if truly idle.
 3. Bengali-first interaction — core already; claim the accessibility bonus in README.
 4. [GATED] Market price intelligence / sell-store-wait.
 5. [GATED] PlantVillage leaf-photo disease detection (pretrained HF model only, no training).
@@ -114,9 +114,12 @@ All application code — including the agribase parser, damped-Holt fitting, Chr
 | District yield/area 2016–2024 + Holt projections | BBS National Yearbook (public raw data); parsed + fitted in-event | Real |
 | Fertilizer doses, crop calendars | BARC / DAE public guides, curated in-event | Real (curated) |
 | Crop water coefficients | FAO-56 Kc table | Real |
-| Input + selling prices | data/prices.md, every row source+URL+date | Real (static, dated, disclosed) |
+| Input + selling prices | BBS Yearbook 2024 Ch.10 (harvest-time + wholesale 2023–24), hand-curated in-event into data/prices.md, each row table+page cited | Real (official, dated) |
+| Labor wages | BBS Yearbook Ch.7.5 monthly agricultural wages 2023–24, curated in-event | Real |
+| District soil profile | BBS Yearbook Ch.1 AEZ tables (district → zone → texture/pH/fertility), curated in-event | Real |
+| Official crop calendar | BBS Yearbook Ch.1.8, curated in-event | Real |
+| District crop damage (risk refinement, optional) | BBS Yearbook Ch.4 | Real if included |
 | bdapps | Simulator matching documented shapes; live on Robi SIM if portal unblocks | Disclosed either way |
-| Soil cross-check | SoilGrids API [GATED] | Real if included |
 
 ## 9. Trace redaction (security)
 
