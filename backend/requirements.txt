@@ -3,7 +3,7 @@
 # Install:    `backend/.venv/Scripts/python -m pip install -r backend/requirements.txt`
 
 # ── Instance A core: agent / tools / kb / memory / schemas ──
-anthropic==0.119.0        # Claude API client (native tool use, streaming)
+openai==2.48.0            # LLM backend (Chat Completions, function tools, streaming) — PROVIDER per human A (deviates from PRD §11)
 pydantic==2.13.4          # schemas.py — the frozen H1 contract
 python-dotenv==1.2.2      # load .env (secrets never in git)
 httpx==0.28.1             # Open-Meteo forecast/climatology + geocoder (direct use as of H1–H3)

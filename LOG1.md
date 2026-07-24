@@ -100,3 +100,24 @@ Append-only. Format defined in CLAUDE.md §1. Newest entry at the bottom.
 **Why:** Rule 1 (LLM never computes/ranks) + injection safety; the deterministic scorer (H6–H9) reads the same data directly in Python.
 **Rejected:** Letting the model emit arbitrary SQL (injection + non-determinism).
 **Impacts other instance:** no (A territory). B's finance tool integration is separate.
+
+## [02:45] Data: wheat absent + maize CORRUPT in source → both need external collection
+**Did:** Investigated whether wheat/maize (PRD six-crop gap) exist in agribase_clean.db. Wheat: no key anywhere (only barley). Maize: present in `rejected_crop_rows` (keys rabi_maize/kharif_maize/maize_rabi_kharif) but CORRUPTED — e.g. Dinajpur rabi_maize ha=461,671 (> the whole district) at 331 kg/ha (real maize ≈8,000–9,000). Area column is national/misaligned. Attempted web-scrape of BBS sources: 45-yr major-crops PDF >10MB (over fetch limit), Kaggle login-gated SPA, yearbook = mangled-PDF trap (NOTES #18b).
+**Decision:** Do NOT recover maize (garbage = rule 2 violation). Both wheat AND maize need clean external district data. Gave human A a collection guide + CSV format: `data/raw/wheat_maize_district.csv` with columns crop_key,district,year(split),hectares,production_mt (yield computed in-event). Target Dinajpur+Rajshahi ≥3 yrs each min; all districts ideal (for percentile). Source: BBS Yearbook of Agricultural Statistics 2024/2022 district crop tables.
+**Why:** Can't fabricate; can't cleanly auto-scrape mangled yearbook PDFs.
+**Rejected:** Whitelisting the corrupt maize rows; auto-scraping the yearbook PDF blind.
+**Impacts other instance:** B — until the CSV lands, wheat+maize stay data-absent; demo crop set is boro/aman/potato/mustard/lentil.
+
+## [02:50] DECISION: switch app agent LLM Claude → OpenAI (human A approved)
+**Did:** Human A chose (via clarifying question) to run the AgriSense agent on OpenAI, not Claude. Re-implemented the LLM layer on the OpenAI SDK behind the existing provider-neutral `ChatBackend` interface. Files: `agent/config.py` (OPENAI_MODEL default gpt-4o-mini, temperature, OPENAI_API_KEY/BASE_URL), `agent/llm_client.py` (`OpenAIClient` + `TurnStream` streaming parser + `to_openai_tools` translation + cost table + `tool_result_message`), `agent/loop.py` refactored to the neutral interface (native OpenAI message history). requirements: `openai==2.48.0` replaces anthropic. `.env.example` → OPENAI_*. `tests/test_llm_backend.py` added (fake-stream parse, cost, translation). **28 tests green.**
+**Decision:** Chat Completions API (stable, tool + streaming); model env-configurable; cost `_PRICING` are best-effort (verify for account/date); OpenAI prompt caching is automatic so the Anthropic cache_control helper was dropped. Kept the `ChatBackend` Protocol so a Claude backend can return later.
+**Why:** Human A's explicit call. **Deviates from PRD §11 / CLAUDE.md / NOTES #5 (all mandate Claude/Sonnet).**
+**Rejected:** Responses API (less certain surface in this env); coupling the loop to OpenAI objects (kept it provider-neutral); the Anthropic backend (retained as latent option behind the Protocol).
+**Impacts other instance:** YES — B: (1) The **frozen SSE schema + all event shapes are UNCHANGED** — your redacting emitter + UI are unaffected; this is a pure A-internal backend swap. (2) **README/Q&A must now say the agent runs on OpenAI (model gpt-4o-mini/…), NOT Claude/Sonnet** — update any model claims. (3) Live end-to-end turn needs `OPENAI_API_KEY` in `backend/.env`.
+
+## [02:52] SECURITY: OpenAI key was pasted in chat → advised rotation
+**Did:** Human A pasted a live `sk-proj-...` OpenAI key in the conversation. Did NOT store, echo, or commit it. Told human A to revoke/rotate it (chat is logged → treat as compromised) and to put the new key in `backend/.env` themselves.
+**Decision:** none (secrets stay out of git — rule 8).
+**Why:** A plaintext key in a logged session is compromised.
+**Rejected:** Writing the key into .env/any file for them.
+**Impacts other instance:** B — same rule: never paste live secrets; .env only.

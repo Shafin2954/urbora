@@ -8,7 +8,7 @@ def test_schemas_import():
 
 
 def test_agent_import():
-    from backend.agent import AgentConfig, LLMClient, cached_system  # noqa: F401
+    from backend.agent import AgentConfig, LLMClient, to_openai_tools  # noqa: F401
     from backend.agent.prompts import SYSTEM_PROMPT
     from backend.agent.tools_spec import TOOL_DEFS, dispatch  # noqa: F401
     from backend.agent.loop import run_turn  # noqa: F401
