@@ -9,8 +9,13 @@
 #     -r api/requirements-api.txt
 # rather than restating them, so we never drift on a shared version.
 #
-# Direct deps B added: fastapi, uvicorn[standard], python-dotenv, pytest.
+# Direct deps B added: fastapi, uvicorn[standard], python-dotenv, pytest, httpx.
 # Everything else is transitive.
+#
+# httpx arrives transitively with anthropic, but backend/payments/client.py
+# imports it directly, so it is pinned explicitly here — A's requirements.txt
+# left that note against the same version.
+httpx==0.28.1
 
 PyYAML==6.0.3
 Pygments==2.20.0
