@@ -6,9 +6,12 @@
 anthropic==0.119.0        # Claude API client (native tool use, streaming)
 pydantic==2.13.4          # schemas.py — the frozen H1 contract
 python-dotenv==1.2.2      # load .env (secrets never in git)
+httpx==0.28.1             # Open-Meteo forecast/climatology + geocoder (direct use as of H1–H3)
+
+# ── Dev / test ──
+pytest==9.1.1             # tests (rule 12 — run before every merge to main)
 
 # ── Instance A adds later, pinned on first real use (placeholders, do NOT install yet) ──
-# httpx==<pin>                    # Open-Meteo forecast/climatology, geocoder, bdapps (httpx ships transitively with anthropic; pin explicitly when tools use it directly)
 # chromadb==<pin>                # in-event RAG index (backend/kb/ingest.py)
 # sentence-transformers==<pin>   # pre-cached embedding model, English queries
 
