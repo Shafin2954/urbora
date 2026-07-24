@@ -7,23 +7,25 @@ holding one JSON object, and the discriminator lives *inside* that JSON as
 client; adding a second naming system on the wire would only give us two places
 to typo an event name.
 
-NOT YET IMPLEMENTED HERE: the redacting trace emitter (PLAN.md H1-H3,
-NOTES.md #19). `tool_call` / `tool_result` payloads carry raw bdapps request
-bodies, which contain `password` and `applicationId`. Nothing may emit those
-two event types until the redactor exists and its unit test passes. The
-constructors below deliberately do not pretend to redact — a no-op redactor
-would be worse than none, because it would look safe.
+Trace redaction (NOTES.md #19) lives in redact.py and is applied *inside* the
+`tool_call` / `tool_result` constructors below. That is deliberate: there is no
+way to build one of those events without redacting, so no caller can forget.
+Raw bdapps request bodies carry `password` and `applicationId`, and the trace
+panel shows params verbatim — the two only coexist safely if masking is
+structural rather than remembered.
 """
 
 import asyncio
 import json
 from collections.abc import AsyncIterator
 from datetime import datetime, timezone
+from typing import Any
 
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 
 from . import config
+from .redact import redact
 
 # A comment line. Clients ignore it; it keeps idle connections from being
 # reaped by proxies or a dozing phone radio.
@@ -52,6 +54,38 @@ def format_sse(payload: dict) -> str:
 
 def token(text: str) -> dict:
     return {"type": "token", "text": text}
+
+
+def tool_call(call_id: str, name: str, params: Any) -> dict:
+    """A tool invocation, params redacted by construction.
+
+    `redacted` lists the field paths that were masked. It is additive to the
+    PLAN.md §2 shape — A produces nothing here, the emitter builds the event —
+    and it lets the trace panel show that masking was deliberate rather than
+    leaving a judge wondering why a field says `***`.
+    """
+    safe_params, redacted_paths = redact(params)
+    return {
+        "type": "tool_call",
+        "id": call_id,
+        "name": name,
+        "params": safe_params,
+        "ts": now_iso(),
+        "redacted": redacted_paths,
+    }
+
+
+def tool_result(call_id: str, name: str, result_raw: Any) -> dict:
+    """A tool's raw result, redacted by construction. See tool_call."""
+    safe_result, redacted_paths = redact(result_raw)
+    return {
+        "type": "tool_result",
+        "id": call_id,
+        "name": name,
+        "result_raw": safe_result,
+        "ts": now_iso(),
+        "redacted": redacted_paths,
+    }
 
 
 def done(in_tokens: int = 0, out_tokens: int = 0, cost_usd: float = 0.0) -> dict:
