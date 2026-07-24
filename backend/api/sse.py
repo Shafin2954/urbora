@@ -13,6 +13,19 @@ way to build one of those events without redacting, so no caller can forget.
 Raw bdapps request bodies carry `password` and `applicationId`, and the trace
 panel shows params verbatim — the two only coexist safely if masking is
 structural rather than remembered.
+
+A's agent loop, however, yields the *raw* pydantic event models by design
+(schemas.py: "tool_call / tool_result carry RAW params & results — the emitter
+(B) redacts"). Those never pass through the constructors, so `format_sse` is
+the second, final choke point: nothing reaches the wire without going through
+it, and it masks any trace event that has not already been masked.
+
+It distinguishes the two by the `redacted` field, which only our constructors
+add. That marker is load-bearing rather than cosmetic: redaction is NOT
+idempotent for phone numbers — masking `***678` a second time yields `***`,
+because it has three digits left — so "just redact everything again at the
+edge" would quietly destroy the last-3-digits affordance that lets a human
+confirm which SIM was charged.
 """
 
 import asyncio
@@ -36,16 +49,51 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
 
+_TRACE_TYPES = {"tool_call": "params", "tool_result": "result_raw"}
+
+
+def ensure_redacted(payload: dict) -> dict:
+    """Mask a trace event that has not already been masked.
+
+    Events built by the constructors below carry `redacted` and are returned
+    untouched — re-masking them would degrade phone masks (module docstring).
+    Everything else claiming to be a `tool_call` / `tool_result` is treated as
+    raw, which is exactly what A's loop yields.
+    """
+    field = _TRACE_TYPES.get(payload.get("type", ""))
+    if field is None or "redacted" in payload:
+        return payload
+    safe, redacted_paths = redact(payload.get(field))
+    return {**payload, field: safe, "redacted": redacted_paths}
+
+
 def format_sse(payload: dict) -> str:
     """Encode one event dict as an SSE frame.
+
+    The last thing every event passes through, and therefore where the "no
+    unredacted trace leaves the process" guarantee is actually enforced.
 
     `ensure_ascii=False` keeps Bangla readable on the wire instead of turning
     it into \\uXXXX soup — helps a lot when debugging with curl.
     Newlines inside the JSON would break the framing, so the separators are
     kept compact and the whole object stays on one line.
     """
-    body = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    body = json.dumps(
+        ensure_redacted(payload), ensure_ascii=False, separators=(",", ":"), default=str
+    )
     return f"data: {body}\n\n"
+
+
+def from_agent_event(event: Any) -> dict:
+    """Convert one event from A's loop into a wire dict.
+
+    A yields pydantic models from schemas.py; the dev harness and B's own
+    routes yield plain dicts. Both are accepted, and neither is redacted here —
+    `format_sse` does that for every event on one path, rather than this
+    function doing it for some of them.
+    """
+    dump = getattr(event, "model_dump", None)
+    return dump() if dump is not None else event
 
 
 # --- event constructors (PLAN.md §2 contract) -------------------------------

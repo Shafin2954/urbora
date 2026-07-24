@@ -1,11 +1,19 @@
 """Chat routes: the real /api/chat seam, and a dev harness for UI work.
 
 /api/chat is B's route wrapping A's agent loop (PLAN.md §1: agent is A's,
-routes are B's). The loop is imported lazily so that this file does not depend
-on A's module existing yet — until it does, the endpoint degrades honestly with
-an `error` event rather than pretending. The moment A pushes
-`backend/agent/loop.py` exposing `run_turn`, this route starts working with no
-change here.
+routes are B's). The loop is imported lazily, so the API still boots and every
+other route still works if A's module is missing or broken — in that case the
+endpoint degrades honestly with an `error` event rather than pretending.
+
+Three things about A's actual `run_turn` shape the code below (LOG2 [04:45]):
+
+  1. It takes `(messages, client=None, system=...)` — a conversation history,
+     not `(session_id, farm_id, message)`. B holds the history (sessions.py).
+  2. It is a **synchronous** generator doing blocking I/O, so it runs on a
+     worker thread (agent_bridge.py) rather than on the event loop.
+  3. It yields **raw** pydantic event models, including unredacted `tool_call`
+     / `tool_result` — by design, per schemas.py. `sse.format_sse` masks them
+     on the way out.
 
 /api/dev/harness exists because the chat UI has to be built before the agent
 lands. Its events are contract-shaped but its content is deliberately, visibly
@@ -26,16 +34,18 @@ from fastapi import APIRouter, Request
 # of the request shape is how the two halves silently diverge.
 from backend.schemas import ChatRequest
 
-from . import sse
+from . import sessions, sse
+from .agent_bridge import stream_sync_generator
 
 router = APIRouter()
 
 
 def _load_agent():
-    """Return A's `run_turn`, or None if the agent module isn't in the tree yet.
+    """Return A's `run_turn`, or None if the agent module isn't importable.
 
     Imported at call time, not module import time, so the API boots and every
-    other route keeps working while A's side is still being built.
+    other route keeps working when A's side is missing, mid-edit, or raising on
+    import (a missing provider dependency, for instance).
     """
     try:
         from backend.agent.loop import run_turn  # type: ignore
@@ -53,18 +63,28 @@ async def chat(payload: ChatRequest, request: Request):
             # Honest degradation (CLAUDE.md §2.2): say what is missing, in the
             # trace, rather than emitting something that looks like an answer.
             yield sse.error(
-                "Agent loop not wired yet (backend/agent/loop.py:run_turn not found). "
-                "API, SSE transport and trace are live; the agent is A's next drop."
+                "Agent loop not available (backend/agent/loop.py:run_turn could not "
+                "be imported). API, SSE transport and trace are live."
             )
             yield sse.done()
             return
 
-        async for event in run_turn(
-            session_id=payload.session_id,
-            farm_id=payload.farm_id,
-            message=payload.message,
-        ):
-            yield event
+        session = sessions.get_session(payload.session_id, payload.farm_id)
+
+        async with session.lock:
+            session.messages.append({"role": "user", "content": payload.message})
+            try:
+                async for event in stream_sync_generator(
+                    lambda: run_turn(session.messages)
+                ):
+                    yield sse.from_agent_event(event)
+            except Exception as exc:  # noqa: BLE001
+                # A's loop catches its own failures and still emits `done`; this
+                # catches the ones it cannot — a bad call signature, an import
+                # that half-worked. Naming the exception beats a stream that
+                # just stops, which is indistinguishable from a dead network.
+                yield sse.error(f"agent turn failed: {type(exc).__name__}: {exc}")
+                yield sse.done()
 
     return sse.sse_response(events(), request)
 
