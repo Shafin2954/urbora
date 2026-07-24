@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from ..tools.cropdb import cropdb_sql
 from ..tools.geocode import geocode
 from ..tools.weather import get_climatology, get_forecast
 
@@ -71,12 +72,40 @@ TOOL_DEFS: list[dict[str, Any]] = [
             "required": ["lat", "lon"],
         },
     },
+    {
+        "name": "cropdb_sql",
+        "description": (
+            "District crop-yield facts with provenance. Actions: 'district_yields' "
+            "(observed yield history kg/ha), 'holt_projection' (damped-Holt base "
+            "yield + band + n_points + trend — a projection, not a guarantee), "
+            "'yield_track_record' (district's latest yield percentile vs other "
+            "districts). Available crops: boro_rice, aman_rice, potato, mustard, "
+            "lentil. Wheat and maize have NO yield data — the tool returns an error "
+            "for them; report that honestly, never estimate."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": ["district_yields", "holt_projection", "yield_track_record"],
+                },
+                "crop": {
+                    "type": "string",
+                    "description": "boro_rice | aman_rice | potato | mustard | lentil",
+                },
+                "district": {"type": "string", "description": "canonical district name"},
+            },
+            "required": ["action", "crop", "district"],
+        },
+    },
 ]
 
 _DISPATCH: dict[str, Callable[..., dict]] = {
     "geocode": geocode,
     "get_forecast": get_forecast,
     "get_climatology": get_climatology,
+    "cropdb_sql": cropdb_sql,
 }
 
 

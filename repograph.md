@@ -15,13 +15,15 @@ A = Instance A (agent/tools/kb/memory/schemas/data) · B = Instance B (api/finan
 - `backend/tools/` — A. `districts.py` (hardcoded 64-district table + ALIASES + `lookup_district()` — geocode offline fallback, NOTES #6). `geocode.py` (`geocode(name)` → Open-Meteo geocoding, candidate list, `needs_confirmation`; falls back to districts.py on failure; never fabricates). `weather.py` (`get_forecast` 16-day source_type=forecast; `get_climatology` archive normals source_type=climatology; retry→disk-cache fallback labeled cached=True→honest `degraded` if no cache). Live-verified against Open-Meteo. Remaining tools (rag_query/cropdb_sql/crop_scorer/aez_soil_check/check_plan_conflicts) land H3–H12.
 - `backend/tests/` — A. `test_geocode_districts.py`, `test_weather.py`, `test_imports.py` — offline (network monkeypatched). Run: `backend/.venv/Scripts/python -m pytest backend/tests -q` from repo root. 16 tests, all green.
 - `backend/.cache/weather/` — A, gitignored. Disk cache of last-good weather responses (fallback source).
-- `backend/kb/` — A. empty (parse_agribase.py, holt.py, ingest.py, curated markdown land H3–H6).
+- `backend/kb/` — A. `holt.py` (in-event generator: reads `agribase_clean.db` recommendation_yields view → damped-Holt base+band+trend, writes `data/crop.db` holt_projections + meta with git sha/timestamp; NEVER modifies agribase_clean.db). Remaining: `ingest.py` (Chroma), curated KB markdown (needs source docs — H3–H6 human-curated).
+- `backend/tools/cropdb.py` — A. `cropdb_sql(action, crop, district)` tool: parameterized actions district_yields / holt_projection / yield_track_record over agribase_clean.db (safe views) + data/crop.db. NOT a raw-SQL surface. `CANON_TO_KEY` maps canonical crop names → db keys. Returns provenance-ready dicts (dataset=medium conf / computed=low-med).
 - `backend/memory/` — A. empty (SQLite WAL: farm profile/conversations/plans/alerts land H9–H12).
 - `backend/api/` `backend/finance/` `backend/payments/` `backend/units.py` — **B, not yet created.**
 
 ## data/
 - `data/raw/` — A. public yearbook extracts (empty, .gitkeep).
-- `crop.db` — A, generated in-event by parse_agribase.py (not yet built).
+- `data/crop.db` — A, generated in-event by `backend/kb/holt.py` from `agribase_clean.db`. Tables: holt_projections (crop_key, district, base_yield_kg_ha, band_kg_ha, n_points, trend, method, fitted_at) + meta (generated_at, git sha, source, disclaimer). 310 rows. Committed (meta-timestamped). Regenerate: `python -m backend.kb.holt`.
+- **CROP SET (from agribase_clean.db):** enabled = aman_rice, boro_rice, potato, mustard, lentil. **Wheat disabled (no source key), maize absent.** Diverges from PRD §3.2 six-crop (no wheat/maize; lentil is an extra). Rabi ranking candidates from data = boro/potato/mustard/lentil; kharif-2 = aman. OPEN for human A: confirm crop set or supply wheat/maize yield data.
 - `data/prices.md` — B (not yet created).
 
 ## Pre-existing at repo root (NOT created by this block — predates it)

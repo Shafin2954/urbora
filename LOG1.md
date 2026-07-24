@@ -72,3 +72,31 @@ Append-only. Format defined in CLAUDE.md §1. Newest entry at the bottom.
 **Why:** CLAUDE.md §3 — a real end-to-end turn precedes a merge to main; don't merge on tests alone for a loop I couldn't exercise live.
 **Rejected:** Merging H1–H3 to master now on the strength of offline tests only — the loop's live LLM path is unexercised.
 **Impacts other instance:** B — at the H3 sync we run A's loop through your SSE UI; that green run is the gate to merge H1–H3 to master.
+
+## [02:15] DECISION: build crop.db on existing agribase_clean.db (human A approved)
+**Did:** Per human A ("continue with the existing"), the yield data source is the pre-existing validated `agribase_clean.db`, NOT a fresh parse_agribase.py from raw yearbook extracts.
+**Decision:** Yield OBSERVATIONS come from agribase_clean.db (safe views only, never modified). Derived Holt PROJECTIONS are still generated in-event by holt.py into `data/crop.db` with meta timestamps + git sha.
+**Why:** Human's call; keeps momentum. Observations are a validated derivative already in the repo.
+**Rejected:** parse_agribase.py from raw extracts (the "rules-clean" path) — human chose existing.
+**Impacts other instance:** B — README MUST use the AGRIBASE_CLEANING.md disclosure wording: "District yield estimates are computed from a validated derivative of the supplied agricultural dataset; the in-database source citation is pending verification; recommendations disclose this limitation." **Rules-risk (NOTES #3):** agribase_clean.db predates the event; the derived crop.db is in-event, but raw source provenance is `pending_verification`. Do NOT claim BBS-verified. Flag for Q&A prep.
+
+## [02:18] CROP SET REALITY — diverges from PRD §3.2 (needs human A confirm)
+**Did:** Inspected agribase_clean.db coverage.
+**Decision:** Data-backed enabled crops = **aman_rice, boro_rice, potato, mustard, lentil**. **Wheat is DISABLED (no crop key in source), maize is ABSENT.** So the scorer's data-backed universe is these 5, NOT PRD §3.2's six (Boro/Wheat/Potato/Maize/Mustard/Aman). Lentil is a data-backed extra; wheat+maize cannot be ranked/costed without fabricating (PRD §5 rule 3) — cropdb_sql returns an honest error for them and the system prompt tells the agent to say so.
+**Why:** A crop with no yield series can't be ranked honestly. Demo still works: Rabi ranking candidates from data = boro/potato/mustard/lentil (≥3 ✓); "plant now" kharif-2 = aman.
+**Rejected:** Fabricating wheat/maize yields to hit the PRD six (violates rule 2/rule 3).
+**Impacts other instance:** B — the rehearsed demo script (PLAN §5) assumes Boro/Wheat/Potato/Maize/Mustard as Rabi candidates. With this data it's Boro/Potato/Mustard/Lentil. **Human A must decide:** (a) accept this 5-crop data-backed set + update demo script, or (b) source wheat/maize district yields. Until decided, treat wheat/maize as data-absent.
+
+## [02:20] Holt viability + crop.db generated
+**Did:** `backend/kb/holt.py` generates `data/crop.db` (310 projection rows). Damped-Holt (fixed α=0.5,β=0.3,φ=0.9) where a series has ≥4 points, else last-observed fallback, else single-point. Every row discloses `n_points` + `method` (NOTES #23). Result: 184 damped_holt / 123 last_observed / 3 single_point. Only aman has dense series (≥6 pts); boro/potato/mustard/lentil are thin (2–4 pts) → honest low confidence.
+**Decision:** Units = **kg/ha** (rule 11 internal=kg), deviating from PRD §5's `t_ha` column names — matches source units + finance engine. crop.db committed (meta-timestamped) as the demo lifeboat + judge-inspectable generated_at.
+**Why:** Deterministic, no optimizer → reproducible in-event; fixed smoothing params.
+**Rejected:** t/ha naming (would force a kg↔t conversion at the finance boundary); scipy/statsmodels Holt (heavy dep, non-deterministic optimization).
+**Impacts other instance:** B — finance engine consumes Holt `base_yield_kg_ha` (± `band_kg_ha`) as the yield input; note it's **kg/ha** and always carries a band. Three finance scenarios should use base, base−band, base+band.
+
+## [02:35] cropdb_sql tool wired into the agent + tests
+**Did:** `backend/tools/cropdb.py` — `cropdb_sql(action, crop, district)` with parameterized actions (district_yields / holt_projection / yield_track_record), read-only, provenance-ready. Registered in `agent/tools_spec.py` (schema + dispatch); system prompt got a "Yield data" section (band-always, wheat/maize-absent honesty). Added `tests/test_cropdb.py`. Full suite: **22 tests green**.
+**Decision:** cropdb_sql exposes fixed actions, NOT raw SQL from the LLM — safer + deterministic, still satisfies the "crop.db SQL tool" role.
+**Why:** Rule 1 (LLM never computes/ranks) + injection safety; the deterministic scorer (H6–H9) reads the same data directly in Python.
+**Rejected:** Letting the model emit arbitrary SQL (injection + non-determinism).
+**Impacts other instance:** no (A territory). B's finance tool integration is separate.

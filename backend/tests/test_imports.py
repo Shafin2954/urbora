@@ -14,7 +14,9 @@ def test_agent_import():
     from backend.agent.loop import run_turn  # noqa: F401
 
     assert SYSTEM_PROMPT.strip()
-    assert {t["name"] for t in TOOL_DEFS} == {"geocode", "get_forecast", "get_climatology"}
+    assert {t["name"] for t in TOOL_DEFS} == {
+        "geocode", "get_forecast", "get_climatology", "cropdb_sql",
+    }
 
 
 def test_dispatch_unknown_tool_is_safe():
