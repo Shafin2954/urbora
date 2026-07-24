@@ -56,6 +56,20 @@ Format:
 - Tag `tier0-stable` at H15. Late-night experiments must never make the tag unreachable.
 - Check PLAN.md before starting anything; off-schedule ideas go to the log as proposals.
 
+## Frontend rules (anti-slop + farmer-first)
+
+Design for the actual user: a farmer on a cheap Android phone, possibly outdoors in sunlight. Judges score function, not decoration.
+
+Banned: purple/blue "AI startup" gradients, glassmorphism/blur panels, decorative shadows/glows, abstract blobs and wave backgrounds, hero landing layouts, placeholder or fake content of any kind, template-energy sections.
+
+Do instead:
+- Hierarchy over decoration: spacing, size, and type communicate structure. Every element earns its place or gets deleted.
+- Farmer-first: large touch targets (≥44px), high contrast (sunlight-readable), big Bangla type (Noto Sans Bengali), one clear primary action per screen, minimal scrolling to key numbers (profit, next task).
+- Domain identity: earthy/agricultural palette, not SaaS defaults. Icons that aid low-literacy comprehension (💧 water, 🌱 sowing), never ornamental.
+- Motion only when it explains something (e.g., trace events arriving).
+
+Before finalizing any screen: clear primary action? every element purposeful? readable at arm's length in daylight? If in doubt, remove one layer of styling and strengthen hierarchy.
+
 ## 4. When in doubt
 
 - Uncertain cross-boundary interface → ask the human, don't guess.
