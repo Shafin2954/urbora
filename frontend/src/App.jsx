@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import './App.css'
 import { apiUrl, fetchHealth } from './api/client.js'
 import ChatPanel from './components/ChatPanel.jsx'
-import CheckoutPanel from './components/CheckoutPanel.jsx'
 import FinancePanel from './components/FinancePanel.jsx'
 import PlanPanel from './components/PlanPanel.jsx'
-import EvidencePanel from './components/EvidencePanel.jsx'
+import AlertPanel from './components/AlertPanel.jsx'
 import GraphPanel from './components/GraphPanel.jsx'
+import AuthScreen from './components/AuthScreen.jsx'
+import Sidebar from './components/Sidebar.jsx'
 import { useChat } from './state/useChat.js'
+import { useAuth } from './state/useAuth.js'
+import { useCrops } from './state/useCrops.js'
 
 /**
  * One responsive page (PRD.md §9): chat primary, with the provenance graph
@@ -29,13 +32,52 @@ import { useChat } from './state/useChat.js'
  */
 
 const HEALTH_POLL_MS = 10000
-const isDev = import.meta.env.DEV
+
+// Demo guest bypass (hackathon safety net — CLAUDE.md rule "venue wifi drops"
+// risk): the whole app otherwise sits behind a Supabase cloud login, which is
+// a single point of failure for a live demo. `?guest=1` in the URL or
+// VITE_DEMO_GUEST=true in .env skips it instantly (useful for a pre-set demo
+// link); the visible "অতিথি হিসেবে দেখুন" button below the real login lets a
+// judge get in with one click without knowing either exists. Guest identity
+// is a local stub only — it is never sent to Supabase. Backend routes that
+// require a real Supabase JWT (crop persistence, chat history) will still
+// degrade honestly rather than crash; see AuthScreen.jsx (not owned here) for
+// the real sign-in path.
+const GUEST_USER = { id: 'guest', email: 'guest@demo' }
+const GUEST_SESSION = { user: GUEST_USER, access_token: 'guest-demo-token' }
+
+function guestRequestedByUrlOrEnv() {
+  try {
+    if (new URLSearchParams(window.location.search).get('guest') === '1') return true
+  } catch { /* no window (SSR/test) — fall through to env */ }
+  return import.meta.env.VITE_DEMO_GUEST === 'true'
+}
 
 export default function App() {
-  const chat = useChat()
+  const realAuth = useAuth()
+  const [guestMode, setGuestMode] = useState(() => guestRequestedByUrlOrEnv())
+  const auth = guestMode
+    ? {
+        user: GUEST_USER,
+        session: GUEST_SESSION,
+        loading: false,
+        configured: true,
+        signIn: realAuth.signIn,
+        signUp: realAuth.signUp,
+        signOut: () => setGuestMode(false),
+      }
+    : realAuth
+  const crops = useCrops(auth.session)
+  const { activeCropId, update: updateCrop } = crops
+  const nameActiveCrop = useCallback((crop) => {
+    if (crop && activeCropId) updateCrop(activeCropId, { crop }).catch(() => {})
+  }, [activeCropId, updateCrop])
+  const nameActiveChat = useCallback((title) => {
+    if (title && activeCropId) updateCrop(activeCropId, { title }).catch(() => {})
+  }, [activeCropId, updateCrop])
+  const chat = useChat({ farmId: crops.activeCrop?.farm_id, sessionId: crops.activeCrop?.session_id, accessToken: auth.session?.access_token, onCropName: nameActiveCrop, onChatTitle: nameActiveChat })
   const [health, setHealth] = useState({ state: 'checking', text: 'checking…' })
   const [tab, setTab] = useState('chat')
-  const [basket, setBasket] = useState(null)
   // The chat and the Finance tab must key on the SAME farm, or the tab's area
   // edit would recompute a projection the agent never made.
   const farmId = chat.farmId
@@ -62,8 +104,40 @@ export default function App() {
     }
   }, [])
 
+  const guestButton = (
+    <button
+      type="button"
+      onClick={() => setGuestMode(true)}
+      style={{
+        position: 'fixed', bottom: '16px', left: '50%', transform: 'translateX(-50%)',
+        zIndex: 1000, padding: '12px 20px', minHeight: '44px', borderRadius: '8px',
+        border: '1px solid #2f6b3f', background: '#f7f4ec', color: '#2f6b3f',
+        fontWeight: 600, cursor: 'pointer',
+      }}
+    >
+      অতিথি হিসেবে দেখুন (ডেমো) — Continue as guest
+    </button>
+  )
+
+  if (auth.loading) return <main className="auth-screen"><p>লোড হচ্ছে…</p></main>
+  if (!auth.configured) return <main className="auth-screen"><p className="error">Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.</p>{guestButton}</main>
+  if (!auth.user) return <>
+    <AuthScreen auth={auth} />
+    {guestButton}
+  </>
+
   return (
     <div className="app">
+      <Sidebar
+        crops={crops.crops}
+        activeCropId={crops.activeCropId}
+        onSelect={crops.setActiveCropId}
+        onCreate={crops.create}
+        onUpdate={crops.update}
+        onDelete={crops.remove}
+        onSignOut={auth.signOut}
+      />
+      <div className="app-main">
       <header className="topbar">
         <div className="brand">
           <img src="/icon.svg" alt="" width="30" height="30" />
@@ -104,30 +178,17 @@ export default function App() {
             পরিকল্পনা
           </button>
         )}
-        <button role="tab" aria-selected={tab === 'evidence'} className={`tab ${tab === 'evidence' ? 'is-active' : ''}`} onClick={() => setTab('evidence')}>
-          প্রমাণ
-        </button>
-        {basket && (
-          <button
-            role="tab"
-            aria-selected={tab === 'checkout'}
-            className={`tab ${tab === 'checkout' ? 'is-active' : ''}`}
-            onClick={() => setTab('checkout')}
-          >
-            কেনাকাটা
-          </button>
-        )}
         <button
           role="tab"
           aria-selected={tab === 'trace'}
           className={`tab tab-trace ${tab === 'trace' ? 'is-active' : ''}`}
           onClick={() => setTab('trace')}
         >
-          Trace{chat.trace.length > 0 ? ` (${chat.trace.length})` : ''}
+          চিত্র{chat.trace.length > 0 ? ` (${chat.trace.length})` : ''}
         </button>
       </nav>
 
-      <div className="workspace">
+      {!crops.activeCrop ? <main className="empty-crop"><h2>শুরু করুন</h2><p>{crops.error ?? 'একটি নতুন আলাপ শুরু করুন।'}</p><button onClick={crops.create}>+ নতুন আলাপ</button></main> : <div className="workspace">
         <main className={`pane pane-chat ${tab === 'chat' ? 'is-active' : ''}`}>
           <ChatPanel
             messages={chat.messages}
@@ -156,151 +217,18 @@ export default function App() {
           <section className={`pane pane-plan ${tab === 'plan' ? 'is-active' : ''}`} aria-label="Season plan">
             <h2 className="pane-title">মৌসুম পরিকল্পনা</h2>
             <PlanPanel plan={chat.plan} />
+            <AlertPanel farmId={farmId} alerts={chat.alerts} onAlerts={chat.setAlerts} />
           </section>
         )}
-        <section className={`pane pane-evidence ${tab === 'evidence' ? 'is-active' : ''}`} aria-label="Tier 0 evidence">
-          <h2 className="pane-title">Tier 0 প্রমাণ</h2>
-          <EvidencePanel trace={chat.trace} />
-        </section>
-
-        {basket && (
-          <section
-            className={`pane pane-checkout ${tab === 'checkout' ? 'is-active' : ''}`}
-            aria-label="Checkout"
-          >
-            <CheckoutPanel basket={basket} onDone={() => setTab('chat')} />
-          </section>
-        )}
-
         <aside
           className={`pane pane-trace ${tab === 'trace' ? 'is-active' : ''}`}
-          aria-label="Agent trace"
+          aria-label="কাজের চিত্র"
         >
-          <h2 className="pane-title">Agent trace — provenance</h2>
-          <GraphPanel trace={chat.trace} usage={chat.usage} />
+          <h2 className="pane-title">কাজের চিত্র</h2>
+          <GraphPanel trace={chat.trace} usage={chat.usage} streaming={chat.streaming} />
         </aside>
+      </div>}
       </div>
-
-      {isDev && (
-        <DevBar
-          chat={chat}
-          onBasket={setBasket}
-          onFinance={async () => {
-            const response = await fetch(apiUrl('/api/finance/recompute'), {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                farm_id: farmId,
-                overrides: {
-                  crop: 'boro_rice',
-                  district: 'Rajshahi',
-                  area: 2,
-                  area_unit: 'bigha',
-                },
-              }),
-            })
-            const body = await response.json()
-            if (response.ok) setTab('finance')
-            else window.alert(body.detail ?? `HTTP ${response.status}`)
-            if (response.ok) chat.setFinance(body.finance)
-          }}
-        />
-      )}
     </div>
-  )
-}
-
-/**
- * A basket for exercising the checkout flow before the agent produces one.
- *
- * Visibly synthetic and in English, like the chat harness: it names itself a
- * harness and makes no agronomic claim, because a plausible-looking Bangla
- * fertiliser basket would be invented data (CLAUDE.md §2.2) and would
- * eventually be mistaken for the real thing.
- *
- * Total is ৳2.00 on purpose — NOTES #22: only ৳2 test debits on the Robi SIM.
- */
-const HARNESS_BASKET = {
-  label: 'UI harness basket — not a recommendation, no agronomic claim.',
-  farmId: 'harness-farm',
-  amount: 2.0,
-  items: [
-    { name: 'Harness item A', qty: 1, unit: 'unit', unit_price_bdt: 1.0 },
-    { name: 'Harness item B', qty: 1, unit: 'unit', unit_price_bdt: 1.0 },
-  ],
-}
-
-/**
- * The E1326 drill (NOTES #4): a basket above the simulator's ৳100 balance, so
- * the insufficient-balance recovery can be rehearsed on cue without draining
- * an account fifty times or adding a back door to the API.
- */
-const HARNESS_BASKET_OVER_BALANCE = {
-  ...HARNESS_BASKET,
-  label: 'UI harness basket — deliberately over the simulator balance (E1326 drill).',
-  amount: 500.0,
-  items: [{ name: 'Harness item A', qty: 1, unit: 'unit', unit_price_bdt: 500.0 }],
-}
-
-/**
- * Dev-only harness controls. Stripped from the production build by the
- * import.meta.env.DEV guard, so there is no chance of a "harness" button
- * appearing on stage.
- */
-// Each input_request replaces the previous one, so requesting one kind at a
-// time is the only way to actually interact with any but the last.
-const WIDGET_KINDS = ['district', 'soil_type', 'budget_bdt', 'area', 'name']
-
-function DevBar({ chat, onBasket, onFinance }) {
-  const [kind, setKind] = useState(WIDGET_KINDS[0])
-
-  return (
-    <footer className="devbar">
-      <span className="label">dev harness</span>
-      <button
-        className="secondary"
-        disabled={chat.streaming}
-        onClick={() => chat.send('harness', { endpoint: '/api/dev/harness' })}
-      >
-        Events
-      </button>
-      <select
-        className="field field-narrow"
-        value={kind}
-        onChange={(event) => setKind(event.target.value)}
-      >
-        {WIDGET_KINDS.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-      <button
-        className="secondary"
-        disabled={chat.streaming}
-        onClick={() => chat.send(kind, { endpoint: '/api/dev/harness/widgets' })}
-      >
-        Widget
-      </button>
-      <button className="secondary" onClick={() => onBasket(HARNESS_BASKET)}>
-        Basket
-      </button>
-      <button
-        className="secondary"
-        onClick={() => onBasket(HARNESS_BASKET_OVER_BALANCE)}
-      >
-        E1326
-      </button>
-      {/* Not a harness projection — this calls the REAL /api/finance/recompute
-          for the demo farm, so whatever it shows is what the engine computed
-          from data/prices.md. With the price tables still empty it surfaces the
-          server's honest refusal, which is exactly what should be on screen. */}
-      <button className="secondary" onClick={onFinance}>
-        Finance
-      </button>
-      <span className="muted">
-        contract-shaped events only — never farmer content
-      </span>
-    </footer>
   )
 }

@@ -1,0 +1,529 @@
+{
+  "_meta": {
+    "purpose": "Curated, individually-cited agronomy passages for backend/kb/retrieval.py's rag_query. Grown from the original 5-sentence corpus for Tier 0 KB scoring.",
+    "crops_covered": ["boro_rice", "aman_rice", "potato", "mustard", "lentil"],
+    "note": "Every passage carries source_title + locator (section/table + URL). confidence reflects how directly the number was verified this session: high = fetched and read the primary page directly; medium = a single named secondary source (research paper/extension guide) found via search; low = numbers that could not be cross-checked and should be verified against a current BARI/BARC table before farmer-facing use without hedging."
+  },
+  "passages": [
+    {
+      "id": "boro_transplant_spacing",
+      "crop": "boro_rice",
+      "topic": "sowing",
+      "title": "Boro transplanting age and spacing",
+      "text": "Boro rice seedlings are transplanted at 35-45 days old, with 1-2 cm standing water in the field. Row-to-row spacing is 20-25 cm and plant-to-plant 15-20 cm; 2-3 seedlings are set per hill at 2-3 cm depth.",
+      "source_title": "BAMIS Package & Practices: Boro Paddy",
+      "locator": "Transplanting section — https://www.bamis.gov.bd/croppnp/1/all/75",
+      "confidence": "high"
+    },
+    {
+      "id": "boro_fert_lowland",
+      "crop": "boro_rice",
+      "topic": "fertilizer",
+      "title": "Boro fertilizer dose — low land, >150 days",
+      "text": "For low-land Boro rice (duration over 150 days), BAMIS recommends per bigha: Urea 40 kg, TSP 13 kg, MoP 22 kg, Gypsum 15 kg, Zinc Sulphate 1.5 kg.",
+      "source_title": "BAMIS Package & Practices: Boro Paddy",
+      "locator": "Fertilizer table, low-land Boro — https://www.bamis.gov.bd/croppnp/1/all/75",
+      "confidence": "high"
+    },
+    {
+      "id": "boro_fert_midland",
+      "crop": "boro_rice",
+      "topic": "fertilizer",
+      "title": "Boro fertilizer dose — medium land, <150 days",
+      "text": "For medium-land Boro rice (under 150 days duration), BAMIS recommends per bigha: Urea 35 kg, TSP 12 kg, MoP 20 kg, Gypsum 15 kg, Zinc Sulphate 1.5 kg — slightly less urea and TSP than the low-land dose because of the shorter growth period.",
+      "source_title": "BAMIS Package & Practices: Boro Paddy",
+      "locator": "Fertilizer table, medium-land Boro — https://www.bamis.gov.bd/croppnp/1/all/75",
+      "confidence": "high"
+    },
+    {
+      "id": "boro_fert_haor",
+      "crop": "boro_rice",
+      "topic": "fertilizer",
+      "title": "Boro fertilizer dose — Haor basin",
+      "text": "In Haor (flash-flood-prone basin) areas, BAMIS recommends a reduced Boro dose per bigha: Urea 27 kg, TSP 12 kg, MoP 22 kg, Gypsum 8 kg, Zinc Sulphate 1.5 kg.",
+      "source_title": "BAMIS Package & Practices: Boro Paddy",
+      "locator": "Fertilizer table, Haor region — https://www.bamis.gov.bd/croppnp/1/all/75",
+      "confidence": "high"
+    },
+    {
+      "id": "boro_fert_split",
+      "crop": "boro_rice",
+      "topic": "fertilizer",
+      "title": "Boro urea split timing",
+      "text": "Urea is split into three doses for Boro rice: one third at the end of land preparation, one third at tiller emergence (20-25 days after the first dose), and one third 5-7 days before panicle initiation. TSP, MoP, Gypsum and Zinc Sulphate are applied in full at the end of land preparation.",
+      "source_title": "BAMIS Package & Practices: Boro Paddy",
+      "locator": "Fertilizer split-timing section — https://www.bamis.gov.bd/croppnp/1/all/75",
+      "confidence": "high"
+    },
+    {
+      "id": "boro_fert_barc_ha",
+      "crop": "boro_rice",
+      "topic": "fertilizer",
+      "title": "BARC national dose vs farmer practice (Boro)",
+      "text": "A BARC-derived national recommendation for Boro rice, reported in a peer-reviewed study of farmer fertilizer adoption in Dinajpur, is Urea 300, TSP 112, MoP 127, Gypsum 75 and Zinc Sulphate 11 kg per hectare — noticeably higher than farmers' traditional practice of about Urea 180, TSP 42, MoP 42 kg/ha.",
+      "source_title": "PLOS ONE: What influences Bangladeshi Boro rice farmers' adoption decisions of recommended fertilizer doses (Dinajpur case study)",
+      "locator": "Table citing BARC Fertilizer Recommendation Guide — https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0269611",
+      "confidence": "medium"
+    },
+    {
+      "id": "boro_irrigation_awd",
+      "crop": "boro_rice",
+      "topic": "irrigation",
+      "title": "Boro irrigation depth by growth stage",
+      "text": "After transplanting, Boro rice needs 2-3 cm standing water for the first 12-15 days. From tiller emergence to panicle initiation, maintain 5-7 cm water depth; from panicle stage to grain hardening, 2-5 cm is enough. During a cold wave, keep 5-7 cm water depth to protect the crop from cold injury.",
+      "source_title": "BAMIS Package & Practices: Boro Paddy",
+      "locator": "Irrigation schedule section — https://www.bamis.gov.bd/croppnp/1/all/75",
+      "confidence": "high"
+    },
+    {
+      "id": "boro_nutrient_topdress",
+      "crop": "boro_rice",
+      "topic": "fertilizer",
+      "title": "Boro deficiency top-dressing",
+      "text": "If Boro rice leaves yellow from sulphur deficiency, top-dress an extra 8 kg gypsum per bigha; if growth is stunted from zinc deficiency, add 1.5 kg zinc sulphate per bigha. In Haor areas, an extra 4-5 kg urea per bigha may be top-dressed if nitrogen deficiency appears.",
+      "source_title": "BAMIS Package & Practices: Boro Paddy",
+      "locator": "Nutrient deficiency management section — https://www.bamis.gov.bd/croppnp/1/all/75",
+      "confidence": "high"
+    },
+    {
+      "id": "boro_critical_temp",
+      "crop": "boro_rice",
+      "topic": "climate",
+      "title": "Boro cold-sensitive growth window",
+      "text": "Boro rice is most cold-sensitive between the booting and heading stage: 12-13°C in the morning and 28-29°C in the day is the critical range. At flowering, temperatures above 35°C damage the crop.",
+      "source_title": "BAMIS Package & Practices: Boro Paddy",
+      "locator": "Critical growth stages section — https://www.bamis.gov.bd/croppnp/1/all/75",
+      "confidence": "high"
+    },
+    {
+      "id": "boro_pest_stemborer",
+      "crop": "boro_rice",
+      "topic": "pest",
+      "title": "Boro stem borer control",
+      "text": "Rice stem borer can cause up to 95% yield loss in Boro rice if unmanaged. Bangladeshi farmers commonly apply Virtako 40WG (thiamethoxam 20% + chlorantraniliprole 20%) at 75 g per hectare for stem borer control.",
+      "source_title": "BioProtection Portal: Rice pest management — identification and control strategies",
+      "locator": "https://bioprotectionportal.com/resources/rice-pest-management-identification-and-control-strategies-to-protect-crop-yield/",
+      "confidence": "medium"
+    },
+    {
+      "id": "boro_pest_bph",
+      "crop": "boro_rice",
+      "topic": "pest",
+      "title": "Boro brown planthopper",
+      "text": "Brown planthopper (BPH) is one of the most damaging rice pests in Asia; it sucks sap causing wilting ('hopperburn') and transmits ragged stunt and grassy stunt viral diseases. The first major Bangladesh outbreak was recorded on Boro rice near Dhaka in April-May 1976. Using resistant varieties and clearing weeds from field bunds reduces BPH buildup.",
+      "source_title": "NCBI PMC: Molecular identification and eco-friendly management of rice brown planthoppers in Bangladesh",
+      "locator": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11334857/",
+      "confidence": "medium"
+    },
+    {
+      "id": "boro_weeding",
+      "crop": "boro_rice",
+      "topic": "weeding",
+      "title": "Boro weeding practice",
+      "text": "Weed Boro rice fields by hand or with weedicide before applying fertilizer, and incorporate the pulled weeds back into the soil rather than removing them.",
+      "source_title": "BAMIS Package & Practices: Boro Paddy",
+      "locator": "Intercultural operations section — https://www.bamis.gov.bd/croppnp/1/all/75",
+      "confidence": "high"
+    },
+    {
+      "id": "aman_transplant",
+      "crop": "aman_rice",
+      "topic": "sowing",
+      "title": "Aman transplanting window",
+      "text": "Transplant Aman rice uses 25-30 day old nursery seedlings, moved to the main field after the onset of sufficient monsoon rainfall.",
+      "source_title": "BAMIS National Agrometeorological Advisory Bulletin (27 Aug 2020)",
+      "locator": "https://www.bamis.gov.bd/res/bulletins/2020/08/27/20697.pdf",
+      "confidence": "medium"
+    },
+    {
+      "id": "aman_fert_landprep",
+      "crop": "aman_rice",
+      "topic": "fertilizer",
+      "title": "Aman basal fertilizer at land preparation",
+      "text": "At the final stage of land preparation for transplanted Aman, BAMIS advises applying TSP 90 kg/ha, MoP 70 kg/ha, Zinc Sulphate 11 kg/ha and Gypsum 60 kg/ha; urea is withheld at this stage for later split top-dressing.",
+      "source_title": "BAMIS National Agrometeorological Advisory Bulletin (27 Aug 2020)",
+      "locator": "https://www.bamis.gov.bd/res/bulletins/2020/08/27/20697.pdf",
+      "confidence": "medium"
+    },
+    {
+      "id": "aman_fert_research",
+      "crop": "aman_rice",
+      "topic": "fertilizer",
+      "title": "Aman fertilizer trial dose (BRRI dhan38)",
+      "text": "A field trial on BRRI dhan38 transplant Aman used Urea 180, TSP 100, MoP 70, Gypsum 60 and Borax 10 kg/ha, with urea applied as basal plus top-dress at 25, 45 and 65 days after transplanting; TSP, MoP, gypsum and borax were applied in full at final land preparation.",
+      "source_title": "Auctores Publishing: Growth and yield of transplant Aman rice (BRRI dhan38) as affected by weeding and zinc level",
+      "locator": "https://auctoresonline.org/article/growth-and-yield-of-transplant-aman-rice-brri-dhan38-as-affected-by-weeding-and-zinc-level",
+      "confidence": "medium"
+    },
+    {
+      "id": "aman_pest_ysb",
+      "crop": "aman_rice",
+      "topic": "pest",
+      "title": "Aman yellow stem borer",
+      "text": "Yellow stem borer is the dominant Aman rice pest: larvae feeding inside the stem cause 'dead heart' at tillering and a chaffy 'white ear head' if they attack at panicle formation, with reported yield loss up to 80% in late-planted crops. Clipping seedling tips at transplanting reduces carryover from the nursery; BAMIS advisories recommend Carbofuran at 10 kg/ha when infestation is detected.",
+      "source_title": "IRRI Rice Knowledge Bank (stem borer fact sheet); BAMIS National Agrometeorological Advisory Bulletin (27 Aug 2020)",
+      "locator": "http://www.knowledgebank.irri.org/training/fact-sheets/pest-management/insects/item/stem-borer ; https://www.bamis.gov.bd/res/bulletins/2020/08/27/20697.pdf",
+      "confidence": "medium"
+    },
+    {
+      "id": "aman_disease_blast",
+      "crop": "aman_rice",
+      "topic": "disease",
+      "title": "Aman blast fungicide treatment",
+      "text": "For rice blast in Bangladesh, Tricyclazole 75% WP at 300 g active ingredient per hectare was the most effective rate in field trials, applied as a foliar spray as soon as blast appears and repeated at 15-day intervals; seed can also be treated with Tricyclazole 75WP at 1.5 g per kg of seed.",
+      "source_title": "Agronomy Journals: Efficacy of tricyclazole 75% WP on paddy blast",
+      "locator": "https://www.agronomyjournals.com/archives/2025/vol8issue11/PartD/8-10-151-582.pdf",
+      "confidence": "medium"
+    },
+    {
+      "id": "aman_disease_sheathblight",
+      "crop": "aman_rice",
+      "topic": "disease",
+      "title": "Aman sheath blight and water management",
+      "text": "Sheath blight (Rhizoctonia solani) typically appears late in the Aman season; since no rice variety offers complete resistance, chemical fungicide control is the main management route. Alternate wetting and drying (AWD) irrigation, instead of continuous flooding, reduces both sheath blight and bacterial leaf blight incidence.",
+      "source_title": "NCBI PMC: Rhizoctonia solani Kuhn pathophysiology — sheath blight disease management in rice",
+      "locator": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9111526/",
+      "confidence": "medium"
+    },
+    {
+      "id": "aman_calendar",
+      "crop": "aman_rice",
+      "topic": "calendar",
+      "title": "Aman calendar overview",
+      "text": "Aman rice is a Kharif-2 crop. Its calendar includes land preparation, transplanting, nitrogen timing, weeding, water checks, pest checkpoints, and harvest.",
+      "source_title": "BRRI 'ধানের বর্ষপঞ্জিকা (আমন)' and BAMIS rice-water guidance",
+      "locator": "BRRI Aman calendar; BAMIS rice-water guidance",
+      "confidence": "high"
+    },
+    {
+      "id": "aman_water",
+      "crop": "aman_rice",
+      "topic": "irrigation",
+      "title": "Aman water-sensitive stages",
+      "text": "Aman is mainly rainfed (Kharif-2, monsoon season) with medium water need; supplementary irrigation is only needed to cover dry spells at the tillering and panicle-initiation stages, which are the crop's most water-sensitive points.",
+      "source_title": "BAMIS rice-water guidance (Aman)",
+      "locator": "BAMIS rice-water guidance, Aman section",
+      "confidence": "medium"
+    },
+    {
+      "id": "aman_growing_window",
+      "crop": "aman_rice",
+      "topic": "climate",
+      "title": "Aman growing window and climate",
+      "text": "Aman rice is grown across July-November (Kharif-2), with an optimum rainfall range of about 800-1500 mm and temperature range 20-36°C for the season.",
+      "source_title": "AIS e-Krishi and BAMIS crop guidance",
+      "locator": "AIS/BAMIS climatology summary",
+      "confidence": "high"
+    },
+    {
+      "id": "aman_weeding",
+      "crop": "aman_rice",
+      "topic": "weeding",
+      "title": "Aman weeding before top-dress",
+      "text": "Weed transplanted Aman by hand or with a recommended herbicide before top-dressing urea, so weeds do not intercept the applied nitrogen.",
+      "source_title": "BAMIS National Agrometeorological Advisory Bulletin (27 Aug 2020)",
+      "locator": "https://www.bamis.gov.bd/res/bulletins/2020/08/27/20697.pdf",
+      "confidence": "medium"
+    },
+    {
+      "id": "potato_sowing_window",
+      "crop": "potato",
+      "topic": "sowing",
+      "title": "Potato sowing windows",
+      "text": "Potato is sown in two windows in Bangladesh: the main Rabi season from 15 October to 15 November, and a smaller Kharif-1 (spring) planting from 15 February to 15 March.",
+      "source_title": "BAMIS Crop Weather Information: Potato",
+      "locator": "https://www.bamis.gov.bd/en/crops/view/52/",
+      "confidence": "high"
+    },
+    {
+      "id": "potato_temp",
+      "crop": "potato",
+      "topic": "climate",
+      "title": "Potato temperature requirements",
+      "text": "Potato needs a soil temperature around 18-20°C at planting for good sprouting. Tuber formation slows above 25°C and is almost fully inhibited at 29°C; 15-18°C soil temperature favours tuber growth.",
+      "source_title": "BAMIS Crop Weather Information: Potato",
+      "locator": "https://www.bamis.gov.bd/en/crops/view/52/",
+      "confidence": "high"
+    },
+    {
+      "id": "potato_water_need",
+      "crop": "potato",
+      "topic": "irrigation",
+      "title": "Potato rainfall and soil moisture needs",
+      "text": "Well-distributed rainfall of about 400-600 mm is enough to cover early potato varieties through their vegetative period; optimum soil moisture is 65-80% of field capacity, and heavy rain alternating with dry spells damages the crop.",
+      "source_title": "BAMIS Crop Weather Information: Potato",
+      "locator": "https://www.bamis.gov.bd/en/crops/view/52/",
+      "confidence": "high"
+    },
+    {
+      "id": "potato_ais",
+      "crop": "potato",
+      "topic": "irrigation",
+      "title": "Potato irrigation schedule",
+      "text": "Potato is a Rabi crop suited to sandy-loam or loam. Irrigate around 20-25, 40-45, and 60-65 days after planting; inspect weeds and pests before each irrigation.",
+      "source_title": "AIS e-Krishi 'আলু'",
+      "locator": "AIS e-Krishi 'আলু'",
+      "confidence": "high"
+    },
+    {
+      "id": "potato_fert_dose",
+      "crop": "potato",
+      "topic": "fertilizer",
+      "title": "Potato BARI fertilizer dose",
+      "text": "A Bangladesh baseline study of potato fertilizer practice reports BARI-recommended doses of Urea 320-350 kg/ha, TSP 220-250 kg/ha, MoP 220-250 kg/ha, Gypsum 100-120 kg/ha, Zinc Sulphate 8-10 kg/ha, Boron 6-8 kg/ha, plus 5-10 tonnes/ha of cowdung.",
+      "source_title": "NCBI PMC: Fertilizer management practices in potato cultivation — a baseline study for the introduction of GE potato in Bangladesh",
+      "locator": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11272610/",
+      "confidence": "medium"
+    },
+    {
+      "id": "potato_fert_split",
+      "crop": "potato",
+      "topic": "fertilizer",
+      "title": "Potato fertilizer split timing",
+      "text": "For potato, apply the full TSP, MoP, Gypsum and Boric acid dose plus half the urea as basal fertilizer before or at planting; apply the remaining half of the urea as a side-dress at about 30 days after planting.",
+      "source_title": "NCBI PMC: Fertilizer management practices in potato cultivation — a baseline study for the introduction of GE potato in Bangladesh",
+      "locator": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11272610/",
+      "confidence": "medium"
+    },
+    {
+      "id": "potato_disease_blight",
+      "crop": "potato",
+      "topic": "disease",
+      "title": "Potato late blight fungicide rotation",
+      "text": "Late blight is the major potato disease in Bangladesh. Farmers commonly rotate mancozeb-based fungicides (Agrizeb), metalaxyl+mancozeb combinations (Sundomil) and dimethomorph+mancozeb (Acrobat MZ); a Tuber Crops Research Sub-Centre (Bogra) trial of 13 fungicides found all of them significantly reduced late blight incidence versus an untreated control.",
+      "source_title": "GGF Journals: Control of late blight disease of potato by using new fungicides (TCRSC Bogra trial)",
+      "locator": "https://ggfjournals.com/assets/uploads/10-151.pdf",
+      "confidence": "medium"
+    },
+    {
+      "id": "potato_disease_biocontrol",
+      "crop": "potato",
+      "topic": "disease",
+      "title": "Potato blight biofungicide option",
+      "text": "In a BARI-related trial, a Trichoderma harzianum-based biofungicide (marketed as Lycomax) was the most effective treatment against both late blight and early blight of potato, while a mancozeb product (Agrizeb) worked better specifically against early blight.",
+      "source_title": "ScienceDirect: Efficacy of Trichoderma harzianum as a biological fungicide against fungal diseases of potato",
+      "locator": "https://www.sciencedirect.com/science/article/pii/S2773078623000286",
+      "confidence": "medium"
+    },
+    {
+      "id": "potato_pest_survey",
+      "crop": "potato",
+      "topic": "pest",
+      "title": "Potato pest prevalence survey",
+      "text": "A survey across 20 upazilas in 10 major potato-growing districts of Bangladesh found 98.5% of fields infested by one or more of: cutworm, aphid, potato tuber worm, leaf miner, mole cricket, field cricket and leafhoppers.",
+      "source_title": "Academia.edu: Efficacy of soil insecticides against sucking pests of potato",
+      "locator": "https://www.academia.edu/93306722/Efficacy_of_Soil_Insecticides_Against_Sucking_Pests_of_Potato",
+      "confidence": "medium"
+    },
+    {
+      "id": "potato_pest_aphid",
+      "crop": "potato",
+      "topic": "pest",
+      "title": "Potato aphid control and virus risk",
+      "text": "Imidacloprid (17.8SL) gave the strongest reduction in potato aphid population, 78-82%, in field trials. Aphids matter beyond direct sap-sucking damage because they spread potato viruses such as PVY; insecticide controls resident aphid colonies well but does not stop virus inoculation by migrating winged aphids carrying the virus.",
+      "source_title": "Cornell University: Potato Virus Y (PVY) — aphid vectors (Management of Potato Tuber Necrotic Viruses)",
+      "locator": "https://blogs.cornell.edu/potatovirus/pvy/aphid-vectors-of-pvy/",
+      "confidence": "medium"
+    },
+    {
+      "id": "potato_salinity_sun",
+      "crop": "potato",
+      "topic": "climate",
+      "title": "Potato salinity and sunshine needs",
+      "text": "Potato is moderately sensitive to soil salinity and needs 6-9 hours of sunshine a day for good growth.",
+      "source_title": "BAMIS Crop Weather Information: Potato",
+      "locator": "https://www.bamis.gov.bd/en/crops/view/52/",
+      "confidence": "high"
+    },
+    {
+      "id": "mustard_sowing_window",
+      "crop": "mustard",
+      "topic": "sowing",
+      "title": "Mustard sowing window and climate",
+      "text": "Mustard is sown from 15 October to 15 November in the Rabi season (a smaller Kharif-1 window runs 15 February-15 March). It grows well at air temperature 15-29°C, soil temperature 13-27°C, sunshine 5.0-8.5 hours and relative humidity 64-83%; cloudy, rainy, high-humidity weather hampers growth.",
+      "source_title": "BAMIS Crop Weather Information: Mustard",
+      "locator": "https://www.bamis.gov.bd/en/crops/view/44/",
+      "confidence": "high"
+    },
+    {
+      "id": "mustard_ais",
+      "crop": "mustard",
+      "topic": "sowing",
+      "title": "Mustard sowing and weeding (AIS)",
+      "text": "Mustard is a Rabi crop. Sow from late October to mid-November in sandy-loam through clay-loam soil. Keep the crop free of weeds and inspect it at crop stages.",
+      "source_title": "AIS কৃষিকথা 'তেলজাতীয় ফসল সরিষার গুরুত্ব এবং চাষাবাদ পদ্ধতি'",
+      "locator": "AIS কৃষিকথা 'তেলজাতীয় ফসল সরিষার গুরুত্ব এবং চাষাবাদ পদ্ধতি'",
+      "confidence": "high"
+    },
+    {
+      "id": "mustard_fert_dose",
+      "crop": "mustard",
+      "topic": "fertilizer",
+      "title": "Mustard basal fertilizer dose (unverified zinc figure)",
+      "text": "A study of chemical fertilizer use in mustard production in Bangladesh reports basal doses of TSP 120 kg/ha, MoP 90 kg/ha, Gypsum 65 kg/ha and Boric acid 2 kg/ha at final land preparation, with nitrogen (urea) applied separately. The same source's Zinc Sulphate figure (45 kg/ha) is far above the range typically used for oilseeds elsewhere in this corpus (single digits to low tens) and could not be independently verified this session — treat it as unconfirmed and check a current BARI table before quoting it to a farmer.",
+      "source_title": "VU Bangladesh: Assessment of Chemical Fertilizer Use in Mustard Production",
+      "locator": "https://vu.edu.bd/uploads/media/images/13-kiron-finalpdf.pdf",
+      "confidence": "low"
+    },
+    {
+      "id": "mustard_n_response",
+      "crop": "mustard",
+      "topic": "fertilizer",
+      "title": "Mustard nitrogen response range",
+      "text": "Field nitrogen trials on BARI mustard varieties tested urea/nitrogen rates from 0 up to 225 kg N/ha; 150 and 220 kg N/ha gave the highest seed protein content in one such trial. This is response-trial data, not a single official recommended dose — use it as a plausible range, not a fixed number.",
+      "source_title": "Bangladesh mustard nitrogen-response literature (multiple field trials)",
+      "locator": "search-derived synthesis of BARI Sarisha nitrogen trials; verify against a current BARC Fertilizer Recommendation Guide entry",
+      "confidence": "low"
+    },
+    {
+      "id": "mustard_boron_foliar",
+      "crop": "mustard",
+      "topic": "fertilizer",
+      "title": "Mustard foliar boron spray timing",
+      "text": "For BARI Sarisha-14, two foliar sprays of 1% boron solution — at the vegetative stage and again at pod (siliqua) formation — increased yield and yield-contributing traits compared with soil-applied boron alone.",
+      "source_title": "AGRIS/FAO record: Maximizing yield of mustard through zinc and boron fertilization",
+      "locator": "https://agris.fao.org/search/en/records/64e71f7d6a37d977ef6cd6ad",
+      "confidence": "medium"
+    },
+    {
+      "id": "mustard_disease_alternaria",
+      "crop": "mustard",
+      "topic": "disease",
+      "title": "Mustard Alternaria blight spray schedule",
+      "text": "Alternaria blight is a recurring mustard disease in Bangladesh. BAMIS advisories recommend spraying Eprodione fungicide at the approved dose as soon as the disease appears, repeated 3-4 times at 10-12 day intervals.",
+      "source_title": "BAMIS Disease Information: Mustard",
+      "locator": "https://www.bamis.gov.bd/en/diseases/1/all/44/",
+      "confidence": "medium"
+    },
+    {
+      "id": "mustard_water_need",
+      "crop": "mustard",
+      "topic": "irrigation",
+      "title": "Mustard irrigation need",
+      "text": "Mustard is a Rabi crop grown mainly on residual soil moisture; it needs little supplemental irrigation and is sensitive to waterlogging. Where irrigation is available, a single light watering at flowering/pod (siliqua) formation is the most valuable application if the soil is visibly dry.",
+      "source_title": "AIS কৃষিকথা 'তেলজাতীয় ফসল সরিষার গুরুত্ব এবং চাষাবাদ পদ্ধতি'",
+      "locator": "AIS কৃষিকথা, irrigation guidance (extended from source generalities — confirm exact stage wording before quoting verbatim)",
+      "confidence": "medium"
+    },
+    {
+      "id": "mustard_pest_aphid",
+      "crop": "mustard",
+      "topic": "pest",
+      "title": "Mustard aphid insecticide efficacy",
+      "text": "Malathion 57EC (brand Malataf) at 2 ml per litre of water gave the strongest control of mustard aphid (Lipaphis erysimi) in a field trial, cutting the aphid population by about 93.75% versus pre-treatment, and was less toxic to beneficial predator insects than diazinon.",
+      "source_title": "SciAlert: Effect of different insecticides on mustard aphids, Lipaphis erysimi (Kalt), and their toxicity to beneficial insects",
+      "locator": "https://scialert.net/fulltext/?doi=pjbs.2002.310.312",
+      "confidence": "medium"
+    },
+    {
+      "id": "lentil_sowing_landprep",
+      "crop": "lentil",
+      "topic": "sowing",
+      "title": "Lentil sowing time and land preparation",
+      "text": "Sow lentil from mid-October to the first week of November. Give one deep ploughing followed by 3-4 cross-harrowings on heavy soil (2-3 ploughings are enough on lighter soil) to pulverise the seedbed.",
+      "source_title": "ApniKheti farming guide: Lentil (Masur) — general South Asian extension guide, not Bangladesh-government-specific",
+      "locator": "https://www.apnikheti.com/en/pn/agriculture/crops/pulses/lentil-masur",
+      "confidence": "medium"
+    },
+    {
+      "id": "lentil_seedrate_spacing",
+      "crop": "lentil",
+      "topic": "sowing",
+      "title": "Lentil seed rate and row spacing",
+      "text": "Lentil seed rate is about 12-15 kg per acre (roughly 30-37 kg/ha), sown 3-4 cm deep in rows 22 cm apart (20 cm apart under late sowing).",
+      "source_title": "ApniKheti farming guide: Lentil (Masur) — general South Asian extension guide, not Bangladesh-government-specific",
+      "locator": "https://www.apnikheti.com/en/pn/agriculture/crops/pulses/lentil-masur",
+      "confidence": "medium"
+    },
+    {
+      "id": "lentil_fert_apnikheti",
+      "crop": "lentil",
+      "topic": "fertilizer",
+      "title": "Lentil light basal fertilizer dose",
+      "text": "A general South Asian extension guide gives a light lentil basal fertilizer dose of Urea 12 kg/acre and single superphosphate (SSP) 50 kg/acre — roughly 5 kg N and 8 kg P2O5 per acre — with potash not usually needed; if seed is not rhizobium-inoculated, the phosphorus dose is doubled. This is a general guide figure, not confirmed against a Bangladesh-specific BARI table.",
+      "source_title": "ApniKheti farming guide: Lentil (Masur) — general South Asian extension guide, not Bangladesh-government-specific",
+      "locator": "https://www.apnikheti.com/en/pn/agriculture/crops/pulses/lentil-masur",
+      "confidence": "medium"
+    },
+    {
+      "id": "lentil_fert_rfd",
+      "crop": "lentil",
+      "topic": "fertilizer",
+      "title": "Lentil reported recommended fertilizer dose (unverified)",
+      "text": "A separately reported recommended fertilizer dose (RFD) for lentil in Bangladesh is Urea 40, TSP 90, MoP 40 and Gypsum 55 kg/ha with 10 kg/ha Zinc Sulphate as basal — noticeably heavier than the general South Asian guide dose in this corpus. This figure's exact primary source could not be pinned down and confirmed this session; treat it as unverified and cross-check against a current BARI/BARC table before presenting it to a farmer as certain.",
+      "source_title": "Bangladesh lentil fertilizer-trial literature (attribution uncertain — flagged for verification)",
+      "locator": "search-derived figure, no single confirmed primary URL located this session",
+      "confidence": "low"
+    },
+    {
+      "id": "lentil_irrigation_apnikheti",
+      "crop": "lentil",
+      "topic": "irrigation",
+      "title": "Lentil irrigation count and critical stages",
+      "text": "Irrigated lentil needs only 2-3 waterings in total. The two most critical stages for irrigation are about 4 weeks after sowing and at flowering; avoid waterlogging at any stage.",
+      "source_title": "ApniKheti farming guide: Lentil (Masur) — general South Asian extension guide, not Bangladesh-government-specific",
+      "locator": "https://www.apnikheti.com/en/pn/agriculture/crops/pulses/lentil-masur",
+      "confidence": "medium"
+    },
+    {
+      "id": "lentil_ais",
+      "crop": "lentil",
+      "topic": "irrigation",
+      "title": "Lentil sowing and irrigation (AIS)",
+      "text": "Lentil is a Rabi crop. Sow from late October to early November in well-drained loam. Give light irrigation only when moisture is deficient and avoid waterlogging.",
+      "source_title": "AIS e-Krishi 'মসুর'",
+      "locator": "AIS e-Krishi 'মসুর'",
+      "confidence": "high"
+    },
+    {
+      "id": "lentil_weeding",
+      "crop": "lentil",
+      "topic": "weeding",
+      "title": "Lentil weed control",
+      "text": "Control weeds in lentil with two hoeings at 30 and 60 days after sowing, or a pre-emergence herbicide (e.g. pendimethalin 30EC at 550 ml/acre) followed by one hoeing at 50 days after sowing.",
+      "source_title": "ApniKheti farming guide: Lentil (Masur) — general South Asian extension guide, not Bangladesh-government-specific",
+      "locator": "https://www.apnikheti.com/en/pn/agriculture/crops/pulses/lentil-masur",
+      "confidence": "medium"
+    },
+    {
+      "id": "lentil_pest_podborer",
+      "crop": "lentil",
+      "topic": "pest",
+      "title": "Lentil pod borer spray",
+      "text": "Lentil pod borer is controlled by spraying 900 g Hexavin 50WP (carbaryl) in 90 litres of water per acre at flowering time, repeated after 3 weeks if the infestation continues.",
+      "source_title": "ApniKheti farming guide: Lentil (Masur) — general South Asian extension guide, not Bangladesh-government-specific",
+      "locator": "https://www.apnikheti.com/en/pn/agriculture/crops/pulses/lentil-masur",
+      "confidence": "medium"
+    },
+    {
+      "id": "lentil_disease_rust_blight",
+      "crop": "lentil",
+      "topic": "disease",
+      "title": "Lentil rust and blight spray",
+      "text": "For lentil rust, spray 400 g of fungicide M-45 (mancozeb) in 200 litres of water per acre; for blight, spray 400 g Bavistin (carbendazim) in 200 litres of water per acre.",
+      "source_title": "ApniKheti farming guide: Lentil (Masur) — general South Asian extension guide, not Bangladesh-government-specific",
+      "locator": "https://www.apnikheti.com/en/pn/agriculture/crops/pulses/lentil-masur",
+      "confidence": "medium"
+    },
+    {
+      "id": "lentil_disease_stemphylium",
+      "crop": "lentil",
+      "topic": "disease",
+      "title": "Lentil stemphylium blight and tolerant varieties",
+      "text": "Stemphylium blight and root rot are managed partly through variety choice: BARI Masur-7 and BARI Masur-8 carry tolerance to stemphylium blight, and BARI Masur-8 is also tolerant of root rot. A foliar spray of M-45 (mancozeb) fungicide after flowering is recommended where the disease appears.",
+      "source_title": "Journal of Plant Registrations: 'BARI Masur-8' — a high-yielding and biofortified lentil cultivar in Bangladesh",
+      "locator": "https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/plr2.20210",
+      "confidence": "medium"
+    },
+    {
+      "id": "lentil_harvest",
+      "crop": "lentil",
+      "topic": "harvest",
+      "title": "Lentil harvest timing",
+      "text": "Harvest lentil when the plants dry up and pods mature; store the grain once moisture content drops to about 12%.",
+      "source_title": "ApniKheti farming guide: Lentil (Masur) — general South Asian extension guide, not Bangladesh-government-specific",
+      "locator": "https://www.apnikheti.com/en/pn/agriculture/crops/pulses/lentil-masur",
+      "confidence": "medium"
+    }
+  ]
+}

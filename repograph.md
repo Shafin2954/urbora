@@ -140,3 +140,44 @@ real names per BDAPPS-API-REFERENCE.md are `BDAPPS_APP_ID` / `BDAPPS_PASSWORD` (
   eight required capabilities and the remaining fresh-live-trace verification.
 - `backend/kb/retrieval.py` is the local source-cited retrieval layer used by
   `rag_query`; its orchestration is covered in `test_loop_integration.py`.
+- `backend/tools/plan_conflicts.py` compares persisted weather-dependent plan
+  tasks against the live forecast; `backend/api/alerts.py` exposes the check
+  and persisted results, covered by `backend/tests/test_plan_conflicts.py`.
+- `backend/tools/care_scheduler.py` exposes source-cited fertilizer/irrigation
+  work from a saved plan; `backend/tools/scenario.py` re-runs ranking/finance
+  for a budget scenario. Their UI entry point is `AlertPanel.jsx` in Plan.
+- Tier 1 live acceptance used the clean API listener on port 8001 because port
+  8000 held orphaned stale listeners; `frontend/vite.config.js` proxies dev
+  `/api` traffic to 8001 until that local process issue is resolved.
+- `backend/tools/agri_inputs.py` is the fixed-query, read-only agent gateway to
+  the Chapter 7 `agristats.db` views (`v_seed`, `v_fertilizer`, `v_pesticides`,
+  `v_wages`, `v_irrigation_by_region`, `v_irrigation_by_method`). It returns
+  cited historic facts only; `finance_projection` remains the sole cost/profit
+  calculator because Chapter 7 does not supply current retail prices.
+- `backend/tests/test_agri_inputs.py` pins the new source boundary, result
+  provenance, crop mapping, and no-arbitrary-SQL behavior.
+- `supabase/migrations/20260725023000_crops.sql` creates the RLS-protected
+  crop ownership/index table. `backend/api/crops.py` proxies the caller's
+  Supabase token to that table and merges the existing SQLite farm/session data.
+- `frontend/src/state/useAuth.js`, `useCrops.js`, and `lib/supabaseClient.js`
+  own browser authentication and crop selection; `AuthScreen.jsx` and
+  `Sidebar.jsx` render the corresponding UI.
+- `supabase/config.toml` is the local Supabase CLI configuration. Run
+  `npx supabase start` / `npx supabase db reset --local` from the repo root;
+  it was initialized and migration-verified locally.
+- This Supabase directory is linked to cloud project `TeamFixeth_AgriSense`
+  (`quppbvckhinyslcebhfg`); migration `20260725023000_crops.sql` is deployed.
+- `frontend/vite.config.js` sets `envDir: '..'` so Vite reads the shared ignored
+  root `.env` instead of requiring a duplicate `frontend/.env`.
+- The active app shell no longer renders the evidence/proof tab or development
+  harness. `GraphPanel.jsx` is now the Bangla, freezeable animated provenance
+  view; it intentionally omits the old raw English trace UI.
+- The crop sidebar is a persistent Bangla “আমার ফসল” consultation list. A new
+  item begins as “নতুন আলাপ”; `useChat.js` saves the agent's planned crop name
+  through `useCrops.js` when `plan_update` arrives.
+- `Sidebar.jsx` now separates resumable chats (“আমার আলাপ”) from saved crop
+  detail records (“আমার ফসল”). `graphLayout.js` also exports the chronological
+  linear layout used by `GraphPanel.jsx` for newest-node-centred animation.
+- `20260725032500_crop_titles.sql` adds the persistent crop-record `title`.
+  The agent emits a hidden first-reply Bangla title marker; `useChat.js` strips
+  and saves it, while `Sidebar.jsx` uses it only for the chat list.

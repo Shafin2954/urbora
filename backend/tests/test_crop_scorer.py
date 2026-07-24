@@ -124,6 +124,25 @@ def test_soil_exclusion_with_synthetic_facts():
     assert "soil" in c.exclusion_reason.lower()
 
 
+def test_water_rank_tubewell_ranks_above_canal():
+    # 2026-07-25 fix: a tubewell (on-demand, farmer-owned) is better irrigation
+    # access than a shared canal, not worse. The old ranks (tubewell=1 <
+    # canal=2) silently excluded boro rice — Bangladesh's dominant Rabi crop,
+    # overwhelmingly shallow-tubewell irrigated (water_min_rank=2 in
+    # kb/crop_facts.py) — for every tubewell-only farm.
+    assert cs.WATER_RANK["rainfed"] < cs.WATER_RANK["canal"] < cs.WATER_RANK["tubewell"]
+    assert cs.WATER_RANK["tubewell"] == cs.WATER_RANK["irrigated"]
+
+
+def test_boro_survives_water_screen_on_tubewell_with_real_crop_facts():
+    # Regression for the same bug via the real KB path: boro_rice must not be
+    # excluded on water access alone when the farm has a tubewell.
+    out = cs.crop_scorer_tool(district=RAJSHAHI, soil_type="clay_loam",
+                              water_source="tubewell", season="rabi")
+    boro = next(c for c in out["candidates"] if c["crop"] == "boro_rice")
+    assert boro["excluded"] is False
+
+
 def test_water_exclusion_with_synthetic_facts():
     facts = {
         "boro_rice": CropFacts(
@@ -416,13 +435,18 @@ def test_every_component_and_exclusion_has_provenance():
 
 # ── agent tool wrapper ────────────────────────────────────────────────────────
 def test_crop_scorer_tool_returns_candidates_and_degraded_list():
-    # Finance, cited crop facts, and district climatology are live.
+    # Finance, cited crop facts, and district climatology are live. Mustard
+    # and lentil carry a fertiliser-only (partial) cost basis (prices.md §2),
+    # so — correctly — they still degrade the Profit picture even though
+    # `finance` itself is fully populated for all 5 crops (2026-07-25 fix).
     out = cs.crop_scorer_tool(district=RAJSHAHI, soil_type="clay_loam",
                               water_source="tubewell", season="rabi")
     assert "candidates" in out and len(out["candidates"]) == 5
-    assert "degraded" in out and len(out["degraded"]) == 0
-    assert not any("Profit" in d for d in out["degraded"])
+    assert "degraded" in out and len(out["degraded"]) >= 1
     assert all(isinstance(d, str) for d in out["degraded"])
+    assert any("fertiliser-only" in d and "lentil" in d and "mustard" in d for d in out["degraded"])
+    # No "Profit component ... unavailable" message — finance itself did load.
+    assert not any(d.startswith("Profit component") for d in out["degraded"])
     # Profit component itself must now be real, not "unavailable".
     for c in out["candidates"]:
         if c["excluded"]:
@@ -430,6 +454,72 @@ def test_crop_scorer_tool_returns_candidates_and_degraded_list():
         profit = next(comp for comp in c["components"] if comp["name"] == "Profit")
         assert profit["max"] == 25.0
         assert profit["provenance"]["value"] != "unavailable"
+
+
+def test_crop_scorer_tool_neutralizes_partial_cost_basis_profit():
+    # The core fix (2026-07-25): mustard/lentil carry a fertiliser-only
+    # minimum-bound cost, not BBS's complete aggregate expenditure (boro/aman/
+    # potato). Scoring Profit from that incomplete basis let the crop with the
+    # LEAST complete cost data win min-max normalization every time (lentil at
+    # ~3977% ROI). Both must now score zero Profit points and say why.
+    out = cs.crop_scorer_tool(district=RAJSHAHI, soil_type="clay_loam",
+                              water_source="tubewell", season="rabi")
+    by_crop = {c["crop"]: c for c in out["candidates"]}
+    for crop in ("mustard", "lentil"):
+        c = by_crop[crop]
+        assert c["excluded"] is False
+        profit = next(comp for comp in c["components"] if comp["name"] == "Profit")
+        assert profit["points"] == 0.0
+        assert "partial_fertilizer_only" in profit["provenance"]["formula"]
+        assert profit["provenance"]["confidence"] == "low"
+        # Real, uninvented number — not fabricated, just not scorable/comparable.
+        assert profit["provenance"]["value"] != "unavailable"
+    # A complete-cost-basis crop (boro) must be unaffected: real points, no
+    # partial-basis language in its formula.
+    boro = by_crop["boro_rice"]
+    boro_profit = next(comp for comp in boro["components"] if comp["name"] == "Profit")
+    assert "partial_fertilizer_only" not in boro_profit["provenance"]["formula"]
+
+
+def test_partial_cost_basis_excluded_from_profit_min_max_range():
+    # Synthetic finance: two "complete" crops plus one "partial" crop whose
+    # raw profit is enormous. If the partial crop still entered the min-max
+    # range it would compress the two real crops toward the bottom/top; it
+    # must not move their points at all.
+    finance_without_partial = {
+        "boro_rice": {"min_cost_per_ha": 1000.0, "net_profit_bdt_per_ha": 10_000.0,
+                      "source_id": "t", "source_title": "t", "formula": "t",
+                      "cost_basis": "complete"},
+        "aman_rice": {"min_cost_per_ha": 1000.0, "net_profit_bdt_per_ha": 50_000.0,
+                      "source_id": "t", "source_title": "t", "formula": "t",
+                      "cost_basis": "complete"},
+    }
+    baseline = score_crops(
+        district=RAJSHAHI, soil_type="clay_loam", water_source="tubewell", season="rabi",
+        candidates=["boro_rice", "aman_rice"], area_ha=2.0, finance=finance_without_partial,
+    )
+    finance_with_partial = dict(finance_without_partial)
+    finance_with_partial["lentil"] = {
+        "min_cost_per_ha": 100.0, "net_profit_bdt_per_ha": 999_999.0,
+        "source_id": "t", "source_title": "t", "formula": "t",
+        "cost_basis": "partial_fertilizer_only",
+    }
+    with_partial = score_crops(
+        district=RAJSHAHI, soil_type="clay_loam", water_source="tubewell", season="rabi",
+        candidates=["boro_rice", "aman_rice", "lentil"], area_ha=2.0, finance=finance_with_partial,
+    )
+    baseline_points = {
+        c.crop: next(cm.points for cm in c.components if cm.name == "Profit") for c in baseline
+    }
+    with_partial_points = {
+        c.crop: next(cm.points for cm in c.components if cm.name == "Profit")
+        for c in with_partial if c.crop != "lentil"
+    }
+    assert baseline_points == with_partial_points
+    lentil_profit = next(
+        cm for c in with_partial if c.crop == "lentil" for cm in c.components if cm.name == "Profit"
+    )
+    assert lentil_profit.points == 0.0
 
 
 def test_crop_scorer_tool_never_raises_on_bad_input():

@@ -30,6 +30,23 @@ fertiliser-price notice. Two honest limitations, stated plainly rather than hidd
 - **The fertiliser price citation is dated 2023-04-11** — the most recent
   government-notified change found; no later revision was located. `confidence: low`
   on those six rows reflects that staleness.
+- **The Input costs table now carries a `cost_basis` column** (`complete` vs
+  `partial_fertilizer_only`) so downstream code (crop_scorer's Profit component)
+  can tell the two kinds of row apart instead of min-max normalizing a complete
+  aggregate against a fertiliser-only floor as if they were the same measurement.
+
+## Update 2026-07-25 — potato farm-gate price corrected
+
+The BBS Yearbook 2024-25 harvest-time price (39.65 ৳/kg, still shown as a
+historical reference below) predates the 2025-26 national potato oversupply
+crash and, used as "today's" price, exceeded this file's own retail context
+row (§3: Dhaka retail 25–30 ৳/kg) — a farmer cannot sell above retail, so that
+combination was internally impossible. Bangladesh's Department of Agricultural
+Marketing (DAM) reported farm-gate prices of Tk 6.0–8.0/kg in April 2026, below
+the ~Tk 15/kg production cost, during the glut (source below). §1's farm-gate
+row now uses the midpoint of that DAM range, 7.0 ৳/kg, `confidence: low`
+because it is a crisis-period, DAM-range figure roughly three months older than
+the retail row it is compared against, not a stable equilibrium price.
 
 ---
 
@@ -52,7 +69,7 @@ source table under a similar name.
 |---|---|---|---|---|---|---|---|
 | boro_rice | 30.51 | paddy, Coarse grade, harvest-time | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 10.5.1 (Harvest-time market prices) p.638 | 2024-2025 | medium |
 | aman_rice | 30.44 | paddy, Coarse grade, harvest-time | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 10.5.1 (Harvest-time market prices) p.638 | 2024-2025 | medium |
-| potato | 39.65 | local variety, harvest-time | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 10.5.1 (Harvest-time market prices) p.638 | 2024-2025 | medium |
+| potato | 7.00 | local variety, farm-gate, mid national 2025-26 oversupply crash (midpoint of DAM-reported Tk 6.0-8.0/kg) | dam_fe_2026 | Bangladesh Dept. of Agricultural Marketing (DAM), via The Financial Express "Potato exports rise, but farmers struggle as prices plunge" | thefinancialexpress.com.bd/trade/potato-exports-rise-but-farmers-struggle-as-prices-plunge, 2026-04-03; supersedes stale BBS Yearbook 2025 Table 10.5.1 p.638 figure of 39.65 (2024-25 pre-crash harvest price, exceeded this file's own retail row — see "Update 2026-07-25" note above) | 2026-04-03 | low |
 | mustard | 78.53 | harvest-time | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 10.5.1 (Harvest-time market prices) p.638 | 2024-2025 | medium |
 | lentil | 90.78 | Masur, raw seed, harvest-time | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 10.5.1 (Harvest-time market prices) p.638 | 2024-2025 | medium |
 
@@ -76,17 +93,17 @@ no Gypsum price found anywhere, so Gypsum/Zinc/Boron doses — which do exist in
 source — are not costed). **These two crops' costs are a fertiliser-only minimum bound,
 not a complete input cost** — seed cost is not included (no citable seed price found).
 
-| crop | item | qty_per_ha | unit | unit_cost_bdt | source_id | source_title | locator | date | confidence |
-|---|---|---|---|---|---|---|---|---|---|
-| boro_rice | Total cultivation cost (all inputs, BBS aggregate) | 1 | ha | 96022.68 | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 8.4 (Productivity and expenditure of Boro by Division) p.540 | 2024-2025 | medium |
-| aman_rice | Total cultivation cost (all inputs, BBS aggregate) | 1 | ha | 73286.51 | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 8.3 (Productivity and expenditure of Amon by Division) p.539 | 2024-2025 | medium |
-| potato | Total cultivation cost (all inputs, BBS aggregate) | 1 | ha | 157532.15 | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 8.5 (Productivity and expenditure, Rabi crops incl. Potato) p.541 | 2024-2025 | medium |
-| mustard | Urea (mid of 250–300 kg/ha range) | 275 | kg | 27 | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.140 (printed ~p.115); price: thedailystar.net "Fertiliser prices raised by Tk 5 per kg" | 2023-04-11 | low |
-| mustard | TSP (mid of 170–180 kg/ha range) | 175 | kg | 27 | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.140 (printed ~p.115); same price source | 2023-04-11 | low |
-| mustard | MoP (mid of 85–100 kg/ha range) | 92.5 | kg | 20 | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.140 (printed ~p.115); same price source | 2023-04-11 | low |
-| lentil | Urea (mid of 40–45 kg/ha range) | 42.5 | kg | 27 | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.103 (printed ~p.78); same price source | 2023-04-11 | low |
-| lentil | TSP (mid of 80–90 kg/ha range) | 85 | kg | 27 | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.103 (printed ~p.78); same price source | 2023-04-11 | low |
-| lentil | MoP (mid of 40–45 kg/ha range) | 42.5 | kg | 20 | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.103 (printed ~p.78); same price source | 2023-04-11 | low |
+| crop | item | qty_per_ha | unit | unit_cost_bdt | cost_basis | source_id | source_title | locator | date | confidence |
+|---|---|---|---|---|---|---|---|---|---|---|
+| boro_rice | Total cultivation cost (all inputs, BBS aggregate) | 1 | ha | 96022.68 | complete | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 8.4 (Productivity and expenditure of Boro by Division) p.540 | 2024-2025 | medium |
+| aman_rice | Total cultivation cost (all inputs, BBS aggregate) | 1 | ha | 73286.51 | complete | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 8.3 (Productivity and expenditure of Amon by Division) p.539 | 2024-2025 | medium |
+| potato | Total cultivation cost (all inputs, BBS aggregate) | 1 | ha | 157532.15 | complete | agristats_bbs2025 | BBS Yearbook of Agricultural Statistics 2025 | Table 8.5 (Productivity and expenditure, Rabi crops incl. Potato) p.541 | 2024-2025 | medium |
+| mustard | Urea (mid of 250–300 kg/ha range) | 275 | kg | 27 | partial_fertilizer_only | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.140 (printed ~p.115); price: thedailystar.net "Fertiliser prices raised by Tk 5 per kg" | 2023-04-11 | low |
+| mustard | TSP (mid of 170–180 kg/ha range) | 175 | kg | 27 | partial_fertilizer_only | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.140 (printed ~p.115); same price source | 2023-04-11 | low |
+| mustard | MoP (mid of 85–100 kg/ha range) | 92.5 | kg | 20 | partial_fertilizer_only | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.140 (printed ~p.115); same price source | 2023-04-11 | low |
+| lentil | Urea (mid of 40–45 kg/ha range) | 42.5 | kg | 27 | partial_fertilizer_only | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.103 (printed ~p.78); same price source | 2023-04-11 | low |
+| lentil | TSP (mid of 80–90 kg/ha range) | 85 | kg | 27 | partial_fertilizer_only | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.103 (printed ~p.78); same price source | 2023-04-11 | low |
+| lentil | MoP (mid of 40–45 kg/ha range) | 42.5 | kg | 20 | partial_fertilizer_only | bari_hatboi_frg_2024 | BARI Krishi Projukti Hatboi + BARC FRG-2024, priced via Daily Star fertiliser-price notice | Hatboi PDF p.103 (printed ~p.78); same price source | 2023-04-11 | low |
 
 ## 3. Retail market context — NOT a farmer's selling price
 

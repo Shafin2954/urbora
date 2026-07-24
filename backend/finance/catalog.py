@@ -165,7 +165,7 @@ class PriceCatalog:
         self.path = Path(path) if path else _prices_path()
         text = self.path.read_text(encoding="utf-8") if self.path.exists() else ""
         self._prices = self._read_prices(text)
-        self._costs = self._read_costs(text)
+        self._costs, self._cost_basis = self._read_costs(text)
         self.retail = self._read_retail(text)
 
     # -- parsing --
@@ -189,8 +189,9 @@ class PriceCatalog:
             )
         return out
 
-    def _read_costs(self, text: str) -> dict[str, list[CostLine]]:
+    def _read_costs(self, text: str) -> tuple[dict[str, list[CostLine]], dict[str, str]]:
         out: dict[str, list[CostLine]] = {}
+        basis: dict[str, str] = {}
         for row in _tables_under(text, _SECTION_INPUT_COSTS):
             crop = row.get("crop", "").strip()
             qty = _number(row.get("qty_per_ha"))
@@ -217,7 +218,14 @@ class PriceCatalog:
                     ),
                 )
             )
-        return out
+            # A crop's cost_basis is the same on every row of that crop (see
+            # prices.md §2's convention); last row wins if a curator ever
+            # disagrees across rows, which is a data-authoring bug to fix in
+            # the markdown, not something to detect here.
+            row_basis = row.get("cost_basis", "").strip().lower()
+            if row_basis:
+                basis[crop] = row_basis
+        return out, basis
 
     def _read_retail(self, text: str) -> list[RetailRow]:
         out: list[RetailRow] = []
@@ -244,6 +252,16 @@ class PriceCatalog:
 
     def cost_lines(self, crop: str) -> list[CostLine]:
         return list(self._costs.get(crop, ()))
+
+    def cost_basis(self, crop: str) -> str:
+        """`complete` (BBS aggregate expenditure) vs `partial_fertilizer_only`
+        (fertiliser-doses-only minimum bound — see prices.md §2's honesty
+        note). Unmarked/absent rows default to `complete` so existing crops
+        that predate this column keep behaving as they always did; a curator
+        adding a new partial-coverage crop must add the column to opt out of
+        that default, not the other way round.
+        """
+        return self._cost_basis.get(crop, "complete")
 
     def missing_for(self, crop: str) -> list[str]:
         """What this crop still needs before it can be costed. Empty = ready."""
@@ -333,6 +351,7 @@ class PriceCatalog:
                     f"({yields_kg_ha[crop]:g} kg/ha x {price:g} BDT/kg) - "
                     f"{cost_per_ha:g} BDT/ha input cost"
                 ),
+                "cost_basis": self.cost_basis(crop),
             }
         return finance, None
 

@@ -23,11 +23,11 @@
  */
 
 const CROP_LABELS = {
-  boro_rice: 'Boro Rice',
-  aman_rice: 'Aman Rice',
-  potato: 'Potato',
-  mustard: 'Mustard',
-  lentil: 'Lentil',
+  boro_rice: 'বোরো ধান',
+  aman_rice: 'আমন ধান',
+  potato: 'আলু',
+  mustard: 'সরিষা',
+  lentil: 'মসুর',
 }
 
 function cropLabel(key) {
@@ -53,25 +53,25 @@ function round2(n) {
 // finer one (see GraphPanel.jsx: label vs sub vs edge-tool each get their own
 // ink). One dict, shared by GraphPanel and the legend, so they can't drift.
 export const NODE_STYLE = {
-  farm: { shape: 'hexagon', r: 26, fill: 'var(--green)', stroke: 'var(--green-dark)', textFill: '#fff' },
-  place: { shape: 'triangle', r: 17, fill: 'var(--surface)', stroke: 'var(--soil)' },
-  weather: { shape: 'triangle', r: 17, fill: 'var(--surface)', stroke: 'var(--soil)' },
-  source: { shape: 'pentagon', r: 15, fill: 'var(--surface)', stroke: 'var(--leaf)' },
-  crop: { shape: 'circle', r: 20, fill: 'var(--green-tint)', stroke: 'var(--green)' },
-  plan: { shape: 'square', r: 18, fill: 'var(--surface-sunk)', stroke: 'var(--green-dark)' },
-  finance: { shape: 'square', r: 18, fill: 'var(--surface-sunk)', stroke: 'var(--green-dark)' },
-  question: { shape: 'circle', r: 12, fill: 'var(--surface)', stroke: 'var(--ink-faint)' },
+  farm: { shape: 'hexagon', r: 20, fill: 'var(--green)', stroke: 'var(--green-dark)', textFill: '#fff' },
+  place: { shape: 'triangle', r: 13, fill: 'var(--surface)', stroke: 'var(--soil)' },
+  weather: { shape: 'triangle', r: 13, fill: 'var(--surface)', stroke: 'var(--soil)' },
+  source: { shape: 'pentagon', r: 11, fill: 'var(--surface)', stroke: 'var(--leaf)' },
+  crop: { shape: 'circle', r: 15, fill: 'var(--green-tint)', stroke: 'var(--green)' },
+  plan: { shape: 'square', r: 14, fill: 'var(--surface-sunk)', stroke: 'var(--green-dark)' },
+  finance: { shape: 'square', r: 14, fill: 'var(--surface-sunk)', stroke: 'var(--green-dark)' },
+  question: { shape: 'circle', r: 9, fill: 'var(--surface)', stroke: 'var(--ink-faint)' },
 }
 
 export const LEGEND = [
-  { kind: 'farm', label: 'Farm' },
-  { kind: 'place', label: 'Place' },
-  { kind: 'weather', label: 'Weather' },
-  { kind: 'source', label: 'KB / dataset source' },
-  { kind: 'crop', label: 'Crop' },
-  { kind: 'plan', label: 'Plan' },
-  { kind: 'finance', label: 'Finance' },
-  { kind: 'question', label: 'Question' },
+  { kind: 'farm', label: 'জমি' },
+  { kind: 'place', label: 'স্থান' },
+  { kind: 'weather', label: 'আবহাওয়া' },
+  { kind: 'source', label: 'তথ্যসূত্র' },
+  { kind: 'crop', label: 'ফসল' },
+  { kind: 'plan', label: 'পরিকল্পনা' },
+  { kind: 'finance', label: 'হিসাব' },
+  { kind: 'question', label: 'প্রশ্ন' },
 ]
 
 function pairEvents(trace) {
@@ -106,7 +106,7 @@ function formatFarmSub(fields) {
   if (fields.water_source) parts.push(fields.water_source)
   if (fields.season) parts.push(fields.season)
   if (fields.budget_bdt != null) parts.push(`৳${fields.budget_bdt}`)
-  return parts.length ? parts.join(' · ') : 'profile forming…'
+  return parts.length ? truncate(parts.join(' · '), 42) : 'তথ্য যোগ হচ্ছে…'
 }
 
 export function buildGraph(trace) {
@@ -123,7 +123,7 @@ export function buildGraph(trace) {
 
   // The farm hexagon always exists, even before any tool has fired — the
   // graph has a center from the first token of the conversation.
-  upsertNode('farm', { kind: 'farm', label: 'Farm', sub: 'profile forming…' })
+  upsertNode('farm', { kind: 'farm', label: 'জমি', sub: 'তথ্য যোগ হচ্ছে…' })
 
   // Farm profile: last-wins merge of every field any relevant call has ever
   // carried, walked in trace order so a later turn's correction (e.g. area
@@ -157,19 +157,19 @@ export function buildGraph(trace) {
     if (rec.name !== 'rag_query' || !rec.result || !Array.isArray(rec.result.matches)) continue
     const isForced = id.startsWith('retrieval-')
     const parentId = isForced ? id.slice('retrieval-'.length) : null
-    const sourceIds = []
+    const sourceMatches = []
     for (const match of rec.result.matches) {
       const sourceId = `source:${match.id}`
       upsertNode(sourceId, {
         kind: 'source',
-        label: match.source_title ?? match.id,
-        sub: match.locator ?? match.crop ?? '',
+        label: truncate(match.source_title ?? match.id, 28),
+        sub: truncate(match.locator ?? match.crop ?? '', 30),
         sourceCallId: id,
       })
-      sourceIds.push(sourceId)
+      sourceMatches.push({ sourceId, crop: match.crop })
       if (!isForced) upsertEdge('farm', sourceId, 'rag_query', id)
     }
-    if (isForced && sourceIds.length) retrievalSourcesByParent.set(parentId, sourceIds)
+    if (isForced && sourceMatches.length) retrievalSourcesByParent.set(parentId, sourceMatches)
   }
 
   // geocode -> place. Kept for weather to attach to when a place was
@@ -202,19 +202,19 @@ export function buildGraph(trace) {
     const degraded = Boolean(rec.result?.error)
     let sub
     if (degraded) {
-      sub = 'unavailable — তথ্য যথেষ্ট নয়'
+      sub = 'তথ্য পাওয়া যায়নি'
     } else if (isClimatology) {
       const n = rec.result?.normals?.length ?? 0
-      sub = `${n} month normals${rec.result?.window ? ` · ${rec.result.window}` : ''}`
+      sub = `${n} মাসের গড়${rec.result?.window ? ` · ${rec.result.window}` : ''}`
     } else {
       const daily = rec.result?.daily ?? []
       sub = daily.length
-        ? `${daily.length}d · day1 ${daily[0].precip_mm}mm, ${daily[0].tmax_c}°C`
-        : '0 days returned'
+        ? `${daily.length} দিন · প্রথম দিন ${daily[0].precip_mm}mm, ${daily[0].tmax_c}°C`
+        : 'কোনো তথ্য নেই'
     }
     upsertNode(weatherId, {
       kind: 'weather',
-      label: isClimatology ? 'Climatology' : 'Forecast',
+      label: isClimatology ? 'জলবায়ুর গড়' : 'পূর্বাভাস',
       sub,
       dashed: isClimatology,
       degraded,
@@ -237,7 +237,7 @@ export function buildGraph(trace) {
         kind: 'crop',
         label: cropLabel(candidate.crop),
         sub: candidate.excluded
-          ? truncate(candidate.exclusion_reason, 60)
+          ? truncate(candidate.exclusion_reason, 40)
           : `${candidate.composite_score}/100 · ${candidate.water_need} water · ${candidate.risk_level} risk`,
         excluded: candidate.excluded,
         sourceCallId: id,
@@ -245,13 +245,8 @@ export function buildGraph(trace) {
       upsertEdge('farm', cropId, 'crop_scorer', id)
     }
     const sources = retrievalSourcesByParent.get(id) ?? []
-    if (sources.length) {
-      const survivors = rec.result.candidates.filter((c) => !c.excluded)
-      for (const sourceId of sources) {
-        for (const survivor of survivors) {
-          upsertEdge(sourceId, `crop:${survivor.crop}`, 'rag_query', id)
-        }
-      }
+    for (const { sourceId, crop } of sources) {
+      if (crop && nodes.has(`crop:${crop}`)) upsertEdge(sourceId, `crop:${crop}`, 'rag_query', id)
     }
   }
 
@@ -262,14 +257,14 @@ export function buildGraph(trace) {
     const plan = rec.result.plan
     upsertNode('plan', {
       kind: 'plan',
-      label: 'Season Plan',
+      label: 'মৌসুম পরিকল্পনা',
       sub: `${plan.tasks.length} tasks · ${cropLabel(plan.crop)}`,
       sourceCallId: id,
     })
     const cropId = `crop:${plan.crop}`
     const from = nodes.has(cropId) ? cropId : 'farm'
     upsertEdge(from, 'plan', 'season_plan', id)
-    for (const sourceId of retrievalSourcesByParent.get(id) ?? []) {
+    for (const { sourceId } of retrievalSourcesByParent.get(id) ?? []) {
       upsertEdge(sourceId, 'plan', 'rag_query', id)
     }
   }
@@ -282,10 +277,10 @@ export function buildGraph(trace) {
     const ok = rec.result && !rec.result.error
     upsertNode('finance', {
       kind: 'finance',
-      label: 'Finance',
+      label: 'হিসাব',
       sub: ok
         ? `net ৳${rec.result.summary.net_profit_bdt} · ROI ${rec.result.summary.roi_pct}%`
-        : `degraded: ${rec.result?.error ?? 'pending'}`,
+        : 'হিসাব পাওয়া যায়নি',
       degraded: !ok,
       sourceCallId: id,
     })
@@ -302,7 +297,7 @@ export function buildGraph(trace) {
     upsertNode(qId, {
       kind: 'question',
       label: rec.params.field,
-      sub: truncate(rec.params.prompt_bn, 40),
+      sub: truncate(rec.params.prompt_bn, 30),
       sourceCallId: id,
     })
     upsertEdge('farm', qId, 'ask_farmer', id)
@@ -326,7 +321,9 @@ export function buildGraph(trace) {
 
   const nodeList = [...nodes.values()]
   const nodeIds = new Set(nodeList.map((n) => n.id))
-  const edgeList = [...edges.values()].filter((e) => nodeIds.has(e.from) && nodeIds.has(e.to))
+  const edgeList = [...edges.values()]
+    .filter((e) => nodeIds.has(e.from) && nodeIds.has(e.to))
+    .map((edge) => ({ ...edge, dashed: Boolean(nodes.get(edge.to)?.excluded || nodes.get(edge.to)?.degraded) }))
 
   return { nodes: nodeList, edges: edgeList, callsById: calls }
 }

@@ -17,14 +17,33 @@ from ..tools.ask import ask_farmer
 from ..tools.crop_scorer import crop_scorer_tool
 from ..tools.farm_memory import remember_farm
 from ..tools.cropdb import cropdb_sql
+from ..tools.agri_inputs import agri_inputs
 from ..tools.finance import finance_projection
 from ..tools.geocode import geocode
 from ..tools.weather import get_climatology, get_forecast
 from ..tools.season_plan import season_plan
+from ..tools.plan_conflicts import check_plan_conflicts
+from ..tools.care_scheduler import care_schedule
+from ..tools.scenario import simulate_budget
 from ..kb.retrieval import rag_query
 
 # Anthropic tool definitions (input_schema = JSON Schema, English descriptions).
 TOOL_DEFS: list[dict[str, Any]] = [
+    {
+        "name": "simulate_budget",
+        "description": "Re-run deterministic crop ranking and finance when the farmer changes budget. The server computes the changed budget and deltas; never do the percentage arithmetic yourself.",
+        "input_schema": {"type": "object", "properties": {"district": {"type": "string"}, "soil_type": {"type": "string"}, "water_source": {"type": "string"}, "season": {"type": "string"}, "area": {"type": "number"}, "area_unit": {"type": "string"}, "budget_bdt": {"type": "number"}, "budget_change_pct": {"type": "number"}}, "required": ["district", "soil_type", "water_source", "season", "area", "area_unit", "budget_bdt", "budget_change_pct"]},
+    },
+    {
+        "name": "care_schedule",
+        "description": "Show source-cited fertilizer and irrigation tasks from the saved season plan, with live forecast context when a task falls in the forecast horizon. Never calculate dose or task date yourself.",
+        "input_schema": {"type": "object", "properties": {"farm_id": {"type": "string"}}, "required": ["farm_id"]},
+    },
+    {
+        "name": "check_plan_conflicts",
+        "description": "Check the saved season plan against the live Open-Meteo forecast. It only flags weather-dependent tasks in the forecast horizon and persists traceable alerts; never invent a weather conflict.",
+        "input_schema": {"type": "object", "properties": {"farm_id": {"type": "string"}}, "required": ["farm_id"]},
+    },
     {
         "name": "rag_query",
         "description": (
@@ -126,6 +145,29 @@ TOOL_DEFS: list[dict[str, Any]] = [
                 "district": {"type": "string", "description": "canonical district name"},
             },
             "required": ["action", "crop", "district"],
+        },
+    },
+    {
+        "name": "agri_inputs",
+        "description": (
+            "Retrieve verified historic BBS Chapter 7 agricultural-input statistics. "
+            "Actions are: seed_supply (crop), fertilizer_market (fertilizer_type: Urea/TSP/DAP/MOP), "
+            "pesticide_use, wage_reference (district, optional gender/meal_type), irrigation_region "
+            "(crop, district), and irrigation_method (crop). These are historical aggregate/reference "
+            "facts, NOT current retail prices or a farm-specific dosage. Never use them to calculate "
+            "costs, profit, or fertilizer dose; use finance_projection and retrieved agronomy sources for those."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "action": {"type": "string", "enum": ["seed_supply", "fertilizer_market", "pesticide_use", "wage_reference", "irrigation_region", "irrigation_method"]},
+                "crop": {"type": "string", "enum": ["boro_rice", "aman_rice", "potato", "mustard", "lentil"]},
+                "district": {"type": "string"},
+                "fertilizer_type": {"type": "string", "enum": ["Urea", "TSP", "DAP", "MOP"]},
+                "gender": {"type": "string", "enum": ["male", "female"]},
+                "meal_type": {"type": "string", "enum": ["one_meal", "two_meal"]},
+            },
+            "required": ["action"],
         },
     },
     {
@@ -312,11 +354,15 @@ _DISPATCH: dict[str, Callable[..., dict]] = {
     "get_forecast": get_forecast,
     "get_climatology": get_climatology,
     "cropdb_sql": cropdb_sql,
+    "agri_inputs": agri_inputs,
     "crop_scorer": crop_scorer_tool,
     "finance_projection": finance_projection,
     "season_plan": season_plan,
     "ask_farmer": ask_farmer,
     "remember_farm": remember_farm,
+    "check_plan_conflicts": check_plan_conflicts,
+    "care_schedule": care_schedule,
+    "simulate_budget": simulate_budget,
 }
 
 

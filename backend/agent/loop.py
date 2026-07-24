@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from typing import Any, AsyncIterator, Iterator
@@ -48,10 +49,185 @@ from ..schemas import (
     ToolResultEvent,
     Usage,
 )
+from ..tools.ask import DISTRICT_BN
+from ..tools.districts import ALIASES, DISTRICTS
 from .config import AgentConfig
 from .llm_client import ChatBackend, LLMClient
 from .prompts import SYSTEM_PROMPT
 from .tools_spec import TOOL_DEFS, dispatch
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Deterministic intake extraction (CLAUDE.md rule 2's spirit applied to intake:
+# a regex is more reliable than prompt-hoping that the model will notice six
+# fields buried in one dense Bangla sentence). This is a mechanical parse, NOT
+# an inference engine — it only returns a field when an explicit keyword or
+# number+unit pattern matches, never a guess or a default. Absence from the
+# returned dict means "not detected in this message", not "confirmed empty";
+# the model still owns asking about anything genuinely missing (prompts.py's
+# intake section), this just gives it an authoritative answer for what it can
+# stop asking about. Traceable: every value here is copied verbatim from the
+# farmer's own words (mapped through a fixed table), never invented.
+#
+# Bangla synonym source: prompts.py's own intake section ("Extract fields the
+# farmer already stated") plus schemas.py's SoilType/WaterSource/Season
+# literals — keep this table in sync with those if either changes.
+# ─────────────────────────────────────────────────────────────────────────────
+
+_BN_DIGITS = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
+
+
+def _bn_to_western_digits(text: str) -> str:
+    return text.translate(_BN_DIGITS)
+
+
+# Bangla district name -> canonical English name (from the intake widget's own
+# label table, so extraction and the ask_farmer dropdown never disagree).
+_DISTRICT_BN_TO_EN: list[tuple[str, str]] = sorted(
+    ((bn, en) for en, bn in DISTRICT_BN.items()),
+    key=lambda pair: len(pair[0]),
+    reverse=True,
+)
+# English canonical names + known alias spellings, longest first so "Cox's
+# Bazar" is tried before any shorter accidental overlap.
+_DISTRICT_EN_NAMES: list[tuple[str, str]] = sorted(
+    [(name, name) for name in DISTRICTS] + [(alias, canon) for alias, canon in ALIASES.items()],
+    key=lambda pair: len(pair[0]),
+    reverse=True,
+)
+
+# Compound soil terms MUST be checked before their substrings ("এঁটেল দোআঁশ"
+# contains both "এঁটেল" and "দোআঁশ"; matching in this order keeps the exact
+# mapping prompts.py documents).
+_SOIL_TERMS: list[tuple[str, str]] = [
+    ("এঁটেল দোআঁশ", "clay_loam"),
+    ("বেলে দোআঁশ", "sandy_loam"),
+    ("দোআঁশ", "loam"),
+    ("এঁটেল", "clay"),
+    ("বেলে", "sandy"),
+    ("পলি মাটি", "silt"),
+    ("পিট মাটি", "peat"),
+    ("clay loam", "clay_loam"),
+    ("clay_loam", "clay_loam"),
+    ("sandy loam", "sandy_loam"),
+    ("sandy_loam", "sandy_loam"),
+    ("loam", "loam"),
+    ("clay", "clay"),
+    ("sandy", "sandy"),
+    ("silt", "silt"),
+    ("peat", "peat"),
+]
+
+_WATER_TERMS: list[tuple[str, str]] = [
+    ("গভীর নলকূপ", "tubewell"),
+    ("অগভীর নলকূপ", "tubewell"),
+    ("নলকূপ", "tubewell"),
+    ("বৃষ্টি নির্ভর", "rainfed"),
+    ("বৃষ্টিনির্ভর", "rainfed"),
+    ("বৃষ্টি-নির্ভর", "rainfed"),
+    ("খাল", "canal"),
+    ("সেচ", "irrigated"),
+    ("tubewell", "tubewell"),
+    ("rainfed", "rainfed"),
+    ("canal", "canal"),
+    ("irrigated", "irrigated"),
+    ("irrigation", "irrigated"),
+]
+
+_SEASON_TERMS: list[tuple[str, str]] = [
+    ("খরিপ-১", "kharif1"), ("খরিপ ১", "kharif1"), ("খরিপ১", "kharif1"),
+    ("খরিপ-২", "kharif2"), ("খরিপ ২", "kharif2"), ("খরিপ২", "kharif2"),
+    ("রবি", "rabi"),
+    ("kharif1", "kharif1"), ("kharif 1", "kharif1"), ("kharif-1", "kharif1"),
+    ("kharif2", "kharif2"), ("kharif 2", "kharif2"), ("kharif-2", "kharif2"),
+    ("rabi", "rabi"),
+]
+
+# (search term, canonical unit key) — matched against western-digit text via
+# the regex below, longest-first so "hectare" beats "ha", etc.
+_AREA_UNIT_TERMS: list[tuple[str, str]] = sorted(
+    [
+        ("বিঘা", "bigha"), ("কাঠা", "katha"), ("শতাংশ", "decimal"),
+        ("শতক", "decimal"), ("একর", "acre"), ("হেক্টর", "hectare"),
+        ("bigha", "bigha"), ("bighas", "bigha"), ("katha", "katha"),
+        ("decimal", "decimal"), ("decimals", "decimal"), ("hectare", "hectare"),
+        ("hectares", "hectare"), ("acre", "acre"), ("acres", "acre"), ("ha", "hectare"),
+    ],
+    key=lambda pair: len(pair[0]),
+    reverse=True,
+)
+_AREA_RE = re.compile(
+    r"(\d+(?:\.\d+)?)\s*(" + "|".join(re.escape(t) for t, _ in _AREA_UNIT_TERMS) + r")",
+    re.IGNORECASE,
+)
+_AREA_UNIT_MAP = dict(_AREA_UNIT_TERMS)
+
+# Budget: digits immediately followed by a money word. Deliberately does not
+# fire on a bare number (e.g. an area or a phone number) — the money keyword
+# is required, so it never invents a budget from an unrelated figure.
+_BUDGET_RE = re.compile(r"(\d[\d,]*(?:\.\d+)?)\s*(?:টাকা|taka|tk\.?|bdt)", re.IGNORECASE)
+
+
+def extract_known_fields(text: str) -> dict[str, Any]:
+    """Pull already-stated intake fields out of one farmer message.
+
+    Returns a dict with any subset of: district, area, area_unit, soil_type,
+    water_source, season, budget_bdt. Only includes a key when an explicit
+    keyword or number+unit pattern matched — never a default, never a guess.
+    Used to inject an authoritative "already known" system note (mirrors the
+    farm-memory note this module already injects for get_farm) so the model
+    stops re-asking for fields the farmer just typed, without relying on the
+    model to notice all six itself in one dense sentence.
+    """
+    if not text or not text.strip():
+        return {}
+    western = _bn_to_western_digits(text)
+    lower = western.lower()
+    found: dict[str, Any] = {}
+
+    for bn_name, en_name in _DISTRICT_BN_TO_EN:
+        if bn_name in text:
+            found["district"] = en_name
+            break
+    else:
+        for name, canon in _DISTRICT_EN_NAMES:
+            if name.lower() in lower:
+                found["district"] = canon
+                break
+
+    m = _AREA_RE.search(western)
+    if m:
+        unit_key = _AREA_UNIT_MAP.get(m.group(2).lower())
+        if unit_key:
+            try:
+                found["area"] = float(m.group(1))
+                found["area_unit"] = unit_key
+            except ValueError:
+                pass
+
+    for term, key in _SOIL_TERMS:
+        if term in text or term.lower() in lower:
+            found["soil_type"] = key
+            break
+
+    for term, key in _WATER_TERMS:
+        if term in text or term.lower() in lower:
+            found["water_source"] = key
+            break
+
+    for term, key in _SEASON_TERMS:
+        if term in text or term.lower() in lower:
+            found["season"] = key
+            break
+
+    m = _BUDGET_RE.search(western)
+    if m:
+        try:
+            found["budget_bdt"] = float(m.group(1).replace(",", ""))
+        except ValueError:
+            pass
+
+    return found
 
 
 def _now() -> str:
@@ -81,6 +257,9 @@ def _panel_event(tool_name: str, result: Any) -> SSEEvent | None:
             from backend.memory.store import save_plan
             save_plan(plan.farm_id, plan.model_dump())
             return PlanUpdateEvent(plan=plan)
+        if tool_name == "check_plan_conflicts" and result.get("alerts"):
+            from ..schemas import AlertEvent
+            return AlertEvent(alert=result["alerts"][0])
         # The intake widget (PRD §8 Tier0.1). The tool validates and shapes it;
         # this is where it becomes the event the UI has been able to render
         # since H2 but never received.
@@ -115,7 +294,27 @@ def run_turn_sync(
         for iterations in range(1, cfg.max_iterations + 1):
             with client.stream(messages, system=system, tools=TOOL_DEFS) as stream:
                 for delta in stream:
-                    yield TokenEvent(text=delta)
+                    # CLAUDE.md rule 10: numerals reaching the client are ALWAYS
+                    # Western, even though prompts.py tells the model this and the
+                    # model does not reliably comply (same lesson as ask_farmer —
+                    # prompt-only guarantees don't hold under this loop). Enforced
+                    # here, deterministically, at the point each streamed chunk
+                    # leaves the loop — not a whole-message regex, because the
+                    # message isn't whole yet.
+                    #
+                    # Safe under streaming because Bangla->Western digit mapping is
+                    # a PER-CHARACTER, CONTEXT-FREE substitution (str.translate on
+                    # single Unicode code points ০-৯, no multi-char sequences, no
+                    # reordering, no lookahead): translating "৮২" then ".৬৪" in two
+                    # separate chunks yields the same "82" + ".64" as translating
+                    # "৮২.৬৪" whole. A number split across a chunk boundary is
+                    # therefore translated correctly either way. `delta` is already
+                    # a decoded Python str by the time it reaches here (the OpenAI
+                    # SDK never hands us a chunk mid-UTF-8-codepoint), so there is
+                    # no partial-character risk to guard against either.
+                    # Only digit GLYPHS are in the translation table — Bangla words
+                    # and punctuation pass through untouched.
+                    yield TokenEvent(text=_bn_to_western_digits(delta))
                 res = stream.result()
 
             total_in += res.usage["in_tokens"]
@@ -252,6 +451,28 @@ async def run_turn(
             "When a tool requires farm_id, copy this value exactly."
         )
         messages.append({"role": "system", "content": note})
+
+    # Deterministic intake extraction (see extract_known_fields above). Runs on
+    # every turn, not just the first — a farmer can state a missing field in
+    # any message. Only injects a note when something was actually detected.
+    extracted = extract_known_fields(message)
+    if extracted:
+        messages.append({
+            "role": "system",
+            "content": (
+                "Deterministic extraction (a regex parse, not the model) found "
+                "these fields already stated in the farmer's next message, "
+                "mapped to canonical field names/values. Do NOT call ask_farmer "
+                "for any field listed here — treat it as known and confirm it "
+                "in passing instead. This is a mechanical parse and can miss "
+                "things a careful read would catch, so still read the farmer's "
+                "own words, and still ask (with ask_farmer) about any of "
+                "district / area+area_unit / soil_type / water_source / "
+                "budget_bdt / season that is NOT listed here and not already "
+                "known from earlier in this conversation.\n"
+                f"{json.dumps(extracted, ensure_ascii=False)}"
+            ),
+        })
 
     messages.append({"role": "user", "content": message})
 

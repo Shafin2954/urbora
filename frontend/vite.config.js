@@ -17,6 +17,11 @@ import { VitePWA } from 'vite-plugin-pwa'
 //    plugin here generates a manifest and NOTHING ELSE. See the comments on
 //    injectRegister/devOptions below before changing either.
 export default defineConfig({
+  // The API and browser share one ignored root `.env`. Vite otherwise looks
+  // beside this config (`frontend/.env`) and silently leaves VITE_* values
+  // undefined, which turns the login screen into a false "not configured"
+  // error even though FastAPI has loaded its copy correctly.
+  envDir: '..',
   plugins: [
     react(),
     VitePWA({
@@ -67,6 +72,10 @@ export default defineConfig({
     strictPort: true, // fail loudly rather than drifting to :5174 mid-demo
     proxy: {
       '/api': {
+        // 8000 is the documented port (README.md, backend/api/config.py
+        // API_PORT default, backend/.env.example): `uvicorn backend.api.main:app
+        // --port 8000`. Production remains same-origin and does not use this
+        // dev-only proxy.
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         // SSE dies if anything buffers or rewrites it. The backend already

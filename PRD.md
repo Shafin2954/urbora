@@ -114,7 +114,7 @@ Rules:
 |---|---|---|
 | Season | sowing window ∩ target season = ∅ → exclude | KB crop calendar |
 | Soil | farmer soil not in crop's allowed list → exclude | KB |
-| Water | crop water class > farm water class (rainfed < tubewell < canal/irrigated) → exclude | KB + intake |
+| Water | crop water class > farm water class (rainfed < canal < tubewell/irrigated) → exclude | KB + intake |
 | Budget | min_cost_per_ha × area > budget → exclude, agent offers reduced-area replan (recovery moment) | finance engine |
 
 ### Stage 2 — suitability score 0–100 for survivors

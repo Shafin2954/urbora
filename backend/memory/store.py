@@ -48,6 +48,14 @@ def _connect() -> sqlite3.Connection:
             updated_at TEXT NOT NULL
         )"""
     )
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS alerts (
+            alert_id TEXT PRIMARY KEY,
+            farm_id TEXT NOT NULL,
+            alert_json TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )"""
+    )
     return conn
 
 
@@ -124,5 +132,30 @@ def get_plan(farm_id: str) -> dict | None:
     try:
         row = conn.execute("SELECT plan_json FROM plans WHERE farm_id=?", (farm_id,)).fetchone()
         return json.loads(row[0]) if row else None
+    finally:
+        conn.close()
+
+
+def save_alert(alert: dict) -> None:
+    """Persist one deterministic weather-plan conflict by its stable id."""
+    conn = _connect()
+    try:
+        conn.execute(
+            "INSERT INTO alerts (alert_id, farm_id, alert_json, updated_at) VALUES (?,?,?,?) "
+            "ON CONFLICT(alert_id) DO UPDATE SET alert_json=excluded.alert_json, updated_at=excluded.updated_at",
+            (alert["alert_id"], alert["farm_id"], json.dumps(alert, ensure_ascii=False), _now()),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def get_alerts(farm_id: str) -> list[dict]:
+    conn = _connect()
+    try:
+        rows = conn.execute(
+            "SELECT alert_json FROM alerts WHERE farm_id=? ORDER BY updated_at DESC", (farm_id,)
+        ).fetchall()
+        return [json.loads(row[0]) for row in rows]
     finally:
         conn.close()

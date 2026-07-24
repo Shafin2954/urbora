@@ -50,8 +50,17 @@ from backend.units import to_hectares
 
 DEFAULT_CANDIDATES: tuple[str, ...] = ("boro_rice", "aman_rice", "potato", "mustard", "lentil")
 
-# PRD ordering "rainfed < tubewell < canal/irrigated" — canal and irrigated tie.
-WATER_RANK: dict[str, int] = {"rainfed": 0, "tubewell": 1, "canal": 2, "irrigated": 2}
+# Water-access ranking, higher = more reliable irrigation access. A tubewell
+# (farmer's own lift/shallow pump, on-demand) is strictly better access than a
+# shared canal (scheduled, contested, seasonal) — NOT worse. PRD.md §6's prose
+# table literally reads "rainfed < tubewell < canal/irrigated", which is
+# backwards from real BD agronomy and, left uncorrected here, silently
+# excluded boro rice — the single most important Rabi crop, overwhelmingly
+# shallow-tubewell irrigated — for every tubewell-only farm (boro's
+# water_min_rank=2 in kb/crop_facts.py was unreachable via tubewell under the
+# old ranks). Fixed 2026-07-25; PRD.md wording still needs a matching
+# correction by whoever owns it (out of this instance's directories).
+WATER_RANK: dict[str, int] = {"rainfed": 0, "canal": 1, "tubewell": 2, "irrigated": 2}
 
 
 @dataclass(frozen=True)
@@ -81,6 +90,11 @@ class CropFinance(TypedDict):
     source_id: str
     source_title: str
     formula: str
+    # "complete" (BBS aggregate expenditure) vs "partial_fertilizer_only"
+    # (fertiliser-doses-only minimum bound). Read via .get() with a
+    # "complete" default everywhere below, since synthetic finance dicts in
+    # tests and any pre-2026-07-25 caller never populate this key.
+    cost_basis: str
 
 
 def _now() -> str:
@@ -227,13 +241,44 @@ def _profit(
         return _unavailable_component("Profit", 25.0, "finance engine not yet built", now), 0.0
     fin = finance[crop]
     raw = fin["net_profit_bdt_per_ha"]
+    est_profit = raw * area_ha if area_ha is not None else raw
+    cost_basis = fin.get("cost_basis", "complete")
+    if cost_basis != "complete":
+        # This crop's cost line is a fertiliser-only minimum bound (see
+        # prices.md §2), not a full cost of cultivation, so its ROI/profit is
+        # structurally incomparable to a crop costed against BBS's complete
+        # aggregate expenditure — the crop with the LEAST complete cost data
+        # would otherwise win the min-max normalization every time. Neutral
+        # zero points, never scored from this basis; est_profit_bdt is still
+        # reported (it is real data, not invented) but the tool-level
+        # `degraded` list must say plainly that it is not comparable.
+        component = ScoreComponent(
+            name="Profit",
+            points=0.0,
+            max=25.0,
+            provenance=_prov(
+                raw,
+                unit="BDT/ha",
+                source_type="computed",
+                source_id=fin["source_id"],
+                source_title=fin["source_title"],
+                formula=(
+                    fin["formula"] + f"; cost_basis={cost_basis} (minimum bound, "
+                    "not a complete cost of cultivation) — excluded from Profit "
+                    "scoring and from the min-max range of crops with complete "
+                    "cost data"
+                ),
+                confidence="low",
+                retrieved_at=now,
+            ),
+        )
+        return component, est_profit
     if profit_range is None:
         points = 25.0
     else:
         lo, hi = profit_range
         points = 25.0 if hi == lo else 25.0 * (raw - lo) / (hi - lo)
     points = round(_clamp(points, 0.0, 25.0), 2)
-    est_profit = raw * area_ha if area_ha is not None else raw
     component = ScoreComponent(
         name="Profit",
         points=points,
@@ -467,8 +512,13 @@ def score_crops(
             "facts": facts,
         }
 
+    # Only crops with a complete cost basis participate in the Profit
+    # min-max range — a partial (fertiliser-only) basis is not a fair
+    # comparison point (see `_profit`'s docstring-length comment above).
     profit_raws = [
-        finance[c]["net_profit_bdt_per_ha"] for c in survivors if finance and c in finance
+        finance[c]["net_profit_bdt_per_ha"]
+        for c in survivors
+        if finance and c in finance and finance[c].get("cost_basis", "complete") == "complete"
     ]
     profit_range = (min(profit_raws), max(profit_raws)) if profit_raws else None
     known_cvs = [d["cv"] for d in scored.values() if d["cv"] is not None]
@@ -612,6 +662,30 @@ def crop_scorer_tool(
         )
     if finance is None:
         degraded.append(f"Profit component and Budget screening: unavailable — {finance_gap}")
+    elif finance:
+        partial_basis_crops = sorted(
+            c for c in crops if c in finance and finance[c].get("cost_basis", "complete") != "complete"
+        )
+        if partial_basis_crops:
+            degraded.append(
+                f"{'/'.join(partial_basis_crops)} cost data is fertiliser-only (minimum bound); "
+                "profit not comparable across crops"
+            )
+        # Sanity backstop, not a hard rule: a >150% ROI is not impossible for
+        # BD field crops but is unusual enough to be worth a flag rather than
+        # a silent, confident-looking number — especially useful if a future
+        # price/cost row is mistyped the way potato's 2024-25 harvest price
+        # was (2026-07-25 fix, see prices.md).
+        high_roi_crops = sorted(
+            c for c in crops
+            if c in finance and finance[c].get("min_cost_per_ha", 0) > 0
+            and (finance[c]["net_profit_bdt_per_ha"] / finance[c]["min_cost_per_ha"]) > 1.5
+        )
+        if high_roi_crops:
+            degraded.append(
+                f"{'/'.join(high_roi_crops)}: computed ROI exceeds 150% — plausible but unusual; "
+                "treat as a data sanity flag, not a guarantee"
+            )
 
     return {
         "candidates": [c.model_dump() for c in results],

@@ -29,8 +29,8 @@ function clamp(v, lo, hi) {
 }
 
 export function layout({ nodes, edges }, opts = {}) {
-  const r1 = opts.r1 ?? 190
-  const r2 = opts.r2 ?? 380
+  const r1 = opts.r1 ?? 170
+  const r2 = opts.r2 ?? 340
 
   const byId = new Map(nodes.map((n) => [n.id, n]))
   const adjacency = new Map(nodes.map((n) => [n.id, []]))
@@ -136,6 +136,32 @@ export function layout({ nodes, edges }, opts = {}) {
     : { minX: -200, minY: -200, maxX: 200, maxY: 200 }
 
   return { nodes: positionedNodes, edges: positionedEdges, bbox }
+}
+
+/**
+ * Calm chronological layout for the live provenance view. New facts enter at
+ * the right; GraphPanel keeps that newest node centred, so prior work moves
+ * left like a readable timeline instead of rebalancing a whole radial graph.
+ */
+export function linearLayout({ nodes, edges }, opts = {}) {
+  const step = opts.step ?? 170
+  const positionedNodes = nodes.map((node, index) => ({ ...node, x: index * step, y: 0 }))
+  const posById = new Map(positionedNodes.map((node) => [node.id, node]))
+  const positionedEdges = edges
+    .filter((edge) => posById.has(edge.from) && posById.has(edge.to))
+    .map((edge) => {
+      const a = posById.get(edge.from)
+      const b = posById.get(edge.to)
+      return { ...edge, x1: a.x, y1: a.y, x2: b.x, y2: b.y, mx: (a.x + b.x) / 2, my: 0 }
+    })
+  const last = positionedNodes.at(-1) ?? { x: 0, y: 0 }
+  const pad = 90
+  return {
+    nodes: positionedNodes,
+    edges: positionedEdges,
+    last,
+    bbox: { minX: -pad, minY: -pad, maxX: last.x + pad, maxY: pad },
+  }
 }
 
 export function fitTransform(bbox, viewportW, viewportH, { minScale = 0.3, maxScale = 2.5, marginFactor = 0.9 } = {}) {

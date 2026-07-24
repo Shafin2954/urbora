@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { apiUrl } from '../api/client.js'
 import { streamSSE } from '../api/sse.js'
 
@@ -23,9 +23,7 @@ const westernDigits = (text) => String(text).replace(/[০-৯]/g, (digit) => '0
  * recalling a returning farmer instead of starting cold. Override with
  * VITE_FARM_ID to talk to a different one.
  */
-export const FARM_ID = import.meta.env.VITE_FARM_ID ?? 'demo-rajshahi'
-
-export function useChat() {
+export function useChat({ farmId, sessionId, accessToken, onCropName, onChatTitle } = {}) {
   const [messages, setMessages] = useState([])
   const [trace, setTrace] = useState([])
   const [inputRequest, setInputRequest] = useState(null)
@@ -37,9 +35,24 @@ export function useChat() {
   const [error, setError] = useState(null)
 
   const abortRef = useRef(null)
-  const sessionRef = useRef(newId())
+  const sessionRef = useRef(sessionId ?? newId())
   // The assistant message currently being streamed into.
   const activeIdRef = useRef(null)
+
+  useEffect(() => {
+    sessionRef.current = sessionId ?? newId()
+    setMessages([]); setTrace([]); setPlan(null); setFinance(null); setAlerts([]); setInputRequest(null); setError(null)
+    if (!sessionId || !accessToken) return undefined
+    const controller = new AbortController()
+    fetch(apiUrl(`/api/sessions/${sessionId}`), { headers: { Authorization: `Bearer ${accessToken}` }, signal: controller.signal })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`)))
+      .then((body) => setMessages((body.messages ?? []).flatMap((message, index) => {
+        if (!['user', 'assistant'].includes(message.role) || typeof message.content !== 'string') return []
+        return [{ id: `history-${index}`, role: message.role, text: message.content }]
+      })))
+      .catch((err) => { if (!controller.signal.aborted) setError(err.message) })
+    return () => controller.abort()
+  }, [sessionId, accessToken])
 
   const appendToken = useCallback((text) => {
     setMessages((prev) => {
@@ -74,6 +87,7 @@ export function useChat() {
 
         case 'plan_update':
           setPlan(event.plan)
+          if (event.plan?.crop) onCropName?.(event.plan.crop)
           break
 
         case 'finance_update':
@@ -86,6 +100,17 @@ export function useChat() {
 
         case 'done':
           setUsage(event.usage ?? null)
+          setMessages((prev) => {
+            const id = activeIdRef.current
+            const index = prev.findIndex((message) => message.id === id)
+            if (index === -1) return prev
+            const match = prev[index].text.match(/^\s*\[\[CHAT_TITLE:\s*([^\]]{1,80})\]\]\s*/)
+            if (!match) return prev
+            onChatTitle?.(match[1].trim())
+            const next = [...prev]
+            next[index] = { ...next[index], text: next[index].text.slice(match[0].length) }
+            return next
+          })
           break
 
         case 'error':
@@ -97,7 +122,7 @@ export function useChat() {
           setTrace((prev) => [...prev, { ...event, seq: prev.length, unknown: true }])
       }
     },
-    [appendToken],
+    [appendToken, onChatTitle, onCropName],
   )
 
   const send = useCallback(
@@ -127,7 +152,7 @@ export function useChat() {
           method: 'POST',
           body: {
             session_id: sessionRef.current,
-            farm_id: FARM_ID,
+            farm_id: farmId,
             message: trimmed,
           },
           signal: controller.signal,
@@ -141,7 +166,7 @@ export function useChat() {
         setStreaming(false)
       }
     },
-    [handleEvent, streaming],
+    [farmId, handleEvent, streaming],
   )
 
   /** Answer an input_request widget. Sent as ordinary text so the agent needs
@@ -166,12 +191,13 @@ export function useChat() {
     // /api/finance/recompute returns — same engine, same shape, so the tab and
     // the agent can never show different numbers for the same farm.
     setFinance,
+    setAlerts,
     alerts,
     usage,
     streaming,
     error,
     sessionId: sessionRef.current,
-    farmId: FARM_ID,
+    farmId,
     send,
     answerInput,
     stop,

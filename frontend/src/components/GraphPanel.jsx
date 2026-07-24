@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { buildGraph, NODE_STYLE, LEGEND } from '../lib/traceGraph.js'
-import { layout, fitTransform, clamp } from '../lib/graphLayout.js'
-import NodeInspector from './NodeInspector.jsx'
-import TracePanel from './TracePanel.jsx'
+import { buildGraph, NODE_STYLE } from '../lib/traceGraph.js'
+import { linearLayout, clamp } from '../lib/graphLayout.js'
 
 /**
  * The provenance graph — Tier 0 item 8, replacing the raw JSON trace dump.
@@ -22,25 +20,28 @@ import TracePanel from './TracePanel.jsx'
 
 const VB_W = 640
 const VB_H = 460
+const focusNewest = (graph) => ({ scale: 1.25, x: VB_W * 0.54 - graph.last.x * 1.25, y: VB_H / 2 - graph.last.y * 1.25 })
 
-export default function GraphPanel({ trace, usage }) {
+export default function GraphPanel({ trace, usage, streaming }) {
   const graph = useMemo(() => buildGraph(trace), [trace])
-  const laid = useMemo(() => layout(graph), [graph])
+  const laid = useMemo(() => linearLayout(graph), [graph])
+  const [frozenLaid, setFrozenLaid] = useState(null)
+  const display = frozenLaid ?? laid
+  const activeCall = [...Object.values(graph.callsById)].reverse().find((call) => !Object.hasOwn(call, 'result'))
 
-  const [view, setView] = useState(() => fitTransform(laid.bbox, VB_W, VB_H))
-  const [selectedId, setSelectedId] = useState(null)
+  const [view, setView] = useState(() => focusNewest(laid))
   const userMovedRef = useRef(false)
   const draggingRef = useRef(null)
   const svgRef = useRef(null)
 
-  const nodeCount = laid.nodes.length
+  const nodeCount = display.nodes.length
   useEffect(() => {
-    if (userMovedRef.current) return
-    setView(fitTransform(laid.bbox, VB_W, VB_H))
-    // Re-fit whenever the graph gains or loses nodes, but stop chasing the
-    // judge's own pan/zoom the moment they touch it.
+    if (frozenLaid) return
+    setView(focusNewest(display))
+    // A fresh fact becomes the reading focus; the user can still pan freely
+    // until the following fact arrives.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodeCount])
+  }, [nodeCount, frozenLaid])
 
   // Only the truly new nodes/edges animate in — a re-render from an
   // unrelated state change must not replay the entrance on everything.
@@ -48,19 +49,19 @@ export default function GraphPanel({ trace, usage }) {
   const seenEdgesRef = useRef(new Set())
   const newNodeIds = useMemo(() => {
     const fresh = new Set()
-    for (const n of laid.nodes) if (!seenNodesRef.current.has(n.id)) fresh.add(n.id)
+    for (const n of display.nodes) if (!seenNodesRef.current.has(n.id)) fresh.add(n.id)
     return fresh
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [laid.nodes])
+  }, [display.nodes])
   const newEdgeIds = useMemo(() => {
     const fresh = new Set()
-    for (const e of laid.edges) if (!seenEdgesRef.current.has(e.id)) fresh.add(e.id)
+    for (const e of display.edges) if (!seenEdgesRef.current.has(e.id)) fresh.add(e.id)
     return fresh
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [laid.edges])
+  }, [display.edges])
   useEffect(() => {
-    for (const n of laid.nodes) seenNodesRef.current.add(n.id)
-    for (const e of laid.edges) seenEdgesRef.current.add(e.id)
+    for (const n of display.nodes) seenNodesRef.current.add(n.id)
+    for (const e of display.edges) seenEdgesRef.current.add(e.id)
   })
 
   const onPointerDown = (e) => {
@@ -85,19 +86,23 @@ export default function GraphPanel({ trace, usage }) {
     setView((v) => ({ ...v, scale: clamp(v.scale * (e.deltaY > 0 ? 0.9 : 1.1), 0.5, 2.5) }))
   }
 
-  const selectedNode = selectedId ? laid.nodes.find((n) => n.id === selectedId) : null
-
   if (graph.nodes.length <= 1 && trace.length === 0) {
     return (
       <p className="muted empty-hint">
-        No tool calls yet. As the agent works, a graph grows outward from the
-        farm — every node a fact, every edge the tool that produced it.
+        কাজ শুরু হলে এখানে তথ্যের সংযোগচিত্র দেখা যাবে।
       </p>
     )
   }
 
   return (
     <div className="graph-panel">
+      <div className="graph-toolbar">
+        <span>{frozenLaid ? 'চিত্র স্থির আছে' : 'কাজের সঙ্গে চিত্র তৈরি হচ্ছে'}</span>
+        <strong className={`graph-active-tool${activeCall ? ' is-active' : ''}`}>{activeCall ? `চলছে: ${TOOL_LABELS[activeCall.name] ?? 'কাজ'}` : streaming ? 'উত্তর তৈরি হচ্ছে' : ''}</strong>
+        <button className="graph-freeze" onClick={() => setFrozenLaid(frozenLaid ? null : laid)}>
+          {frozenLaid ? 'চালু করুন' : 'স্থির করুন'}
+        </button>
+      </div>
       <svg
         ref={svgRef}
         className="graph-svg"
@@ -111,29 +116,18 @@ export default function GraphPanel({ trace, usage }) {
         onWheel={onWheel}
       >
         <g transform={`translate(${view.x} ${view.y}) scale(${view.scale})`}>
-          {laid.edges.map((edge) => (
-            <EdgeView key={edge.id} edge={edge} isNew={newEdgeIds.has(edge.id)} />
+          {display.edges.map((edge) => (
+            <EdgeView key={edge.id} edge={edge} isNew={newEdgeIds.has(edge.id)} isActive={Boolean(graph.callsById[edge.callId] && !Object.hasOwn(graph.callsById[edge.callId], 'result'))} />
           ))}
-          {laid.nodes.map((node) => (
+          {display.nodes.map((node) => (
             <NodeView
               key={node.id}
               node={node}
               isNew={newNodeIds.has(node.id)}
-              isSelected={node.id === selectedId}
-              onSelect={() => setSelectedId(node.id)}
             />
           ))}
         </g>
       </svg>
-
-      <ul className="graph-legend" aria-label="Legend">
-        {LEGEND.map(({ kind, label }) => (
-          <li key={kind} className="graph-legend-item">
-            <MiniShape kind={kind} />
-            <span>{label}</span>
-          </li>
-        ))}
-      </ul>
 
       {usage && (
         <p className="usage mono">
@@ -142,14 +136,6 @@ export default function GraphPanel({ trace, usage }) {
         </p>
       )}
 
-      <details className="graph-raw-log">
-        <summary>Raw log ({trace.length} events)</summary>
-        <TracePanel trace={trace} usage={null} />
-      </details>
-
-      {selectedNode && (
-        <NodeInspector node={selectedNode} callsById={graph.callsById} onClose={() => setSelectedId(null)} />
-      )}
     </div>
   )
 }
@@ -170,6 +156,8 @@ function Shape({ kind, r, fill, stroke, dashed }) {
     stroke,
     strokeWidth: 2,
     strokeDasharray: dashed ? '4 3' : undefined,
+    strokeLinejoin: 'round',
+    strokeLinecap: 'round',
   }
   switch (style.shape) {
     case 'circle':
@@ -187,17 +175,7 @@ function Shape({ kind, r, fill, stroke, dashed }) {
   }
 }
 
-function MiniShape({ kind }) {
-  const style = NODE_STYLE[kind]
-  const r = 9
-  return (
-    <svg width="20" height="20" viewBox="-10 -10 20 20" aria-hidden="true">
-      <Shape kind={kind} r={r} fill={style.fill} stroke={style.stroke} />
-    </svg>
-  )
-}
-
-function NodeView({ node, isNew, isSelected, onSelect }) {
+function NodeView({ node, isNew }) {
   const style = NODE_STYLE[node.kind] ?? NODE_STYLE.question
   const stroke = node.excluded || node.degraded ? 'var(--clay)' : style.stroke
   const dashed = Boolean(node.excluded || node.degraded || node.dashed)
@@ -205,21 +183,15 @@ function NodeView({ node, isNew, isSelected, onSelect }) {
 
   return (
     <g
-      className={`graph-node${isNew ? ' is-new' : ''}${isSelected ? ' is-selected' : ''}`}
+      className={`graph-node${isNew ? ' is-new' : ''}`}
       transform={`translate(${node.x} ${node.y})`}
       tabIndex={0}
-      role="button"
+      role="img"
       aria-label={`${node.kind}: ${node.label}`}
-      onClick={onSelect}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onSelect()
-        }
-      }}
     >
       <circle r={hitRadius} fill="transparent" />
       <Shape kind={node.kind} r={style.r} fill={style.fill} stroke={stroke} dashed={dashed} />
+      <LabelBackground text={node.label} y={style.r + 14} className="graph-node-label-bg" />
       <text
         className="graph-node-label"
         y={style.r + 14}
@@ -228,23 +200,39 @@ function NodeView({ node, isNew, isSelected, onSelect }) {
       >
         {node.label}
       </text>
-      {node.sub && (
-        <text className="graph-node-sub mono" y={style.r + 27} textAnchor="middle" fill="var(--ink-soft)">
-          {node.sub}
-        </text>
-      )}
+      {node.sub && <>
+        <LabelBackground text={node.sub} y={style.r + 27} className="graph-node-sub-bg" />
+        <text className="graph-node-sub mono" y={style.r + 27} textAnchor="middle" fill="var(--ink-soft)">{node.sub}</text>
+      </>}
     </g>
   )
 }
 
-function EdgeView({ edge, isNew }) {
+const TOOL_LABELS = {
+  rag_query: 'তথ্য খোঁজা', geocode: 'স্থান খোঁজা', get_forecast: 'আবহাওয়া',
+  get_climatology: 'জলবায়ু', crop_scorer: 'ফসল বাছাই', season_plan: 'পরিকল্পনা',
+  finance_projection: 'হিসাব', ask_farmer: 'প্রশ্ন', cropdb_sql: 'তথ্যভান্ডার',
+}
+
+function EdgeView({ edge, isNew, isActive }) {
+  const length = Math.hypot(edge.x2 - edge.x1, edge.y2 - edge.y1)
+  const toKind = edge.tool === 'rag_query' || edge.to.startsWith('source:') ? 'var(--leaf)' : edge.to.startsWith('weather:') || edge.to.startsWith('place:') ? 'var(--soil)' : edge.to === 'plan' || edge.to === 'finance' ? 'var(--green-dark)' : 'var(--green)'
+  const label = TOOL_LABELS[edge.tool] ?? 'কাজ'
+  const labelWidth = Math.max(26, label.length * 7 + 12)
   return (
-    <g className={`graph-edge${isNew ? ' is-new' : ''}`}>
-      <line x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2} stroke="var(--border)" strokeWidth={1.5} />
-      <rect x={edge.mx - 34} y={edge.my - 8} width={68} height={14} fill="var(--bg)" opacity={0.9} />
-      <text className="graph-edge-label mono" x={edge.mx} y={edge.my + 3} textAnchor="middle" fill="var(--soil)">
-        {edge.tool}
-      </text>
+    <g className={`graph-edge${isNew ? ' is-new' : ''}${isActive ? ' is-active' : ''}`}>
+      <line className="graph-edge-lead" x1={edge.x1} y1={edge.y1} x2={edge.mx} y2={edge.my} stroke={toKind} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={edge.dashed ? '4 3' : undefined} opacity={0.7} />
+      <line className="graph-edge-tail" x1={edge.mx} y1={edge.my} x2={edge.x2} y2={edge.y2} stroke={toKind} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={edge.dashed ? '4 3' : undefined} opacity={0.7} />
+      {isNew && <g transform={`translate(${edge.mx} ${edge.my})`}><polygon className="graph-edge-pulse" points="0,-7 6,5 -6,5" fill={toKind} /></g>}
+      {length >= 40 && <>
+        <rect x={edge.mx - labelWidth / 2} y={edge.my - 8} width={labelWidth} height={14} rx={3} fill="var(--bg)" opacity={0.94} />
+        <text className="graph-edge-label" x={edge.mx} y={edge.my + 3} textAnchor="middle" fill="var(--soil)">{label}</text>
+      </>}
     </g>
   )
+}
+
+function LabelBackground({ text, y, className }) {
+  const width = Math.max(20, String(text).length * 6.2 + 8)
+  return <rect className={className} x={-width / 2} y={y - 10} width={width} height={14} rx={3} fill="var(--bg)" opacity={0.92} />
 }

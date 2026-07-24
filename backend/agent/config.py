@@ -21,9 +21,19 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 load_dotenv()
 
-DEFAULT_MODEL = "gpt-4o-mini"       # tool-capable, cost-appropriate baseline; override via OPENAI_MODEL
+DEFAULT_MODEL = "gpt-4o"            # tool-calling must be reliable under this 14-tool
+# loop + long system prompt. gpt-4o-mini was the original baseline but was
+# verified live (2026-07-25) to skip tool calls entirely on a dense intake
+# message — zero tool_call events, model answered from recall instead. gpt-4o
+# was verified working on this account (ask_farmer fired correctly). Override
+# via OPENAI_MODEL if your account has something better; see backend/.env.example.
 DEFAULT_MAX_TOKENS = 4000
-DEFAULT_TEMPERATURE = 0.2           # low for deterministic narration; blank env → omit param
+DEFAULT_TEMPERATURE = 0.0           # deterministic narration AND deterministic tool-call
+# decisions. Live-verified 2026-07-25: at 0.2, gpt-4o was flaky on a vague opening
+# message — sometimes called ask_farmer (correct), sometimes answered the same
+# missing-district question in plain chat text instead (the bug rule this whole
+# section exists to prevent). 0.0 is the lowest lever available before touching
+# the prompt further; blank env → omit param (for reasoning models that reject it).
 DEFAULT_MAX_ITERATIONS = 12         # agent loop guard (NOTES #5, CLAUDE.md rule 9)
 
 

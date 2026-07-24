@@ -1,1 +1,1 @@
-"""Tools: weather, geocode, rag_query, cropdb_sql, crop_scorer, check_plan_conflicts (Instance A)."""
+"""Tools: weather, geocode, retrieval, crop facts, Chapter 7 input facts, and planning helpers."""

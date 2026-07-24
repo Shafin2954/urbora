@@ -133,3 +133,59 @@ Append-only. Format defined in CLAUDE.md §1. Newest entry at the bottom.
 **Rejected:** Asking A to change `run_turn` to my original shape (theirs is better, and the adapter is 60 lines on my side of the fence). Re-redacting every event unconditionally (lossy, above). A bounded queue in the bridge (backpressure needs the producer to block, which reintroduces a hang risk; the 12-iteration guard bounds the volume anyway).
 **Still open, for A:** `farm_id` arrives on `ChatRequest` and is stored on the session, but **`run_turn` has no way to receive it** — so the agent currently cannot know which farm it is talking about. That needs a parameter, or it needs to come from your memory layer. Flagging rather than inventing a convention.
 **Impacts other instance:** **yes.** (a) A — `farm_id` above. (b) A — your agent's own `.env` loading fix works; I installed your `openai==2.48.0` pin into the shared root `.venv`. (c) A — nothing about your loop changed; the adapter is entirely on B's side.
+
+## [02:35] Crop-scoped Supabase shell and graph cleanup
+**Did:** Added the `crops` Supabase migration; RLS-passthrough crop/session API routes; pinned `@supabase/supabase-js@2.110.8`; auth, crop sidebar, crop editing, transcript rehydration, rounded desktop shell, and provenance-graph cleanup. The graph now connects each retrieved source only to its named crop (3 edges in the captured shape, not 9).
+**Decision:** Supabase remains an ownership/index layer. SQLite remains the sole source for farm profile fields and conversation messages.
+**Why:** This preserves the tested agent, memory, and finance paths while giving each authenticated crop its own stable `farm_id` and `session_id`.
+**Rejected:** Migrating farm memory or chat history into Postgres; that would create a risky dual data migration near the demo.
+**Impacts other instance:** yes — add the Supabase URL and anon key to the root `.env`, then run the supplied migration. No agent/tool/schema changes were made.
+
+## [02:33] Local Supabase stack verified
+**Did:** Initialized the repository with `npx supabase`, started the local stack, and ran `npx supabase db reset --local`. The crops migration applied successfully and the local migration ledger reports `20260725023000` on both sides.
+**Decision:** Keep the generated standard `supabase/config.toml`; use `npx supabase` rather than requiring a globally installed CLI.
+**Why:** It makes the setup reproducible on the demo machine while retaining the migration already committed for crop identity/RLS.
+**Rejected:** A global CLI dependency; it was unavailable on this machine.
+**Impacts other instance:** yes — local API is at `127.0.0.1:54321` and Studio at `127.0.0.1:54323`; add the printed local anon key to the ignored root `.env` before using the auth UI.
+
+## [02:38] AgriSense cloud project linked and migrated
+**Did:** Linked this repository to cloud project `TeamFixeth_AgriSense` (`quppbvckhinyslcebhfg`), copied its public URL/anon key into the ignored root `.env`, and pushed `20260725023000_crops.sql`. Remote migration history confirms the revision is applied.
+**Decision:** The backend and browser share the public anon key; no service-role key is stored by this app.
+**Why:** Every crop request still forwards the signed-in user's access token to RLS, while the same environment works in Vite and FastAPI.
+**Rejected:** Storing a service-role key or bypassing RLS for backend writes.
+**Impacts other instance:** yes — restart Vite and FastAPI so they load the new `.env`; the cloud schema is ready for the auth/crop flow.
+
+## [02:46] Fixed Vite root environment loading
+**Did:** Set `frontend/vite.config.js` `envDir: '..'` and rebuilt the production client; the configured Supabase project URL is now present in the bundled client.
+**Decision:** Keep one ignored root `.env` for both FastAPI and Vite.
+**Why:** Vite had been searching only `frontend/.env`, while FastAPI correctly loaded the root file, producing the misleading browser-only “Supabase is not configured” error.
+**Rejected:** Duplicating credentials into a second frontend `.env` file.
+**Impacts other instance:** no.
+
+## [03:28] Chat titles, focused graph, and compact list rows
+**Did:** Added the cloud `title` column migration for chats, instructed the agent to emit a hidden Bangla first-question summary marker, and save/strip that marker in the client. Tightened sidebar rows, corrected composer edge padding, increased the linear graph focus scale, and added a centred live tool-status indicator.
+**Decision:** Crop names and chat titles are separate persisted fields: the first describes the identified crop, while the second is the agent-written one-line purpose of the conversation.
+**Why:** A crop such as “বোরো ধান” cannot distinguish two different discussions about it; a short first-question summary can, while keeping the crop details view useful.
+**Rejected:** Naming chats directly from raw farmer text in the browser; the agent can produce a concise Bangla summary and is the requested authority for it.
+**Impacts other instance:** yes — migration `20260725032500_crop_titles.sql` is deployed to the linked cloud project; restart FastAPI to load the updated system prompt.
+
+## [03:11] Split crop memory from chat navigation and linearized graph
+**Did:** Divided the sidebar into “আমার আলাপ” (all resumable conversations) and “আমার ফসল” (agent-identified crop records with saved details/edit access). Replaced the radial provenance display with a left-moving linear sequence: each new node is centred, prior work shifts left, and a rotating triangle bridges the staged edge/node entrance.
+**Decision:** A named crop appears in both sections because one consultation is the durable conversation behind that crop; the crop section opens saved details instead of resuming chat.
+**Why:** This preserves one-thread-per-crop persistence while making the two intents—continue talking versus inspect/edit crop data—visibly distinct.
+**Rejected:** A second database entity for crop details; it would duplicate the existing RLS crop record and SQLite profile memory without adding user value.
+**Impacts other instance:** no.
+
+## [03:02] Persistent Bangla consultation list and overflow fix
+**Did:** Removed root-page overflow so only the chat transcript scrolls. Renamed the fresh crop action to “নতুন আলাপ”, clarified the sidebar’s “আমার ফসল” section, translated edit-field labels, and persistently name a consultation when the agent emits its planned crop.
+**Decision:** A fresh consultation remains unnamed until the agent has enough information to emit a season plan; its crop name is then saved in the existing Supabase crop index.
+**Why:** This makes the sidebar a durable list of actual crop discussions, not an up-front form that asks the farmer to categorize a chat before the agent knows the crop.
+**Rejected:** A separate client-only title store; it would disappear across devices and contradict the crop-memory design.
+**Impacts other instance:** no.
+
+## [02:55] Compact Bangla UI and calmer provenance graph
+**Did:** Reduced base type size, fixed transparent-button hover contrast, constrained the application/chat area to its own scroll region, widened the desktop shell, removed the proof tab and all dev-harness UI, and made the graph background transparent. The graph now uses Bangla labels, animated active tool edges, and a freeze/resume control.
+**Decision:** Removed the raw English graph log and node-inspector UI from this farmer-facing screen; raw source values remain untouched.
+**Why:** The previous graph was too dense and English-heavy for the requested product surface. Freezing preserves a readable evidence snapshot while live tool edges still explain work as it happens.
+**Rejected:** Translating source-provided evidence or tool payloads; that risks changing factual values rather than translating interface language.
+**Impacts other instance:** no.
