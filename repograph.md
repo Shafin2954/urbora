@@ -6,6 +6,11 @@ other instance doesn't re-explore. "?" = not yet known / not yet built.
 ## Ownership legend
 A = Instance A (agent/tools/kb/memory/schemas/data) · B = Instance B (api/finance/payments/frontend/units)
 
+## Unit conventions (ratified — use these everywhere)
+**1 maund = 40 kg.** **1 bigha = 20 katha = 0.1338 ha.** Internal values are always
+ha and kg; local units exist only at the intake/display edges, via `backend/units.py`.
+Must also be stated in the README (NOTES #9). Detail and reasoning: `backend/units.py`.
+
 ## backend/ (created H0–H1 by A)
 - `backend/requirements.txt` — pinned deps. A's core: anthropic 0.119.0, pydantic 2.13.4, python-dotenv 1.2.2. B's are pulled in via `-r api/requirements-api.txt`. Pin exact on first add.
 - `backend/.env.example` — A's env keys. **See the env-loading trap below** for which `.env` is actually read.

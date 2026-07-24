@@ -21,19 +21,14 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 from fastapi import APIRouter, Request
-from pydantic import BaseModel
+
+# THE CONTRACT (A, frozen H1). Imported, never redefined — a second definition
+# of the request shape is how the two halves silently diverge.
+from backend.schemas import ChatRequest
 
 from . import sse
 
 router = APIRouter()
-
-
-class ChatRequest(BaseModel):
-    """PLAN.md §2: POST /api/chat {session_id, farm_id|null, message}."""
-
-    session_id: str
-    farm_id: str | None = None
-    message: str
 
 
 def _load_agent():

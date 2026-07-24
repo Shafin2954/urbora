@@ -13,6 +13,7 @@ python-dotenv==1.2.2      # load .env (secrets never in git)
 # sentence-transformers==<pin>   # pre-cached embedding model, English queries
 
 # ── Instance B adds: api / finance / payments (append below, keep pins exact) ──
-# fastapi==<pin>
-# uvicorn[standard]==<pin>
-# sse-starlette==<pin>           # or hand-rolled SSE — B's call
+# B's pins live in one file so the two of us can never drift on a shared
+# version. Direct adds: fastapi, uvicorn[standard], python-dotenv, pytest.
+# SSE is hand-rolled (no sse-starlette) — see backend/api/sse.py for why.
+-r api/requirements-api.txt
