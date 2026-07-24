@@ -37,6 +37,10 @@ from typing import Any, AsyncIterator, Iterator
 from ..schemas import (
     DoneEvent,
     ErrorEvent,
+    FinanceProjection,
+    FinanceUpdateEvent,
+    PlanUpdateEvent,
+    SeasonPlan,
     SSEEvent,
     TokenEvent,
     ToolCallEvent,
@@ -51,6 +55,31 @@ from .tools_spec import TOOL_DEFS, dispatch
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _panel_event(tool_name: str, result: Any) -> SSEEvent | None:
+    """Turn a tool result into a panel-update event, when it is one.
+
+    Some tools produce structured objects the UI renders in a tab rather than
+    prose the model narrates. Emitting those directly means the Finance and
+    Plan tabs fill from the tool's own output — the same numbers the trace
+    shows — instead of from anything the model retypes.
+
+    Returns None for everything else, and never raises: a malformed result must
+    cost us a panel update, not the turn.
+    """
+    if not isinstance(result, dict) or result.get("error"):
+        return None
+    try:
+        if tool_name == "finance_projection" and "projection" in result:
+            return FinanceUpdateEvent(
+                finance=FinanceProjection.model_validate(result["projection"])
+            )
+        if tool_name == "season_plan" and "plan" in result:
+            return PlanUpdateEvent(plan=SeasonPlan.model_validate(result["plan"]))
+    except Exception:  # noqa: BLE001 — a bad shape loses the panel, not the turn
+        return None
+    return None
 
 
 def run_turn_sync(
@@ -93,6 +122,12 @@ def run_turn_sync(
                 yield ToolCallEvent(id=tc.id, name=tc.name, params=tc.args, ts=_now())
                 result = dispatch(tc.name, tc.args)
                 yield ToolResultEvent(id=tc.id, name=tc.name, result_raw=result, ts=_now())
+                # A costing is structured data, not just narration material: the
+                # Finance tab renders it from this event while the model is
+                # still writing its Bangla summary.
+                panel = _panel_event(tc.name, result)
+                if panel is not None:
+                    yield panel
                 messages.append(
                     client.tool_result_message(
                         tc.id,

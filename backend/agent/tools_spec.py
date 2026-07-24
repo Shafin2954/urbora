@@ -15,6 +15,7 @@ from typing import Any, Callable
 
 from ..tools.crop_scorer import crop_scorer_tool
 from ..tools.cropdb import cropdb_sql
+from ..tools.finance import finance_projection
 from ..tools.geocode import geocode
 from ..tools.weather import get_climatology, get_forecast
 
@@ -139,6 +140,42 @@ TOOL_DEFS: list[dict[str, Any]] = [
             "required": ["district", "soil_type", "water_source", "season"],
         },
     },
+    {
+        "name": "finance_projection",
+        "description": (
+            "Costed three-scenario projection for ONE crop on ONE farm: itemised "
+            "costs, expected yield, revenue, net profit, ROI, break-even yield and "
+            "break-even price. You must NEVER compute money yourself — call this "
+            "and narrate it. Yield comes from crop.db's damped-Holt projection; "
+            "always quote the base yield together with its band, never alone. "
+            "Prices come from data/prices.md, and only from cited rows: if a crop "
+            "has no cited price or cost yet the tool returns "
+            "error='price_data_unavailable' listing what is missing — say that "
+            "plainly in Bangla ('তথ্য যথেষ্ট নয়') and do NOT estimate a number. "
+            "Pass the farmer's area in the unit they said it in; the tool converts. "
+            "If you pass budget_bdt it also returns whether the plan is affordable "
+            "and the largest area that would fit — use that for a reduced-area "
+            "replan instead of calculating one."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "crop": {
+                    "type": "string",
+                    "description": "boro_rice | aman_rice | potato | mustard | lentil",
+                },
+                "district": {"type": "string", "description": "canonical district name"},
+                "area": {"type": "number", "description": "farm size as the farmer stated it"},
+                "area_unit": {
+                    "type": "string",
+                    "enum": ["bigha", "katha", "decimal", "acre", "hectare"],
+                    "description": "unit for `area`; defaults to hectare",
+                },
+                "budget_bdt": {"type": "number", "description": "farmer's budget in BDT"},
+            },
+            "required": ["crop", "district", "area"],
+        },
+    },
 ]
 
 _DISPATCH: dict[str, Callable[..., dict]] = {
@@ -147,6 +184,7 @@ _DISPATCH: dict[str, Callable[..., dict]] = {
     "get_climatology": get_climatology,
     "cropdb_sql": cropdb_sql,
     "crop_scorer": crop_scorer_tool,
+    "finance_projection": finance_projection,
 }
 
 

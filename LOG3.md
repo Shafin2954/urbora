@@ -45,3 +45,40 @@ it isn't, and that day is unrecoverable).
 **Verified:** `POST /api/chat` over real HTTP reaches the loop and degrades honestly —
 no `.env` on this machine, so it returns `error` naming the missing key, then `done`.
 **Impacts other instance:** n/a — one operator from here.
+
+## [11:20] Phase 1 — finance wired end to end, waiting on data not on code
+**Did:** `data/prices.md` (the citation table), `backend/finance/catalog.py` (parses it into
+engine inputs), `backend/tools/finance.py` (`finance_projection` agent tool, registered in
+`tools_spec.py`), the finance seam supplied to `crop_scorer_tool`, `backend/api/finance.py`
+(`POST /api/finance/recompute`), and `_panel_event` in the loop so a costing emits a
+`finance_update` the Finance tab can render. 55 new tests; **328 green**.
+**Decision — prices are a data drop, not a code change.** The yearbook extraction is still
+running, so `prices.md`'s farm-gate and input-cost tables ship **empty**, and every consumer
+degrades honestly: the tool returns `price_data_unavailable` naming exactly what is missing,
+the route returns 422, the scorer reports Profit unavailable. Filling in one markdown row
+switches all of it on with no code touched — proven by tests that write a filled table and
+assert the whole chain lights up, rather than by hoping.
+**Why:** "It'll work when the data lands" is the class of claim that turns out to be false at
+4am. The tests make it checkable now.
+**Decision — retail prices are structurally unreachable from revenue.** The TCB bulletin A
+committed is *retail Dhaka*: milled rice 50–60৳/kg, split dal 90–100, potato 25–30, dated
+24-07-2026. A farmer sells **paddy**, unmilled, at roughly half that. `prices.md` keeps those
+rows (they are real, cited, and genuinely useful as market context) in a third table that
+`catalog.py` parses but `projection()` cannot read. A test pins it: costs present + retail row
+present + no farm-gate row still refuses.
+**Why:** Wiring retail into revenue would roughly double every profit figure on screen, in the
+direction that flatters us, and a judge who knows paddy prices would catch it in one question.
+**Decision — partial price coverage supplies the scorer nothing at all.** PRD §6 normalizes
+Profit min-max *within the candidate set*, so pricing three of five crops would rank the other
+two down for lacking a citation rather than for being worse crops. All five or none.
+**Also:** the finance tool converts the farmer's bigha/katha itself and returns
+`max_area_ha_within_budget` precomputed, so the reduced-area replan (demo recovery #2) needs no
+arithmetic from the model — rule 1 holds even in the recovery path.
+**Verified:** over HTTP, all three refusals name the cause — uncited prices, missing inputs, and
+a typo'd override field (`aera` fails loudly instead of silently recomputing the old area).
+With a filled fixture table, 2 bigha → 3 scales cost/revenue/profit by exactly 1.5, holds ROI
+constant, leaves break-even price unmoved, and the cost column still adds up in the JSON the
+browser receives.
+**Rejected:** Deriving farm-gate from retail with a milling-ratio conversion (defensible only
+with a citation for the ratio; without one it is invented data). Shipping example rows in
+prices.md to make the tables look filled (placeholder content, banned).

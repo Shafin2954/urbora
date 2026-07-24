@@ -1,10 +1,13 @@
 """crop_scorer.py — deterministic, unit-tested crop ranking (PRD §6).
 
 Pure function `score_crops()`. The LLM never ranks crops itself — it narrates
-this module's output (CLAUDE.md rule 1). Two real dependencies don't exist yet:
+this module's output (CLAUDE.md rule 1). Dependency status:
 
-  * B's finance engine (backend/finance/, prices.md) -> blocks the Budget
-    exclusion and the Profit component.
+  * Finance engine (backend/finance/) -> BUILT. `crop_scorer_tool` now supplies
+    the `finance` seam from `data/prices.md`, which switches on the Budget
+    exclusion and the Profit component — but only once a crop actually has a
+    cited price and cost row. While prices.md's farm-gate table is empty, this
+    still reports unavailable, for a data reason rather than a code reason.
   * Curated BARC/BRRI/BARI KB markdown -> blocks the Season/Soil/Water
     exclusions and the Agronomic fit + Climate fit components.
 
@@ -549,40 +552,74 @@ def crop_scorer_tool(
     area_ha: float | None = None,
     budget_bdt: float | None = None,
 ) -> dict:
-    """Agent tool entrypoint. Today: finance=None, crop_facts=None — Budget
-    exclusion and the Agronomic/Profit/Climate components are all unavailable
-    by design (no fabricated data). Climatology fetch is skipped: Climate fit
-    needs crop_facts too, so fetching it would spend an API call for nothing.
-    TODO(kb): once crop_facts exists, fetch climatology here per-crop via
-    districts.lookup_district + weather.get_climatology and pass it through.
+    """Agent tool entrypoint.
+
+    `finance` is supplied from `data/prices.md` when — and only when — every
+    candidate has a cited price and cost (see `PriceCatalog.scorer_finance`).
+    That switches on the Profit component and the Budget exclusion. Partial
+    coverage supplies nothing at all, because PRD §6 normalizes Profit min-max
+    *within the candidate set*: scoring three crops and not the other two would
+    rank the uncited ones down for lacking a citation rather than for being
+    worse crops.
+
+    `crop_facts=None` still: Agronomic/Climate fit and the season/soil/water
+    screening wait on the curated KB. Climatology fetch is skipped with them,
+    since Climate fit needs both — fetching it now would spend an API call for
+    nothing.
     """
+    crops = candidates or DEFAULT_CANDIDATES
+    finance, finance_gap = _finance_for(crops, district)
+
     try:
         results = score_crops(
             district=district,
             soil_type=soil_type,  # type: ignore[arg-type]
             water_source=water_source,  # type: ignore[arg-type]
             season=season,  # type: ignore[arg-type]
-            candidates=candidates or DEFAULT_CANDIDATES,
+            candidates=crops,
             area_ha=area_ha,
             budget_bdt=budget_bdt,
-            finance=None,
+            finance=finance,
             climatology_by_crop=None,
             crop_facts=None,
         )
     except Exception as e:  # noqa: BLE001 — never crash the agent turn
         return {"error": f"crop_scorer failed: {e}"}
 
+    degraded = [
+        "Season/soil/water suitability screening: not yet available (KB not "
+        "curated) — all candidates with yield data are shown regardless of "
+        "fit; confirm manually.",
+        "Agronomic fit component: unavailable (KB not curated).",
+        "Climate fit component: unavailable (KB not curated).",
+    ]
+    if finance is None:
+        degraded.append(f"Profit component and Budget screening: unavailable — {finance_gap}")
+
     return {
         "candidates": [c.model_dump() for c in results],
-        "degraded": [
-            "Season/soil/water suitability screening: not yet available (KB not "
-            "curated) — all candidates with yield data are shown regardless of "
-            "fit; confirm manually.",
-            "Agronomic fit component: unavailable (KB not curated).",
-            "Climate fit component: unavailable (KB not curated).",
-            "Profit component: unavailable (finance engine not yet built).",
-        ],
+        "degraded": degraded,
     }
+
+
+def _finance_for(crops: list[str], district: str) -> tuple[dict | None, str | None]:
+    """Assemble the finance seam for this district's candidate set.
+
+    Revenue per hectare needs a yield, and the yield is district-specific, so
+    this pairs each crop's damped-Holt base with its cited price. A crop whose
+    projection is missing is reported as ungettable rather than defaulted.
+    """
+    try:
+        from backend.finance import load_catalog
+
+        yields: dict[str, float] = {}
+        for crop in crops:
+            projection = holt_projection(crop, district)
+            if "error" not in projection:
+                yields[crop] = projection["base_yield_kg_ha"]
+        return load_catalog().scorer_finance(crops, yields)
+    except Exception as e:  # noqa: BLE001 — a price-file problem must not kill ranking
+        return None, f"finance inputs could not be read ({e})"
 
 
 if __name__ == "__main__":
