@@ -1,58 +1,64 @@
-# CLAUDE.md — Rules for Claude Code (TeamFixeth_AgriSense)
+# CLAUDE.md v2 — Rules for Claude Code (TeamFixeth_AgriSense)
 
-Two Claude Code instances work this repo in parallel. Instance A (agent/tools/kb/memory, human: Person A) and Instance B (api/frontend/finance/payments, human: Person B). Read PRD.md, PLAN.md, NOTES.md before your first task. Re-read NOTES.md when anything behaves strangely — your bug is probably listed there.
+Two Claude Code instances work this repo in parallel: Instance A (agent/tools/kb/memory, human A) and Instance B (api/frontend/finance/payments, human B). Codex may assist inside a person's own territory only. Read PRD.md, PLAN.md, NOTES.md before your first task. Re-read NOTES.md when anything behaves strangely — your bug is probably listed.
 
 ## 0. Identity and boundaries
 
-- You are Instance A or Instance B. The human tells you which at session start. If they didn't, ask.
-- Directory ownership is defined in PLAN.md §1. **Never create, edit, or delete files outside your owned directories.** If you believe a change is needed in the other instance's territory, write the request into your LOG file and tell your human to relay it. No exceptions, even for "obvious one-line fixes" — that's how 3am merge conflicts happen.
-- `backend/schemas.py` is owned by A. After the H1 freeze, any change to it requires: a LOG entry with reasoning, human A's approval, and a heads-up to B before merging.
+- You are Instance A or Instance B; the human tells you which at session start. If they didn't, ask.
+- Directory ownership: PLAN.md §1. **Never create, edit, or delete files outside your owned directories.** Cross-boundary need → LOG entry + human relays. No exceptions, including "obvious one-line fixes."
+- `backend/schemas.py`: owned by A. After the H1 freeze, changes require a LOG entry with reasoning, human A's approval, and a heads-up to B before merge.
+- Never point two agents (Claude Code, Codex) at the same directory simultaneously.
 
 ## 1. Logging protocol (mandatory)
 
-- Instance A writes to `LOG1.md`. Instance B writes to `LOG2.md`. Append-only — never rewrite or delete past entries.
-- **Write an entry for every unit of work**: a feature completed, a decision taken, a bug found/fixed, a dependency added, an approach abandoned.
-- Entries are for the humans. Write them so a tired teammate at 4am understands in 20 seconds what happened and why. Plain language. No jargon walls.
+- Instance A → `LOG1.md`. Instance B → `LOG2.md`. Append-only; never rewrite past entries.
+- One entry per unit of work: feature done, decision taken, bug found/fixed, dependency added, approach abandoned.
+- Written for humans: a tired teammate at 4am understands it in 20 seconds. Plain language.
+- Write into repograph.md after creating any entry saying which file/folder is about what, so that exploration s easier for the other instance. If you don't know, say so.
+- save the explored data whenever possible to remove unnecessary exploration and token usage.
 
-Entry format:
+Format:
 
 ```
 ## [HH:MM] <short title>
 **Did:** what changed, which files.
 **Decision:** what was decided (if any).
-**Why:** the reason, in one or two plain sentences.
-**Rejected:** alternatives considered and why not. Write "none" if none.
+**Why:** one or two plain sentences.
+**Rejected:** alternatives considered and why not. "none" if none.
 **Impacts other instance:** yes/no — if yes, what they need to know.
 ```
 
-- Decisions with no code (e.g., "chose fixed 1 bigha = 33 decimal convention") get entries too. Silent decisions are the enemy.
-- If you abandon an approach after sinking time into it, log it honestly with the time cost. That entry saves the other person from repeating it.
+- Decisions without code (e.g., "1 bigha = 33 decimal convention") get entries too. Silent decisions are the enemy.
+- Abandoned an approach? Log it with the time it cost. That entry saves the other person from repeating it.
 
 ## 2. Hard technical rules
 
-1. **The LLM never does arithmetic.** All money, yield, dose, and unit math goes through `backend/finance/` or `backend/units.py` as tool calls. If you catch a prompt letting the model compute numbers, that is a bug — fix and log it.
-2. **No invented data.** Weather numbers come from Open-Meteo responses. Yields come from agribase.db. Doses come from KB retrieval. If a real source is unavailable, degrade honestly (say so in the agent's reply) — never fabricate.
-3. **Every tool call is traced.** Any new tool must emit `tool_call` and `tool_result` SSE events with raw params and raw results. A tool that doesn't appear in the trace panel doesn't exist for the judges.
-4. **Pin all dependencies** exactly on first add. requirements.txt and package-lock.json are commitments.
-5. **Secrets never touch git.** `.env` only; keep `.env.example` current. Check diffs before pushing.
-6. **Agent loop guards:** max 12 iterations per turn; log token usage and cost per turn to console and the `done` event.
-7. **Bangla-first:** farmer-facing text defaults to Bangla, mirrors the user's language. Internal reasoning, tool params, RAG queries, trace, and code comments: English. Western numerals inside tables and computed values.
-8. **Units:** everything internal is hectares and kg. Local units exist only at the intake/display edges via `units.py`.
-9. **Tests where they matter:** finance engine and units.py must have unit tests, run before each merge to main. Do not write tests for UI polish — tests are for math correctness (20 judged points), not coverage theater.
-10. **Simulator honesty:** bdapps simulator responses must match the documented shapes exactly and be labeled `mode:"simulator"` in code, UI, and README. Never present simulated as live.
+1. **The LLM never does arithmetic and never ranks crops.** Money/yield/dose/unit math → `backend/finance/` or `units.py`. Crop ranking → `crop_scorer.py` (deterministic, PRD §4). The model narrates tool outputs. A prompt letting the model compute or rank = bug; fix and log.
+2. **No invented data.** Weather from Open-Meteo responses. Yields from crop.db. Doses from KB retrieval. Source unavailable → degrade honestly in the agent's reply ("তথ্য যথেষ্ট নয়") — never fabricate.
+3. **Provenance is mandatory.** Every number reaching the UI carries a Provenance object (schemas.py). A number without provenance must not render. This is schema-enforced, not prompt-hoped.
+4. **Weather labeling.** Every weather-derived claim carries `source_type: forecast | climatology`. Climatology is a planning assumption, never a prediction — wording rules in PRD §6 Tier0.2.
+5. **Every tool call is traced, and traced redacted.** New tools must emit `tool_call`/`tool_result` SSE events with raw params/results. The emitter (B) redacts: password/appId/key/token/secret → `***`, phone/subscriberId → last 3 digits. Untraced tool = doesn't exist for judges. Unredacted trace = security bug.
+6. **In-event artifacts.** parse_agribase.py, holt.py, ingest.py are written and run during the event; crop.db and the Chroma index are generated in-event with timestamps in a meta table. Never copy application code from prior projects — rewrite fresh. Raw public data and pre-cached third-party models/wheels are fine.
+7. **Pin all dependencies** exactly on first add.
+8. **Secrets never touch git.** `.env` only; `.env.example` current; check diffs before push.
+9. **Agent loop guards:** max 12 iterations/turn; token usage + cost per turn in the `done` event and console.
+10. **Bangla-first:** farmer-facing text defaults to Bangla, mirrors user language. Internal reasoning, tool params, RAG queries (always English), trace, code comments: English. Western numerals in tables/computed values.
+11. **Units:** internal = hectares/kg only; local units exist at intake/display edges via units.py. 1 bigha = 33 decimal = 0.1338 ha.
+12. **Tests where they matter:** finance engine, units.py, crop_scorer.py, trace redactor. Run before every merge to main. No coverage theater on UI.
+13. **Simulator honesty:** bdapps simulator matches documented shapes exactly, labeled `mode:"simulator"` in code, UI, README. Never present simulated as live. Checkout always has a confirmation step before charging.
+14. **Scope gate:** [GATED] items in PRD §6 may not be started until the `tier0-stable` tag exists AND main is green. Until then they are LOG proposals only. Tier 0 > Tier 1 > gated, always.
 
 ## 3. Workflow rules
 
-- Branch: A on `dev-a`, B on `dev-b`. Merge to `main` only at sync points (PLAN.md §3), A merges first, B rebases.
-- Commit small and often, imperative messages ("add climatology tool", not "stuff").
-- Before merging to main: run the finance/units tests + one manual end-to-end chat turn. Broken main is forbidden after H12.
-- At H15, tag `tier0-stable`. Late-night experiments must never make the tag unreachable.
-- **All application code is written during the event window** (competition rule). The agribase.db is a pre-existing *data artifact* from a public source — data is allowed, code is not. Do not copy code in from prior projects; rewrite fresh. Public scaffolding (CLI generators, templates) is fine.
-- Scope discipline: check PLAN.md before starting anything. If a task isn't in the current hour block, it goes to the log as a proposal, not into the code. Tier 0 before Tier 1 before Tier 2, always.
+- A on `dev-a`, B on `dev-b`. Merge to `main` only at sync points (PLAN.md §3); A merges first, B rebases.
+- Small commits, imperative messages.
+- Before merging to main: run the test suite (rule 12) + one manual end-to-end chat turn. Broken main forbidden after H12.
+- Tag `tier0-stable` at H15. Late-night experiments must never make the tag unreachable.
+- Check PLAN.md before starting anything; off-schedule ideas go to the log as proposals.
 
 ## 4. When in doubt
 
-- Uncertain about a cross-boundary interface → ask the human, don't guess.
-- Uncertain whether a feature is in scope → it isn't; log the proposal.
-- Uncertain whether data is real → treat as mock and label it, or remove it.
-- Stuck >25 minutes on one bug → log it, tell the human, switch tasks. The timeline in PLAN.md outranks any single bug.
+- Uncertain cross-boundary interface → ask the human, don't guess.
+- Uncertain scope → it's gated; log the proposal.
+- Uncertain whether data is real → treat as mock and label, or remove.
+- Stuck >25 min on one bug → log, tell the human, switch tasks. The timeline outranks any single bug.

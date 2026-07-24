@@ -1,103 +1,142 @@
-# PRD — AgriSense AI (TeamFixeth_AgriSense)
+# PRD v2 — AgriSense AI (TeamFixeth_AgriSense)
 
-IUT 12th ICT Fest — Bdapps Agentic AI Hackathon, Final Round. 24h build: 24 Jul 09:00 → 25 Jul 09:00.
+IUT 12th ICT Fest — Bdapps Agentic AI Hackathon, Final Round. 24h: 24 Jul 09:00 → 25 Jul 09:00. This is the single product spec. PLAN.md = execution, NOTES.md = caveats, CLAUDE.md = agent rules.
 
 ## 1. One-line product
 
-A Bangla-first PWA where a smallholder farmer talks to an autonomous agent that produces a costed, weather-grounded season plan for their specific farm — and every number in that plan is traceable to a real tool call.
+A Bangla-first PWA where a smallholder farmer talks to an autonomous agent that produces a costed, weather-grounded season plan for their specific farm — and every number in that plan carries provenance a judge can inspect.
 
-## 2. Target user
+## 2. Target users
 
-Bangladeshi smallholder farmer. Low literacy assumed. Speaks/reads Bangla. Uses a cheap Android phone. Thinks in bigha/katha, BDT, and district names — not hectares or lat/lon.
+Primary: Bangladeshi smallholder farmer. Low literacy assumed, Bangla, cheap Android phone, thinks in bigha/katha, BDT, district names.
+Secondary: the judge. Must verify in <4 min: the agent is real (trace), the math is real (change input → outputs change), the data is real (provenance on every number).
 
-Secondary user: the judge. Needs to verify in <4 minutes that the agent is real (trace panel), the math is real (change input → outputs change), and the data is real (weather + KB citations).
+## 3. The five judged agentic behaviors — where each shows
 
-## 3. Why an agent (not a chatbot)
-
-The five judged agentic behaviors, and where we demonstrate each:
-
-| Behavior | Where it shows |
+| Behavior | Where |
 |---|---|
-| Tool use | Open-Meteo forecast + climatology, geocoder, Chroma RAG, agribase SQL, finance engine, bdapps CaaS. All real values, all in trace. |
-| Multi-step planning | One request ("plan my season") triggers: geocode → weather → RAG → crop ranking → calendar → finance. Visible as chained tool calls. |
-| Missing info handling | Intake checklist (location, size, soil, water, budget, season). Agent detects gaps, asks targeted Bangla follow-ups only for missing fields. |
-| Memory | SQLite farm profile + conversation state. Survives restart → returning farmer never repeats. Demo opens with a remembered farm. |
-| Explainability | Every recommendation names its inputs: "৪৫ কেজি ইউরিয়া... because soil=loam (you said), stage=vegetative (calendar), rain=0mm next 5 days (Open-Meteo, called 14:02)." |
+| Tool use | Open-Meteo forecast + climatology, geocoder, Chroma RAG, crop.db SQL, crop scorer, finance engine, bdapps CaaS. Real values, all traced. |
+| Multi-step planning | "Plan my season" → geocode → weather → RAG → scorer → calendar → finance, chained visibly. |
+| Missing info + recovery | Intake gap detection with targeted Bangla follow-ups. Plus scripted recoveries: geocode ambiguity → confirm; budget too low → reduced-area/cheaper-crop replan; weather API down → retry then labeled cached data; missing KB evidence → admit insufficiency, never invent. Minimum two recoveries appear in the demo. |
+| Memory | SQLite farm profile + conversations + plans. Survives restart. Demo opens with a remembered farm. |
+| Explainability | Every recommendation names inputs + provenance: "৪৫ কেজি ইউরিয়া — soil=loam (আপনি বলেছেন), stage=vegetative (calendar), rain=0mm/5d (পূর্বাভাস, Open-Meteo 14:02)." |
 
-## 4. Scope tiers (mirrors judging)
+## 4. Crop recommendation algorithm (deterministic, inspectable)
 
-### Tier 0 — required, all 8 (target: done by H12, hardened by H15)
+`backend/tools/crop_scorer.py` (owner A). Pure function, unit-tested. The LLM narrates scorer output in Bangla; the LLM never ranks crops itself.
 
-1. **Conversational intake (Bangla)** — collects location, farm size, soil, water availability, budget, season. Local units accepted (bigha/katha/decimal), normalized internally.
-2. **Live weather grounding** — Open-Meteo forecast API (16-day, real) for near-term actions; Open-Meteo climate/historical API (real) for the long-range calendar. Agent states which source per claim. No invented forecasts, ever.
-3. **Crop recommendation** — ≥3 ranked candidates with suitability, water need, risk, rough profit. Profit grounded in agribase district yields, not model recall.
-4. **Season plan** — dated calendar: land prep → sowing window → fertilizer timings → irrigation → weed/pest checkpoints → harvest.
-5. **Financial projection** — itemized costs, expected yield, revenue, net profit, ROI, break-even. Computed by deterministic finance engine (pure functions, unit-tested). LLM never does arithmetic. Change an input → outputs change correctly.
-6. **Explained reasoning** — see table above; enforced by system prompt + response schema.
-7. **Knowledge base with RAG** — curated markdown from BARC fertilizer guide, DAE/extension crop calendars, FAO-56 Kc table, covering 5–6 demo crops (boro/aman rice, wheat, potato, lentil, mustard). Chroma embedded, retrieval feeds advice. Plus structured agribase SQLite (yearbook 2016–2024, district-level yield/area) as an SQL tool.
-8. **Visible agent trace** — live side/bottom panel streaming every tool call: name, params sent, raw values returned, timestamp. English. Judge can match any number in the plan to a trace entry.
+### Stage 1 — hard exclusions (each logged with farmer-readable reason)
 
-### Tier 1 — differentiation (H15–H18, in priority order)
-
-1. Persistent memory across sessions (mostly free from SQLite design — just demo it).
-2. Scenario simulation — "rainfall −30%?", "budget −40%?" → re-run finance engine + plan deltas with changed numbers.
-3. Fertilizer & irrigation scheduler — quantities by growth stage (BARC + FAO-56 Kc), organic alternatives, cost.
-4. Proactive weather-triggered advice — forecast check on session open; if rain conflicts with a scheduled application, agent volunteers the adjustment.
-5. Pest/disease risk from crop × stage × weather (KB-driven) — only if 1–4 done.
-
-### Tier 2 — bonus (H18+, only if Tier 0/1 green)
-
-1. **bdapps CaaS checkout** (10 pts — treated as near-required): balance query → direct debit (small real amount on Robi SIM) → SMS receipt (Bengali encoding 16). Simulator fallback with exact request/response shapes if portal app not approved or IP whitelist fails. All-outbound flow — no public callback URL needed.
-2. SoilGrids REST cross-check of farmer-stated soil type (~30 min, second real external API).
-3. Bengali interaction — already core, claim the bonus in README.
-4. Market price / sell-store-wait — parking lot.
-5. PlantVillage leaf-photo disease detection — parking lot, pretrained HF model only.
-
-### Explicit non-goals
-
-Marketplace/escrow, USSD/SMS inbound flows, satellite imagery (NASA/SERVIR/Sentinel), model training of any kind, auth/user accounts beyond farm profiles, polished visual design.
-
-## 5. Product shape
-
-- **PWA**: installable, manifest + service worker (prod build only), mobile-first layout. Chat is the primary surface; trace panel is a bottom-sheet/expandable on mobile, side panel on desktop.
-- **Bangla-first**: agent converses in Bangla by default (mirrors user's language if they switch). UI labels Bangla, Noto Sans Bengali. Numbers in math tables stay Western numerals for judge inspectability. Trace panel English.
-- **Views**: Chat | Plan (season calendar) | Finance (cost table, editable inputs) | Trace.
-
-## 6. Stack (final)
-
-| Layer | Choice | Why |
+| Filter | Rule | Source |
 |---|---|---|
-| Agent loop | Custom loop on Claude API (Sonnet), tool-use native | Own the loop → trivial trace emission; no framework debugging at 3am |
-| LLM fallback | Gemini Flash / Groq behind a one-file client abstraction | Provider outage insurance |
-| Backend | Python FastAPI + SSE | Tools are Python functions; fast to write; simple streaming |
-| RAG | Chroma, embedded/local | Zero infra, survives venue wifi death |
-| Embeddings | sentence-transformers (pre-cached locally) | Offline-safe; queries formulated in English by the agent (cross-lingual fix) |
-| Structured data | agribase SQLite (yearbook 2016–2024) via SQL tool | Real district yields → real profit numbers |
-| Memory | SQLite (farm profile, conversations, plans), WAL mode | Persistent memory Tier 1 nearly free |
-| Frontend | Vite + React PWA (vite-plugin-pwa) | Real SSE trace panel; mobile-first; SW off in dev |
-| Weather | Open-Meteo (forecast + climate endpoints) | Free, keyless, real, has historical |
-| Payments | bdapps CaaS via httpx (plain JSON POST, auth in body) | Matches provided API reference; outbound-only |
+| Season | sowing window ∩ target season = ∅ → exclude | KB crop calendar |
+| Soil | farmer soil not in crop's allowed list → exclude | KB |
+| Water | crop water class > farm water class (rainfed < tubewell < canal/irrigated) → exclude | KB + intake |
+| Budget | min_cost_per_ha × area > budget → exclude, agent offers reduced-area replan (recovery demo moment) | finance engine |
 
-## 7. Success criteria (map to 100 pts)
+### Stage 2 — suitability score 0–100 for survivors
 
-- Agentic (20): all five behaviors visible in one demo run.
-- Accuracy (20): finance engine unit tests pass; judge changes an input live and outputs update; yields match agribase for the district.
-- Scope (15): Tier 0 runs end-to-end, stable, rehearsed twice.
-- KB/RAG (12): trace shows retrieval chunks feeding the advice; README lists sources.
-- bdapps (10): live debit + SMS receipt on stage, or labeled simulator with correct shapes.
-- Explainability (10): every recommendation cites its inputs inline.
-- Technical (8): pinned deps, clean tool interfaces, tests on finance + units.
-- Innovation (5): scenario simulation + proactive advice + SoilGrids cross-check + Bangla PWA.
+| Component | Max | Computation | Source |
+|---|---|---|---|
+| Agronomic fit | 25 | soil primary=25 / secondary=15 / marginal=8 | KB |
+| Profit | 25 | net profit/ha (base scenario), min-max normalized within candidate set | finance engine (Holt base yield) |
+| Climate fit | 20 | linear penalty for climatology rain/temp outside crop optimal range | Open-Meteo climatology + KB |
+| District track record | 20 | percentile of this crop's district yield vs same crop across districts; ±2 for damped-Holt trend direction | crop.db |
+| Stability | 10 | 10 × (1 − CV of district yields 2016–2024), floor 0 | crop.db |
 
-## 8. Data sources & honesty ledger (mirror into README)
+Output per candidate: composite + every component (value + provenance) + water need (KB) + risk level (yield-CV terciles → low/med/high) + est. profit (finance engine). Judge sees exactly why #1 beat #2.
+
+### Role of yield data — explicitly NOT "recommend the highest-yield crop"
+
+Raw yield is incomparable across crops and ignores price, cost, constraints, risk. Usage: district history → relative track record (20/100); damped-Holt point estimate → base yield into finance, band = ± residual std dev, labeled "projection from BBS 2016–2024, not a guarantee"; yield CV → risk. Disclosed limitation: district yield is a district-wide average; no fake per-farm adjustment — the scenario band covers uncertainty.
+
+## 5. Provenance (enforced by schema, not prompt)
+
+Every number reaching the UI carries a Provenance object:
+
+```
+value, unit, source_type: kb|api|dataset|static_table|computed,
+source_id, source_title, locator (page/table/url/query), retrieved_at,
+formula (human-readable, if computed), confidence: high|medium|low
+```
+
+KB chunks store source URL, publication date, section/table id at ingest; metadata flows into Provenance at retrieval. Rule: a number without Provenance must not render. B shows provenance on tap/hover.
+
+## 6. Scope tiers (nothing cut — stretch items GATED)
+
+Gate rule: items marked [GATED] may not be started until the `tier0-stable` tag exists (target H15) AND main is green. Until then they are proposals in the log, not code. This is how we keep full ambition without losing the 15 scope points.
+
+### Tier 0 — required (done H12, hardened H15)
+
+1. **Conversational intake (Bangla)** — location, farm size, soil, water, budget, season. Local units accepted, normalized via units.py.
+2. **Live weather grounding** — `get_forecast` (Open-Meteo 16-day, real, actionable) + `get_climatology` (Open-Meteo historical normals, real, planning assumption). Every weather claim labeled `source_type: forecast|climatology`. Bangla wording reflects it: forecast → "পূর্বাভাস অনুযায়ী"; climatology → "গত বছরের গড় অনুযায়ী, ভিন্ন হতে পারে". Climatology presented as predicted future rainfall = bug. No invented weather, ever.
+3. **Crop recommendation** — §4 scorer, ≥3 ranked candidates.
+4. **Season plan** — dated calendar land prep → harvest, tasks flagged `depends_on_weather`, each task with source.
+5. **Financial projection** — itemized costs; yield = damped-Holt base; three scenarios (conservative = base−band & price−10%, base, optimistic = base+band & price+10%); revenue, net profit, ROI, break-even yield AND break-even price. Prices from `data/prices.md`: every row cited with source name + URL + date collected — no placeholders, real link or delete the row. Computed only in `backend/finance/` pure functions with consistency unit tests. LLM never does arithmetic.
+6. **Explained reasoning** — §3 table + §5 provenance.
+7. **Knowledge base with RAG** — curated markdown from BARC/DAE guides + FAO-56 Kc table, written during the event from public sources; Chroma index generated in-event by `ingest.py`. Plus structured crop.db (see §8 data rules) via SQL tool. RAG queries formulated in English (cross-lingual fix), conversation stays Bangla.
+8. **Visible agent trace** — live panel streaming every tool call: name, params, raw results, timestamp. English. Redacted (§9). Any number in the plan traceable to an entry.
+
+### Tier 1 (H15–H18, priority order)
+
+1. Persistent memory across sessions (from SQLite design — demo it).
+2. Scenario simulation — "rainfall −30%?" / "budget −40%?" → scorer + finance re-run, changed numbers, deltas shown.
+3. Fertilizer & irrigation scheduler — doses by growth stage (BARC + FAO-56 Kc), organic alternatives, cost.
+4. Proactive weather-triggered advice — minimal credible version: persisted plan tasks + `check_plan_conflicts` tool scanning the 16-day forecast against upcoming weather-dependent tasks; runs on session open and via "আমার প্ল্যান চেক করুন" button; conflicts saved as alert events, shown as banner; agent proposes revision, farmer confirms, plan updates. Visibly revisits and revises an existing plan. No cron/push needed.
+5. [GATED] Pest and disease risk from crop × stage × weather (KB-driven), with prevention/treatment options and cost.
+
+### Tier 2 (bonus, gated except payments)
+
+1. **bdapps CaaS checkout** (10 pts, treated as near-required, NOT gated): portal blocked pre-event (needs receiving URLs), so simulator is the primary path, built H3–H6 with exact request/response shapes from BDAPPS-API-REFERENCE.md including error paths (E1326 insufficient balance). Flow: confirmation step ("৳X কাটা হবে — নিশ্চিত?") → balance query → direct debit → Bengali SMS receipt (encoding 16). All-outbound; no public callback URL. `mode: live|simulator` labeled in UI + README. If portal unblocks before H15: whitelist venue IP, test real ৳2 debit on Robi SIM at H15–18; on-stage failure → one rehearsed click back to simulator.
+2. [GATED] SoilGrids REST cross-check of farmer-stated soil (second live external API, ~30 min).
+3. Bengali-first interaction — core already; claim the accessibility bonus in README.
+4. [GATED] Market price intelligence / sell-store-wait.
+5. [GATED] PlantVillage leaf-photo disease detection (pretrained HF model only, no training).
+6. [GATED] Voice input (Bangla STT).
+
+### Non-goals regardless
+
+Marketplace/escrow, USSD/SMS inbound flows, satellite imagery, model training, auth beyond farm profiles, visual polish beyond one clean responsive page.
+
+## 7. Product shape
+
+- **PWA**: manifest-based installable, mobile-first. Service worker [GATED] and prod-build-only if attempted (NOTES #7).
+- **One responsive page**: chat primary; Plan / Finance / Trace as tabs (desktop: trace side panel). Noto Sans Bengali. Western numerals inside tables and computed values; Bangla text around them. Trace panel English (for judges).
+- Bangla-first: agent mirrors user language, defaults Bangla.
+
+## 8. Data rules (competition-safe) + honesty ledger
+
+All application code — including the agribase parser, damped-Holt fitting, Chroma ingest — is written and run DURING the event. Derived artifacts (crop.db, Chroma index) are generated in-event with timestamps stored in a meta table. The raw National Yearbook extracts are public data, hosted publicly with the link in README. Pre-cached third-party artifacts that are fine: embedding model, pip wheels, npm packages.
 
 | Data | Source | Real/Mock |
 |---|---|---|
 | Weather forecast + climatology | Open-Meteo API, live | Real |
-| District yield/area 2016–2024 | National Yearbook of Agricultural Statistics (BBS), parsed to SQLite before event (data artifact, not application code; also published publicly at <link>) | Real |
-| Fertilizer doses, crop calendars | BARC / DAE public guides, curated to markdown during event | Real (curated) |
+| District yield/area 2016–2024 + Holt projections | BBS National Yearbook (public raw data); parsed + fitted in-event | Real |
+| Fertilizer doses, crop calendars | BARC / DAE public guides, curated in-event | Real (curated) |
 | Crop water coefficients | FAO-56 Kc table | Real |
-| Soil cross-check | SoilGrids REST API | Real (if included) |
-| Market prices for profit estimate | Static reference table with cited source + date | Semi-real (disclosed) |
-| Supplier catalog | Not built | — |
-| bdapps | Live CaaS on Robi SIM, or simulator with documented shapes | Disclosed either way |
+| Input + selling prices | data/prices.md, every row source+URL+date | Real (static, dated, disclosed) |
+| bdapps | Simulator matching documented shapes; live on Robi SIM if portal unblocks | Disclosed either way |
+| Soil cross-check | SoilGrids API [GATED] | Real if included |
+
+## 9. Trace redaction (security)
+
+The SSE trace emitter redacts before sending: `password`, `applicationId` values, anything matching /key|token|secret/i → `***`; phone/subscriberId → last 3 digits only. Applies to params and raw results. Unit-tested with a fake bdapps payload. Judges see judge-relevant values, never credentials.
+
+## 10. Stack (final)
+
+| Layer | Choice | Why |
+|---|---|---|
+| Agent loop | Custom loop, Claude API (Sonnet), native tool use | Own the loop → trivial trace emission |
+| LLM config | Single client, model switchable by env var only (no abstraction layer) | Scope discipline; [GATED] fallback provider |
+| Backend | Python FastAPI + SSE | Tools are Python functions |
+| RAG | Chroma embedded/local, index built in-event | Zero infra, survives wifi death |
+| Embeddings | sentence-transformers, model pre-cached | Offline-safe; English queries |
+| Structured data | crop.db (SQLite) generated in-event, SQL tool | Real district yields + Holt projections |
+| Memory | SQLite, WAL mode | Tier 1 persistence nearly free |
+| Frontend | Vite + React, manifest PWA | SSE trace panel, mobile-first |
+| Weather | Open-Meteo forecast + climate endpoints | Free, keyless, real |
+| Payments | bdapps CaaS via httpx; simulator twin | Outbound-only; portal-independent |
+
+## 11. Success criteria → 100 pts
+
+Agentic 20: five behaviors + two recoveries in one run. Accuracy 20: finance tests pass, live input change recomputes, yields match crop.db. Scope 15: Tier 0 end-to-end, stable, rehearsed. KB 12: trace shows retrieval feeding advice, sources in README. bdapps 10: full checkout flow, labeled mode. Explainability 10: provenance on every number. Technical 8: pinned deps, tests on finance/units/scorer/redactor. Innovation 5: scenario sim + proactive alerts + Bangla PWA + any gated wins.

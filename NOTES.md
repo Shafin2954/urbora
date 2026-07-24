@@ -1,49 +1,57 @@
-# NOTES — Caveats. Read before coding. Re-read at every sync.
+# NOTES v2 — Caveats. Read before coding. Re-read at every sync.
 
-Ranked by kill-probability. Each has a mitigation. If you hit one without a mitigation here, log it and tell the other person immediately.
+Ranked by kill-probability. Each has a mitigation. Hit one without a mitigation here → log it + tell the other person immediately.
 
 ## Kill-class
 
-1. **Weather API can't cover a season.** Open-Meteo forecast = 16 days. Season = 90–120 days. Faking month-3 weather = judges catch it = credibility gone on the 20-pt accuracy criterion. → Two tools: `get_forecast` (real, near-term actions) + `get_climatology` (real historical/climate endpoint, long-range calendar). Agent names its source per claim.
+1. **Weather API can't cover a season.** Forecast = 16 days; season = 90–120. Faking month-3 weather = credibility gone on 20-pt accuracy. → Two labeled tools: `get_forecast` (actionable) + `get_climatology` (planning assumption). Every claim carries `source_type`; Bangla wording differs ("পূর্বাভাস অনুযায়ী" vs "গত বছরের গড় অনুযায়ী, ভিন্ন হতে পারে"). Climatology presented as prediction = bug.
 
-2. **LLM arithmetic.** Judges will change an input and check consistency. Model-computed money drifts. → LLM NEVER does math. Finance engine = pure functions + unit tests. Model calls the tool and narrates the result. This rule is in CLAUDE.md; treat violation as a bug.
+2. **LLM arithmetic or LLM ranking.** Judges change an input and check consistency. → LLM never computes and never ranks. Finance engine + crop_scorer are pure tested functions; model narrates their output. Violation = bug.
 
-3. **bdapps portal risks.** (a) No app exists yet — create at portal immediately; approval timing unknown. (b) `E1312` — venue's public IP must be whitelisted; get it at venue (`curl ifconfig.me`) hour 0; NAT rotation would re-break it. (c) On error, bdapps may return HTML not JSON — guard for `<html`. → Simulator twin with exact documented request/response shapes built in parallel; brief allows "sandbox/simulator mode"; label mode in README and UI. Checkout flow is all-outbound: no public callback URL, no tunnel needed. Rehearse live Robi debit at H15–18, never first time on stage.
+3. **Rules risk on pre-event artifacts.** "All application code written during the event." → Parser, Holt fit, Chroma ingest all WRITTEN AND RUN in-event; crop.db + index generated in-event with meta timestamps; raw yearbook data hosted publicly, link in README. Pre-cached third-party model/wheels/packages are fine. If judges ask: raw public data in, all code and derived artifacts produced in-window.
 
-4. **Runaway agent loop burning credits.** Tool error → retry spiral → $80 gone. → Max 12 iterations/turn. Per-turn token+cost printed and sent in `done` event. Sonnet, not Opus. Prompt caching on system prompt + static KB context.
+4. **bdapps portal blocked** (needs receiving URLs → no app yet). → Simulator is PRIMARY, built H3–H6, exact request/response shapes incl. error codes (E1326 insufficient-balance path is demo-able). Confirmation step before any charge. `mode` label in UI + README. If portal unblocks: whitelist venue IP (`curl ifconfig.me`), real ৳2 debit on Robi SIM tested H15–18, never first time on stage; on-stage live failure → one rehearsed click to simulator. Guard for HTML-not-JSON error responses.
 
-5. **Geocoding village names.** Wrong "Mirpur" = wrong weather = silently wrong everything. → Geocode tool returns candidates; agent confirms with farmer. Hardcoded 64-district fallback table.
+5. **Runaway agent loop burning credits.** → Max 12 iterations/turn, per-turn token+cost in `done` event and console. Sonnet. Prompt caching on system prompt + static context. Two Pro accounts ≠ infinite; watch the cost line.
+
+6. **Geocoding village names.** Wrong "Mirpur" = silently wrong everything. → Geocode returns candidates, agent confirms with farmer (doubles as recovery demo #1). Hardcoded 64-district fallback.
 
 ## Hour-eater class
 
-6. **Cross-lingual RAG.** KB is English, farmer speaks Bangla. Bangla query against English embeddings retrieves garbage, silently. → Agent formulates all `rag_query` calls in English (instructed in system prompt), converses in Bangla. Do NOT reach for multilingual embedding models — scope trap.
+7. **Cross-lingual RAG.** English KB, Bangla queries → silent garbage retrieval. → Agent formulates all rag_query calls in English (system prompt rule), converses in Bangla. No multilingual embedding models — scope trap.
 
-7. **Service worker cache in dev.** Stale JS ghosts, hour lost. → SW disabled in dev (`devOptions.enabled=false`), enabled only in final build. If weirdness: hard-reload + unregister SW first, before debugging code.
+8. **Service worker cache in dev.** Stale JS ghosts. → No SW at all in core scope; manifest-only PWA. SW is [GATED] and prod-build-only if ever attempted. If frontend weirdness: hard-reload + check for a rogue SW before debugging code.
 
-8. **Local units.** Farmers: bigha/katha/decimal, maund. Charts: kg/ha. One silent conversion bug = visibly wrong advice to any Bangladeshi judge. Bigha varies regionally — fix 1 bigha = 33 decimal = 0.1338 ha, state the convention in README. → Single `units.py`, tested at H1–3, everything internal in hectares/kg.
+9. **Local units.** bigha/katha/decimal/maund vs kg/ha; bigha varies regionally. → Fix 1 bigha = 33 decimal = 0.1338 ha, convention stated in README. Single tested units.py; internal = ha/kg only.
 
-9. **KB curation rabbit hole.** Messy PDFs eat 6 hours. → Hard cap 3 hours. 15–25 hand-cleaned markdown docs, 5–6 demo crops only (boro/aman rice, wheat, potato, lentil, mustard). Judges test rice, not dragonfruit. Depth over breadth.
+10. **KB curation rabbit hole.** → Hard cap 3h. 3 demo crops deep. Judges test rice, not dragonfruit.
 
-10. **Venue wifi + first-run downloads.** sentence-transformers pulls its model on first use; pip/npm need net. → Pre-cache embedding model, commit lockfiles, download wheels early, run one full offline boot test (weather degrades gracefully, app must not crash).
+11. **Venue wifi + first-run downloads.** → Pre-cache embedding model, lockfiles, wheels. One full offline boot test: app must not crash; weather degrades to labeled cached data (this is also recovery behavior #3).
 
-11. **Merge conflicts at 3am.** → Ownership map in PLAN.md is law. schemas.py frozen H1, single owner. Branch per person, sync merges every 2–3h, `tier0-stable` tag as demo lifeboat.
+12. **Merge conflicts at 3am.** → Ownership map is law; schemas.py frozen H1; branch per person; sync merges; `tier0-stable` tag = demo lifeboat.
 
-12. **SSE + CORS friction.** Vite dev → FastAPI stream: CORS/buffering burns an hour if discovered late. → Hello-world SSE pipe is B's first task, H0–1. SQLite WAL mode for concurrent reads during streams.
+13. **SSE + CORS friction.** → Hello-world SSE pipe is B's first hour. SQLite WAL mode.
+
+14. **Scope sprawl via agent enthusiasm.** Two Claude Codes + Codex generate code faster than two humans can integrate and verify. The brief: "ten half-built features is the most common way teams lose." → GATE: no [GATED] item starts before `tier0-stable` exists and main is green. Agents propose in logs; humans open the gate.
 
 ## Paper-cut class
 
-13. **Chroma version churn.** Breaking API changes between versions. → Pin every dependency exactly, immediately, both `requirements.txt` and `package-lock.json`.
+15. **Chroma / dependency churn.** → Pin exact versions immediately, both ecosystems.
 
-14. **Demo wandering.** Live intake conversation drifts, 4 minutes gone. → Scripted demo farm (district near venue, 2 bigha, loam, tube-well, ৳50,000, Aman) seeded in DB. Rehearse twice, timed. Code freeze H22.
+16. **Demo wandering.** → Seeded scripted farm, rehearsed twice, timed. Code freeze H22. Rehearse the live↔simulator toggle and one recovery moment explicitly.
 
-15. **Bangla numerals vs math.** Bengali numerals in cost tables hurt judge inspectability. → Western numerals inside tables/trace; Bangla text around them. Trace panel English (it's for judges).
+17. **Bangla numerals in math tables.** → Western numerals in tables/trace/computed values; Bangla text around them. Trace panel English.
 
-16. **Market prices.** No reliable free live BD price API. Inventing one = fake grounding. → Static reference price table with source + date, disclosed in README and in the plan's assumptions list. Honest beats fake-live.
+18. **Market prices.** No reliable free live BD price API; inventing one = fake grounding. → data/prices.md, every row source + URL + date. No placeholders anywhere — real link or delete the row.
 
-17. **Yearbook data legality.** Rules ban pre-built application code, not data. Yearbook is public; our SQLite is a parsed artifact. → README discloses source + that parsing predates the event; publish the dataset publicly if 20 min spare. If judges ask, answer exactly this.
+19. **Trace leaking secrets.** bdapps auth rides in request bodies. → Redacting emitter: password/appId/key/token/secret → `***`; phone/subscriberId → last 3 digits. Unit-tested with fake bdapps payload.
 
-18. **Secrets in git.** bdapps password, Anthropic key. → `.env` only, `.env.example` committed, check `git diff` before every push.
+20. **Secrets in git.** → .env only, .env.example committed, diff check before every push.
 
-19. **Sonnet response drift into English.** Long sessions can drift out of Bangla. → System prompt rule: mirror the farmer's language; default Bangla. Spot-check at each sync.
+21. **Sonnet drifting out of Bangla.** → System prompt: mirror farmer's language, default Bangla. Spot-check each sync.
 
-20. **Robi SIM balance.** Live debit demo fails on ৳0 balance. → Top up the SIM before H15. Debit tiny amounts (৳2) in tests.
+22. **Robi SIM balance = 0 at demo.** → Top up before H15 if live path is on. ৳2 test debits only.
+
+23. **Holt overclaim.** 9 data points = wide uncertainty. → Damped Holt point estimate as base + residual-sd band, labeled "projection, not guarantee." Never quote the projection without the band in finance views.
+
+24. **Provenance gaps discovered late.** → H12–H15 includes an explicit audit: click every number, confirm provenance renders. A number without provenance must not ship.
