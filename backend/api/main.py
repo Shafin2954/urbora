@@ -16,6 +16,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import config, sse
+from .chat import router as chat_router
 
 app = FastAPI(
     title="AgriSense API",
@@ -32,6 +33,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(chat_router)
 
 
 @app.get("/api/health")

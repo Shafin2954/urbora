@@ -1,13 +1,14 @@
-/* Layout for the H0 connection self-test. Mobile-first: the farmer's phone is
- * the design target, the desktop is just a wider phone. */
+/* One responsive page. Mobile-first: the farmer's phone is the design target,
+ * the desktop is the judge's wider view of the same thing. */
 
 .app {
-  max-width: 760px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 12px 16px 0;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 /* --- top bar --- */
@@ -18,8 +19,6 @@
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
 }
 
 .brand {
@@ -33,6 +32,7 @@
   align-items: center;
   gap: 8px;
   color: var(--ink-soft);
+  font-size: 0.85rem;
 }
 
 .dot {
@@ -42,8 +42,7 @@
   flex: none;
 }
 
-/* Colour is never the only signal — the adjacent text says the same thing,
- * which matters for colourblind judges and for a washed-out phone screen. */
+/* Colour is never the only signal — the text beside it says the same thing. */
 .dot-ok {
   background: var(--green);
 }
@@ -54,20 +53,365 @@
   background: var(--ink-faint);
 }
 
-/* --- panel --- */
-
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: flex-start;
+.trace-count {
+  padding-left: 8px;
+  border-left: 1px solid var(--border);
 }
 
-.panel-head {
+/* --- tabs --- */
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  min-height: 44px;
+  padding: 0 16px;
+  background: none;
+  color: var(--ink-soft);
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  font-weight: 600;
+}
+
+.tab:hover:not(:disabled) {
+  background: var(--green-tint);
+}
+
+.tab.is-active {
+  color: var(--green-dark);
+  border-bottom-color: var(--green);
+}
+
+/* --- workspace --- */
+
+.workspace {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  min-height: 0;
+}
+
+.pane {
+  display: none;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.pane.is-active {
+  display: flex;
+  flex: 1;
+}
+
+.pane-title {
+  padding: 12px 0 8px;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* --- chat --- */
+
+.chat {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  min-height: 0;
 }
+
+.transcript {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.empty-hint {
+  margin: auto 0;
+}
+
+.msg {
+  max-width: 46ch;
+  padding: 12px 16px;
+  border-radius: 14px;
+}
+
+.msg-user {
+  align-self: flex-end;
+  background: var(--green);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.msg-assistant {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+/* Bangla needs the extra line-height; cramped Bengali conjuncts are the
+ * fastest way to make text unreadable at arm's length. */
+.msg-text {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background: var(--green);
+  vertical-align: text-bottom;
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Motion only when it explains something — respect the OS setting. */
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    animation: none;
+  }
+}
+
+/* --- composer --- */
+
+.composer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: 8px;
+  padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.field {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 14px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.field-narrow {
+  flex: 0 1 130px;
+}
+
+.field:focus-visible {
+  border-color: var(--green);
+}
+
+/* --- input_request widgets --- */
+
+.input-request {
+  align-self: flex-start;
+  width: 100%;
+  max-width: 46ch;
+  padding: 14px 16px;
+  background: var(--green-tint);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ir-prompt {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.chip:hover:not(:disabled) {
+  background: var(--surface);
+  border-color: var(--green);
+  color: var(--green-dark);
+}
+
+/* --- searchable dropdown --- */
+
+.dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-list {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgb(23 37 27 / 12%);
+}
+
+.dropdown-item {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  background: none;
+  color: var(--ink);
+  border-radius: 8px;
+  text-align: left;
+  font-weight: 500;
+}
+
+.dropdown-item:hover:not(:disabled) {
+  background: var(--green-tint);
+}
+
+.dropdown-empty {
+  padding-top: 6px;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+/* --- trace (English, judge-facing) --- */
+
+.trace {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 16px;
+}
+
+.trace-entry {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.trace-entry.is-call {
+  border-left: 3px solid var(--green);
+}
+
+.trace-entry.is-result {
+  border-left: 3px solid var(--leaf);
+}
+
+.trace-head {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: none;
+  color: var(--ink);
+  border-radius: 0;
+  text-align: left;
+}
+
+.trace-head:hover:not(:disabled) {
+  background: var(--surface-sunk);
+}
+
+.type {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--surface-sunk);
+  color: var(--ink-soft);
+  flex: none;
+}
+
+.type-tool_call {
+  background: var(--green-tint);
+  color: var(--green-dark);
+}
+
+.type-tool_result {
+  background: var(--leaf);
+  color: var(--green-dark);
+}
+
+.trace-name {
+  flex: 1;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.trace-ts {
+  color: var(--ink-faint);
+  font-size: 0.78rem;
+  flex: none;
+}
+
+.trace-body {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--surface-sunk);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.trace-redacted {
+  padding: 8px 12px;
+  font-size: 0.72rem;
+  color: var(--clay);
+  border-top: 1px solid var(--border);
+}
+
+.usage {
+  padding: 8px 0;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+}
+
+/* --- misc --- */
 
 .muted {
   color: var(--ink-soft);
@@ -79,94 +423,59 @@
   font-weight: 600;
   border-left: 4px solid var(--clay);
   padding-left: 12px;
+  max-width: 60ch;
 }
 
 .label {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ink-faint);
 }
 
-/* --- assembled token output --- */
+/* --- dev harness bar (dev build only) --- */
 
-.assembled {
-  width: 100%;
+.devbar {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px 16px;
-  background: var(--green-tint);
-  border-radius: 12px;
-}
-
-.assembled-text {
-  font-size: 1.15rem;
-  line-height: 1.6;
-}
-
-/* --- event list (ancestor of the Trace panel) --- */
-
-.events {
-  width: 100%;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--surface);
-}
-
-.events li {
-  display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
-  padding: 10px 14px;
   flex-wrap: wrap;
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  border-top: 1px dashed var(--border);
 }
 
-.events li + li {
-  border-top: 1px solid var(--border);
+/* Dev-only, but still 44px: keeping the touch-target rule absolute means the
+ * check has no exceptions to remember, and nothing here is worth 8px. */
+.devbar button {
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 0.85rem;
 }
 
-.at {
-  color: var(--ink-faint);
-  min-width: 62px;
-}
-
-.type {
+.devbar .muted {
   font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--surface-sunk);
-  color: var(--ink-soft);
 }
 
-.type-token {
-  background: var(--green-tint);
-  color: var(--green-dark);
-}
-.type-done {
-  background: var(--leaf);
-  color: var(--green-dark);
-}
-.type-error {
-  background: #f6dfd4;
-  color: var(--clay);
-}
+/* --- desktop: trace becomes a side panel, the judge's view --- */
 
-.raw {
-  color: var(--ink-soft);
-  word-break: break-all;
-  flex: 1 1 100%;
-}
+@media (min-width: 900px) {
+  .tabs {
+    display: none;
+  }
 
-.verdict {
-  max-width: 60ch;
+  .pane-chat,
+  .pane-trace {
+    display: flex;
+  }
+
+  .pane-chat {
+    flex: 1 1 60%;
+  }
+
+  .pane-trace {
+    flex: 1 1 40%;
+    max-width: 460px;
+    border-left: 1px solid var(--border);
+    padding-left: 20px;
+  }
 }

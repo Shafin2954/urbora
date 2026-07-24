@@ -1,39 +1,31 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import { apiUrl, fetchHealth } from './api/client.js'
-import { streamSSE } from './api/sse.js'
+import ChatPanel from './components/ChatPanel.jsx'
+import TracePanel from './components/TracePanel.jsx'
+import { useChat } from './state/useChat.js'
 
 /**
- * H0-H1 connection self-test.
+ * One responsive page (PRD.md §9): chat primary, with Trace alongside.
  *
- * This screen is scaffolding with a job: prove browser -> Vite proxy ->
- * FastAPI -> SSE works, and keeps working. It is deliberately NOT a mock of
- * the farmer UI — CLAUDE.md bans placeholder content, and a fake chat window
- * full of invented advice is exactly the thing that later gets mistaken for a
- * working feature. The real chat UI replaces this at H1-H3; the event list
- * below is the direct ancestor of the Trace panel.
+ * Plan and Finance tabs land at H9-H12 when there is real data to put in them.
+ * They are deliberately absent rather than present-and-empty — an empty tab
+ * reads as a broken feature, and CLAUDE.md bans placeholder content.
  *
- * Arrival offsets are in milliseconds because they are the actual evidence:
- * events ~400ms apart prove the stream is streaming. All of them landing at
- * once would mean something buffered the response — better to learn that now
- * than on stage.
+ * Layout: on a phone, Chat and Trace are tabs, because the farmer needs the
+ * whole screen for the conversation. From 900px the trace becomes a side
+ * panel, because that is the judge's view and they want to watch tool calls
+ * land while the answer is still being written.
  */
 
 const HEALTH_POLL_MS = 10000
-
-function StatusDot({ state }) {
-  return <span className={`dot dot-${state}`} aria-hidden="true" />
-}
+const isDev = import.meta.env.DEV
 
 export default function App() {
+  const chat = useChat()
   const [health, setHealth] = useState({ state: 'checking', text: 'checking…' })
-  const [events, setEvents] = useState([])
-  const [streaming, setStreaming] = useState(false)
-  const [error, setError] = useState(null)
-  const abortRef = useRef(null)
+  const [tab, setTab] = useState('chat')
 
-  // Poll health so the indicator reflects a backend that dies mid-session —
-  // uvicorn --reload falling over on a syntax error is the common case.
   useEffect(() => {
     const controller = new AbortController()
     let timer
@@ -41,7 +33,7 @@ export default function App() {
     const check = async () => {
       try {
         const body = await fetchHealth(controller.signal)
-        setHealth({ state: 'ok', text: `${body.service} · ${body.status}` })
+        setHealth({ state: 'ok', text: body.status })
       } catch {
         if (controller.signal.aborted) return
         setHealth({ state: 'down', text: 'API unreachable' })
@@ -56,110 +48,112 @@ export default function App() {
     }
   }, [])
 
-  const runSelfTest = useCallback(async () => {
-    abortRef.current?.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
-
-    setEvents([])
-    setError(null)
-    setStreaming(true)
-
-    const startedAt = performance.now()
-    let seq = 0
-
-    try {
-      // POST on purpose: same verb and body shape as the real /api/chat, so
-      // this exercises the transport we ship rather than a GET stand-in.
-      await streamSSE(apiUrl('/api/hello/stream'), {
-        method: 'POST',
-        body: { source: 'frontend-selftest' },
-        signal: controller.signal,
-        onEvent: (payload) => {
-          setEvents((prev) => [
-            ...prev,
-            { seq: seq++, atMs: Math.round(performance.now() - startedAt), payload },
-          ])
-        },
-      })
-    } catch (err) {
-      if (!controller.signal.aborted) setError(err.message)
-    } finally {
-      if (abortRef.current === controller) abortRef.current = null
-      setStreaming(false)
-    }
-  }, [])
-
-  useEffect(() => () => abortRef.current?.abort(), [])
-
-  const tokenText = events
-    .filter((event) => event.payload.type === 'token')
-    .map((event) => event.payload.text)
-    .join('')
-
   return (
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <img src="/icon.svg" alt="" width="32" height="32" />
+          <img src="/icon.svg" alt="" width="30" height="30" />
           <h1>AgriSense</h1>
         </div>
         <div className="health" title={apiUrl('/api/health')}>
-          <StatusDot state={health.state} />
+          <span className={`dot dot-${health.state}`} aria-hidden="true" />
           <span className="mono">{health.text}</span>
+          {chat.trace.length > 0 && (
+            <span className="mono trace-count">{chat.trace.length} calls</span>
+          )}
         </div>
       </header>
 
-      <main className="panel">
-        <div className="panel-head">
-          <h2>Connection self-test</h2>
-          <p className="muted">
-            H0 scaffolding — proves browser → Vite proxy → FastAPI → SSE. The
-            chat UI replaces this screen at H1–H3.
-          </p>
-        </div>
-
-        <button onClick={runSelfTest} disabled={streaming}>
-          {streaming ? 'Streaming…' : 'Run SSE self-test'}
+      {/* Tabs are how you switch panes on a phone; on desktop the trace is
+          always visible, so the trace tab hides itself there via CSS. */}
+      <nav className="tabs" role="tablist">
+        <button
+          role="tab"
+          aria-selected={tab === 'chat'}
+          className={`tab ${tab === 'chat' ? 'is-active' : ''}`}
+          onClick={() => setTab('chat')}
+        >
+          কথা বলুন
         </button>
+        <button
+          role="tab"
+          aria-selected={tab === 'trace'}
+          className={`tab tab-trace ${tab === 'trace' ? 'is-active' : ''}`}
+          onClick={() => setTab('trace')}
+        >
+          Trace{chat.trace.length > 0 ? ` (${chat.trace.length})` : ''}
+        </button>
+      </nav>
 
-        {error && (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        )}
+      <div className="workspace">
+        <main className={`pane pane-chat ${tab === 'chat' ? 'is-active' : ''}`}>
+          <ChatPanel
+            messages={chat.messages}
+            inputRequest={chat.inputRequest}
+            streaming={chat.streaming}
+            error={chat.error}
+            onSend={chat.send}
+            onAnswerInput={chat.answerInput}
+          />
+        </main>
 
-        {tokenText && (
-          <div className="assembled">
-            <span className="label">Assembled tokens</span>
-            {/* Bangla round-trips through SSE here. If this line renders as
-                boxes or mojibake, the problem is encoding, not agronomy. */}
-            <p className="assembled-text">{tokenText}</p>
-          </div>
-        )}
+        <aside
+          className={`pane pane-trace ${tab === 'trace' ? 'is-active' : ''}`}
+          aria-label="Agent trace"
+        >
+          <h2 className="pane-title">Agent trace</h2>
+          <TracePanel trace={chat.trace} usage={chat.usage} />
+        </aside>
+      </div>
 
-        {events.length > 0 && (
-          <ol className="events">
-            {events.map((event) => (
-              <li key={event.seq}>
-                <span className="at mono">+{event.atMs}ms</span>
-                <span className={`type type-${event.payload.type}`}>
-                  {event.payload.type}
-                </span>
-                <code className="raw">{JSON.stringify(event.payload)}</code>
-              </li>
-            ))}
-          </ol>
-        )}
-
-        {events.length > 0 && !streaming && (
-          <p className="muted verdict">
-            {events.length} events received. The spacing is the proof: staggered
-            offsets mean a live stream, identical offsets would mean it was
-            buffered and flushed at the end.
-          </p>
-        )}
-      </main>
+      {isDev && <DevBar chat={chat} />}
     </div>
+  )
+}
+
+/**
+ * Dev-only harness controls. Stripped from the production build by the
+ * import.meta.env.DEV guard, so there is no chance of a "harness" button
+ * appearing on stage.
+ */
+// Each input_request replaces the previous one, so requesting one kind at a
+// time is the only way to actually interact with any but the last.
+const WIDGET_KINDS = ['district', 'soil_type', 'budget_bdt', 'area', 'name']
+
+function DevBar({ chat }) {
+  const [kind, setKind] = useState(WIDGET_KINDS[0])
+
+  return (
+    <footer className="devbar">
+      <span className="label">dev harness</span>
+      <button
+        className="secondary"
+        disabled={chat.streaming}
+        onClick={() => chat.send('harness', { endpoint: '/api/dev/harness' })}
+      >
+        Events
+      </button>
+      <select
+        className="field field-narrow"
+        value={kind}
+        onChange={(event) => setKind(event.target.value)}
+      >
+        {WIDGET_KINDS.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      <button
+        className="secondary"
+        disabled={chat.streaming}
+        onClick={() => chat.send(kind, { endpoint: '/api/dev/harness/widgets' })}
+      >
+        Widget
+      </button>
+      <span className="muted">
+        contract-shaped events only — never farmer content
+      </span>
+    </footer>
   )
 }
