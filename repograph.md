@@ -36,6 +36,19 @@ Must also be stated in the README (NOTES #9). Detail and reasoning: `backend/uni
 - **Wire format:** every SSE event is one `data:` line holding one JSON object, discriminator `type` *inside* the JSON (matches PLAN §2). The SSE `event:` field is deliberately unused.
 - **Transport is POST + fetch streaming, not EventSource** — EventSource cannot POST, and the contract is `POST /api/chat` with a JSON body.
 
+## backend/finance/ — B (the only place money arithmetic happens)
+- `engine.py` — `project(...)` returns a full `FinanceProjection` (3 scenarios, break-even yield + price, assumptions); `CostLine` is the per-hectare input row; `min_cost_per_ha()` is what the scorer's budget exclusion must use so the two can't disagree.
+- **Yields cross this boundary in kg/ha** (crop.db units, LOG1 [02:20]) — pass crop.db values straight through, no conversion. A value in 0 < y < 50 kg/ha is **refused** as a probable t/ha mistake.
+- **All arithmetic is `Decimal`; floats only at the schema boundary.** Rule: round, then combine — the displayed qty is the one priced, the displayed line totals are the ones summed, so every row multiplies out and the column adds up exactly on screen. Consequence: doubling the area scales the bill to ~1e-5 relative, not exactly (quantities are rounded to 4dp first). Deliberate; see the engine docstring.
+- Scenarios (PRD §8 Tier0.5): conservative = (base − band) × price×0.9, base, optimistic = (base + band) × price×1.1. Break-even is answered against the **base** scenario.
+
+## backend/payments/ — B (bdapps, simulator-first)
+- `simulator.py` — the twin: documented bdapps shapes exactly, numeric fields as strings (gotcha #7), `E1326`/`E1601` → insufficient balance per the reference's §8 code table (its §6.3 inline note disagrees; §8 wins, LOG2 [03:55]).
+- `client.py` — the live path. Detects bdapps' HTML-not-JSON error responses and names the likely cause (IP not whitelisted).
+- `msisdn.py` — accepts every way a farmer types a number; **raises** on an invalid one rather than "fixing" it, because a silently corrected number charges a stranger.
+- `service.py` — mode toggle (**defaults to simulator**; live construction raises without credentials), the confirmation gate, and the Bengali receipt. `CheckoutResult.raw` goes through the redactor.
+- `backend/api/checkout.py` — `POST /api/checkout`, `/api/checkout/quote`, `GET /api/checkout/mode`. **The confirmation gate is server-enforced:** `/quote` registers a single-use pending confirmation keyed on farm_id+mobile+amount; `/checkout` returns **409** without a matching unexpired quote. No schema change was needed.
+
 ## backend/units.py — B
 Area (bigha/katha/decimal/acre/ha/sq_m/sq_ft) and mass (maund/seer/kg/quintal/ton/g), Bangla aliases, Bangla display labels. Internal is **always ha and kg**; local units exist only at the intake/display edges.
 - **1 bigha = 0.1337803776 ha** (20 katha × 720 sq ft ≈ the ratified 0.1338). The docs' "= 33 decimal" is an approximation — a bigha is really 33.06 decimal. Acre/decimal stay on the exact international acre.
@@ -55,8 +68,8 @@ Area (bigha/katha/decimal/acre/ha/sq_m/sq_ft) and mass (maund/seer/kg/quintal/to
 - Plan/Finance tabs are deliberately **absent** until H9–H12 — an empty tab reads as a broken feature.
 
 ## tests/ — root-level, shared by file (CLAUDE.md rule 12)
-`test_units.py`, `test_redact.py` (B). **A's `test_crop_scorer.py` belongs here too.**
-Run from the repo root: `.venv/Scripts/python -m pytest tests/ -q`.
+`test_units.py`, `test_redact.py`, `test_finance.py`, `test_payments.py` (B). **A's `test_crop_scorer.py` belongs here too.**
+Run from the repo root: `.venv/Scripts/python -m pytest tests/ -q` — 214 green as of LOG2 [04:20].
 
 ## data/
 - `data/raw/` — A. public yearbook extracts (empty, .gitkeep).
@@ -65,7 +78,8 @@ Run from the repo root: `.venv/Scripts/python -m pytest tests/ -q`.
 - `data/prices.md` — B (not yet created).
 
 ## Still to build (B)
-`backend/finance/`, `backend/payments/`, `data/prices.md`.
+`data/prices.md` (the cost/price numbers the finance engine is waiting for),
+Plan/Finance tabs + `/api/finance/recompute` (H9–H12), checkout UI.
 
 **What A needs to drop in for the loop to light up:** `backend/agent/loop.py` exposing
 `async def run_turn(session_id, farm_id, message) -> AsyncIterator[dict]`, yielding PLAN §2
