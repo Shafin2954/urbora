@@ -1,0 +1,123 @@
+/* AgriSense design tokens.
+ *
+ * Constraints these values answer to (CLAUDE.md frontend rules):
+ *   - a cheap Android phone, possibly held in direct sunlight
+ *   - a low-literacy Bangla reader
+ *   - a judge who needs to find a number fast
+ * So: earthy agricultural palette, high contrast, big type, generous touch
+ * targets. No purple/blue gradients, no glassmorphism, no decorative shadows.
+ *
+ * Deliberately light-only. `color-scheme: light dark` plus a dark override is
+ * how you get a half-legible screen in daylight on a phone that happens to be
+ * in dark mode. One palette, tuned for the worst lighting we expect.
+ */
+:root {
+  --bg: #f7f4ec; /* cream — paper, not screen-white glare */
+  --surface: #ffffff;
+  --surface-sunk: #f1ece0;
+
+  --ink: #17251b; /* near-black green; 15:1 on --bg */
+  --ink-soft: #4c5b51;
+  --ink-faint: #77857c;
+
+  --green: #2f6b3f; /* primary action + brand; matches PWA theme_color */
+  --green-dark: #24522f;
+  --green-tint: #e6efe4;
+  --leaf: #9ec27a;
+  --soil: #8a6a4a;
+  --clay: #b4531f; /* warnings, exclusions */
+  --border: #ddd6c6;
+
+  /* Noto Sans Bengali first: PRD.md §9 names it, and most Android devices
+   * already ship it. NOT loaded from a CDN — venue wifi is assumed hostile
+   * (NOTES.md #11), and a webfont that fails to load at the demo is worse
+   * than a system font that always works. TODO before the offline boot test
+   * (H20-H22): self-host the woff2 in public/ so desktops match phones. */
+  --sans: 'Noto Sans Bengali', 'Hind Siliguri', system-ui, 'Segoe UI', Roboto,
+    sans-serif;
+  --mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  font: 17px/1.5 var(--sans);
+  color: var(--ink);
+  background: var(--bg);
+  color-scheme: light;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 650;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+h1 {
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 1.05rem;
+}
+
+p {
+  margin: 0;
+}
+
+code,
+.mono {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+/* Every tappable thing clears 44px. A farmer's thumb, outdoors, in a hurry. */
+button {
+  font: inherit;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: var(--green-dark);
+}
+
+button:disabled {
+  background: var(--surface-sunk);
+  color: var(--ink-faint);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+
+button.secondary {
+  background: var(--surface);
+  color: var(--green-dark);
+  border-color: var(--border);
+}
+
+button.secondary:hover:not(:disabled) {
+  background: var(--green-tint);
+}
+
+/* Visible focus is an accessibility floor, not decoration. */
+:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 2px;
+}

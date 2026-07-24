@@ -1,0 +1,26 @@
+{
+  "name": "agrisense-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "comment": "Versions are exact, no ^ ranges — CLAUDE.md §2.7 / NOTES.md #15. A caret here is how the demo machine and the venue machine end up on different builds at 3am.",
+  "scripts": {
+    "dev": "vite",
+    "dev:host": "vite --host",
+    "build": "vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.4",
+    "oxlint": "1.75.0",
+    "vite": "8.1.5",
+    "vite-plugin-pwa": "1.3.0"
+  }
+}

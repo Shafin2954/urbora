@@ -1,0 +1,172 @@
+/* Layout for the H0 connection self-test. Mobile-first: the farmer's phone is
+ * the design target, the desktop is just a wider phone. */
+
+.app {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* --- top bar --- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.health {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-soft);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+
+/* Colour is never the only signal — the adjacent text says the same thing,
+ * which matters for colourblind judges and for a washed-out phone screen. */
+.dot-ok {
+  background: var(--green);
+}
+.dot-down {
+  background: var(--clay);
+}
+.dot-checking {
+  background: var(--ink-faint);
+}
+
+/* --- panel --- */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.panel-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.muted {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.error {
+  color: var(--clay);
+  font-weight: 600;
+  border-left: 4px solid var(--clay);
+  padding-left: 12px;
+}
+
+.label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
+/* --- assembled token output --- */
+
+.assembled {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  background: var(--green-tint);
+  border-radius: 12px;
+}
+
+.assembled-text {
+  font-size: 1.15rem;
+  line-height: 1.6;
+}
+
+/* --- event list (ancestor of the Trace panel) --- */
+
+.events {
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.events li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 14px;
+  flex-wrap: wrap;
+}
+
+.events li + li {
+  border-top: 1px solid var(--border);
+}
+
+.at {
+  color: var(--ink-faint);
+  min-width: 62px;
+}
+
+.type {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-sunk);
+  color: var(--ink-soft);
+}
+
+.type-token {
+  background: var(--green-tint);
+  color: var(--green-dark);
+}
+.type-done {
+  background: var(--leaf);
+  color: var(--green-dark);
+}
+.type-error {
+  background: #f6dfd4;
+  color: var(--clay);
+}
+
+.raw {
+  color: var(--ink-soft);
+  word-break: break-all;
+  flex: 1 1 100%;
+}
+
+.verdict {
+  max-width: 60ch;
+}
