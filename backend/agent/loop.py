@@ -1,23 +1,38 @@
-"""The agent loop (Instance A) — provider-neutral.
+"""The agent loop (Instance A) — provider-neutral, with a session-aware async
+entrypoint matching B's frozen API contract.
 
-Drives the LLM (OpenAI backend today) through native tool use and yields the
-frozen SSE event models from schemas.py. Instance B's redacting emitter serializes
-these (and redacts secrets in tool_call/tool_result) before they leave the
-process — the loop emits RAW.
+Two layers:
+  * `run_turn_sync` — the pure engine. Drives the LLM (OpenAI backend today)
+    through native tool use and yields the frozen SSE event models from
+    schemas.py. Takes an explicit `messages` list (native provider history)
+    and appends to it in place.
+  * `run_turn` — the real entrypoint B's `/api/chat` imports (see
+    backend/api/chat.py): `async def run_turn(session_id, farm_id, message)
+    -> AsyncIterator[dict]`. Loads the session's history from
+    backend/memory/store.py, runs the sync engine (bridged onto a worker
+    thread so the blocking OpenAI call never stalls FastAPI's event loop),
+    saves the updated history back, and yields PLAIN DICTS. tool_call/
+    tool_result are built via B's `sse.tool_call`/`sse.tool_result` so
+    redaction happens by construction (CLAUDE.md rule 5) — this file does not
+    reimplement redaction.
 
-The loop depends only on the `ChatBackend` interface (llm_client.py), so switching
-providers never touches this file. Guards (rule 9 / NOTES #5): max_iterations per
-turn; token usage + cost accumulated across iterations → `done` event + cost line.
+`farm_id` is accepted (matches the contract) but not yet used to seed context
+— returning-farmer memory injection is a Tier 1 follow-up, not built here;
+tracked honestly rather than half-wired.
+
+Guards (rule 9 / NOTES #5): max_iterations per turn; token usage + cost
+accumulated across iterations -> `done` event + cost line.
 
 Import as `backend.agent.loop` from the repo root.
 """
 
 from __future__ import annotations
 
+import asyncio
 import json
 import sys
 from datetime import datetime, timezone
-from typing import Any, Iterator
+from typing import Any, AsyncIterator, Iterator
 
 from ..schemas import (
     DoneEvent,
@@ -38,7 +53,7 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
-def run_turn(
+def run_turn_sync(
     messages: list[dict[str, Any]],
     client: ChatBackend | None = None,
     system: str = SYSTEM_PROMPT,
@@ -103,9 +118,69 @@ def run_turn(
     )
 
 
+_SENTINEL = object()
+
+
+async def _sync_iter_to_async(sync_gen: Iterator[Any]) -> AsyncIterator[Any]:
+    """Bridge a blocking sync generator into an async iterator without stalling
+    the event loop: each `next()` call (including the blocking OpenAI stream
+    read inside it) runs in a worker thread via asyncio.to_thread."""
+    it = iter(sync_gen)
+
+    def _next() -> Any:
+        try:
+            return next(it)
+        except StopIteration:
+            return _SENTINEL
+
+    while True:
+        item = await asyncio.to_thread(_next)
+        if item is _SENTINEL:
+            return
+        yield item
+
+
+async def run_turn(
+    session_id: str,
+    farm_id: str | None,
+    message: str,
+    client: ChatBackend | None = None,
+) -> AsyncIterator[dict]:
+    """The real agent entrypoint — this is what backend/api/chat.py imports.
+
+    Loads `session_id`'s stored conversation history, appends `message`, runs
+    the pure engine, persists the updated history, and yields plain dicts on
+    the exact PLAN §2 wire shape. tool_call/tool_result go through B's
+    sse.tool_call/sse.tool_result (redaction is structural there, never
+    reimplemented here — CLAUDE.md rule 5); every other event is
+    `.model_dump()`'d directly from its pydantic SSEEvent.
+    """
+    from ..api import sse  # B's redacting constructors (import, not reimplement)
+    from ..memory.store import get_session_messages, save_session_messages
+
+    messages = get_session_messages(session_id)
+    messages.append({"role": "user", "content": message})
+
+    async for event in _sync_iter_to_async(run_turn_sync(messages, client=client)):
+        if isinstance(event, ToolCallEvent):
+            yield sse.tool_call(event.id, event.name, event.params)
+        elif isinstance(event, ToolResultEvent):
+            yield sse.tool_result(event.id, event.name, event.result_raw)
+        elif isinstance(event, TokenEvent):
+            yield sse.token(event.text)
+        elif isinstance(event, ErrorEvent):
+            yield sse.error(event.message)
+        elif isinstance(event, DoneEvent):
+            yield sse.done(event.usage.in_tokens, event.usage.out_tokens, event.usage.cost_usd)
+        else:
+            yield event.model_dump()  # plan_update/finance_update/alert/input_request
+
+    save_session_messages(session_id, messages)
+
+
 if __name__ == "__main__":
     # Live end-to-end smoke: one Bangla planning turn (needs OPENAI_API_KEY).
-    # Force UTF-8 stdout — Windows cp1252 can't encode Bangla tokens / arrows.
+    # Force UTF-8 stdout — Windows cp1252 can't print Bangla tokens / arrows.
     try:
         sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
     except Exception:  # noqa: BLE001
@@ -113,7 +188,7 @@ if __name__ == "__main__":
     history: list[dict[str, Any]] = [
         {"role": "user", "content": "রাজশাহীতে আমার জমির জন্য আবহাওয়া দেখে পরামর্শ দাও।"}
     ]
-    for ev in run_turn(history):
+    for ev in run_turn_sync(history):
         if isinstance(ev, TokenEvent):
             print(ev.text, end="", flush=True)
         elif isinstance(ev, ToolCallEvent):
