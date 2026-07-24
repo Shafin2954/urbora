@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from ..tools.crop_scorer import crop_scorer_tool
 from ..tools.cropdb import cropdb_sql
 from ..tools.geocode import geocode
 from ..tools.weather import get_climatology, get_forecast
@@ -99,6 +100,45 @@ TOOL_DEFS: list[dict[str, Any]] = [
             "required": ["action", "crop", "district"],
         },
     },
+    {
+        "name": "crop_scorer",
+        "description": (
+            "Deterministic crop ranking (you must NEVER rank crops yourself — "
+            "call this tool and narrate its output). Ranks boro_rice, aman_rice, "
+            "potato, mustard, lentil for a farm. CURRENT LIMITATION: only the "
+            "'District track record' and 'Stability' components score real "
+            "points today (the curated soil/water/climate knowledge base and "
+            "B's finance engine don't exist yet) — 'Agronomic fit', 'Profit', and "
+            "'Climate fit' report as 'unavailable', and Season/Soil/Water/Budget "
+            "screening does not run (all supported crops are shown regardless of "
+            "fit). The result's 'degraded' list names exactly what's unavailable "
+            "and why — you MUST relay this honestly in Bangla before presenting "
+            "any ranking; never present the partial composite as a complete "
+            "recommendation."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "district": {"type": "string", "description": "canonical district name"},
+                "soil_type": {
+                    "type": "string",
+                    "enum": ["clay", "loam", "sandy_loam", "clay_loam", "silt", "sandy", "peat"],
+                },
+                "water_source": {
+                    "type": "string",
+                    "enum": ["rainfed", "tubewell", "canal", "irrigated"],
+                },
+                "season": {"type": "string", "enum": ["rabi", "kharif1", "kharif2"]},
+                "candidates": {
+                    "type": "array", "items": {"type": "string"},
+                    "description": "subset of the 5 supported crops; omit for all 5",
+                },
+                "area_ha": {"type": "number", "description": "farm area in hectares"},
+                "budget_bdt": {"type": "number", "description": "farmer's budget in BDT"},
+            },
+            "required": ["district", "soil_type", "water_source", "season"],
+        },
+    },
 ]
 
 _DISPATCH: dict[str, Callable[..., dict]] = {
@@ -106,6 +146,7 @@ _DISPATCH: dict[str, Callable[..., dict]] = {
     "get_forecast": get_forecast,
     "get_climatology": get_climatology,
     "cropdb_sql": cropdb_sql,
+    "crop_scorer": crop_scorer_tool,
 }
 
 
