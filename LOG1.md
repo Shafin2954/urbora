@@ -121,3 +121,17 @@ Append-only. Format defined in CLAUDE.md §1. Newest entry at the bottom.
 **Why:** A plaintext key in a logged session is compromised.
 **Rejected:** Writing the key into .env/any file for them.
 **Impacts other instance:** B — same rule: never paste live secrets; .env only.
+
+## [03:10] Integrated B's work: merged origin/master into dev-a
+**Did:** B had already merged dev-b → master (master=1626a38: FastAPI SSE skeleton, redacting emitter, units.py, Vite frontend, chat UI). Merged origin/master into dev-a (merge commit bd441f0). Conflicts resolved in requirements.txt (kept A's openai/httpx/pytest + B's `-r api/requirements-api.txt`) and repograph.md (both sections). Confirmed schemas.py UNCHANGED since freeze ✓. A's 28 backend tests still green post-merge; B's files all present.
+**Decision:** Reconcile via merge (no history rewrite / force-push) rather than rebase. dev-a now carries the full A+B tree.
+**Why:** Get A's backend + B's api/ui on one branch for the H3 end-to-end.
+**Rejected:** Rebasing dev-a onto master (would rewrite already-pushed commits + force-push).
+**Impacts other instance:** B — workflow note: you merged to master before A this time (PLAN §4 says A-first); harmless here, no conflicts on your files. schemas.py stayed frozen — thank you.
+
+## [03:15] DECISION: 5-crop set final — drop maize AND wheat
+**Did:** Human A decided: ship the 5 data-backed crops only (boro_rice, aman_rice, potato, mustard, lentil). Wheat stays out (no data). Maize stays out too — its source data is corrupt and the labeled-placeholder handling was disproportionate effort for one crop. Built and then REVERTED the maize placeholder (uncommitted; holt.py/cropdb.py/prompts/tools_spec/tests restored to the 5-crop state; crop.db unchanged, no extra_observations table).
+**Decision:** Scorer/finance/demo universe = these 5. cropdb_sql returns an honest "no data" for wheat/maize. Supersedes the earlier "crop set needs human confirm" (LOG 02:18).
+**Why:** Human A — avoid over-investing in one bad-data crop; keep scope tight. Demo still has ≥3 Rabi candidates (boro/potato/mustard/lentil) + aman for kharif-2.
+**Rejected:** Maize as a labeled corrupt placeholder (too much special-casing for one crop); fabricating wheat/maize (rule 2).
+**Impacts other instance:** B — demo/README crop set is 5 (no wheat, no maize). Update any six-crop references.
