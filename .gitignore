@@ -1,0 +1,32 @@
+# ── Secrets (CLAUDE.md rule 8 — secrets NEVER touch git) ──
+.env
+*.env
+!.env.example
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Virtualenvs ──
+.venv/
+venv/
+backend/.venv/
+
+# ── Node / frontend (Instance B) ──
+node_modules/
+dist/
+.vite/
+
+# ── Local model / index caches (pre-cached, not committed) ──
+backend/kb/.chroma/
+backend/kb/chroma_index/
+*.onnx
+.cache/
+
+# ── OS noise ──
+.DS_Store
+Thumbs.db

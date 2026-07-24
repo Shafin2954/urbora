@@ -1,0 +1,18 @@
+# AgriSense backend dependencies — pin EXACT versions on first add (CLAUDE.md rule 7).
+# Python 3.12. Create venv: `python -m venv backend/.venv`
+# Install:    `backend/.venv/Scripts/python -m pip install -r backend/requirements.txt`
+
+# ── Instance A core: agent / tools / kb / memory / schemas ──
+anthropic==0.119.0        # Claude API client (native tool use, streaming)
+pydantic==2.13.4          # schemas.py — the frozen H1 contract
+python-dotenv==1.2.2      # load .env (secrets never in git)
+
+# ── Instance A adds later, pinned on first real use (placeholders, do NOT install yet) ──
+# httpx==<pin>                    # Open-Meteo forecast/climatology, geocoder, bdapps (httpx ships transitively with anthropic; pin explicitly when tools use it directly)
+# chromadb==<pin>                # in-event RAG index (backend/kb/ingest.py)
+# sentence-transformers==<pin>   # pre-cached embedding model, English queries
+
+# ── Instance B adds: api / finance / payments (append below, keep pins exact) ──
+# fastapi==<pin>
+# uvicorn[standard]==<pin>
+# sse-starlette==<pin>           # or hand-rolled SSE — B's call
