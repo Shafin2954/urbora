@@ -62,18 +62,22 @@ Area (bigha/katha/decimal/acre/ha/sq_m/sq_ft) and mass (maund/seer/kg/quintal/to
 - **1 bigha = 0.1337803776 ha** (20 katha × 720 sq ft ≈ the ratified 0.1338). The docs' "= 33 decimal" is an approximation — a bigha is really 33.06 decimal. Acre/decimal stay on the exact international acre.
 - **1 maund = 40 kg** (market/DAM maund, ratified by human B), not the 37.3242 kg historical one.
 
-## frontend/ — B (Vite + React, manifest-only PWA)
+## frontend/ — single operator since H10.5 (Vite + React, manifest-only PWA)
 - `vite.config.js` — React plugin, PWA manifest, and the **`/api` proxy to :8000** (the reason there is no CORS in dev).
-- `src/App.jsx` — one responsive page: chat + trace. Tabs on a phone, side-by-side from 900px. Dev harness bar is stripped from the production build.
-- `src/state/useChat.js` — **the only place SSE event semantics live.** Handles every PLAN §2 event; unknown types surface in the trace rather than vanishing.
+- `src/App.jsx` — one responsive page: chat/finance/plan/evidence/checkout tabs on the left, the provenance graph permanently docked on the right from 900px. Dev harness bar is stripped from the production build. **Fixed on `graph-ui` [15:35+]:** the tab bar used to `display:none` above 900px, making Finance/Plan/Evidence unreachable on a laptop — only Chat+Trace ever rendered there. Tabs now stay visible at every width.
+- `src/state/useChat.js` — **the only place SSE event semantics live.** Handles every PLAN §2 event; unknown types surface in the trace rather than vanishing. `trace` accumulates for the whole session and is never cleared between turns.
 - `src/components/ChatPanel.jsx` — transcript + composer, Bangla-first. Composer stays live while a widget shows.
 - `src/components/InputRequest.jsx` — all five `input_kind`s: chips, searchable dropdown (64 districts), number, number+unit, text. Answers are sent as ordinary Bangla text ("2 বিঘা") so the agent needs no second parsing path.
-- `src/components/TracePanel.jsx` — judge-facing trace, English. Shows already-redacted params/results and names the masked fields.
+- `src/components/GraphPanel.jsx` — **[new, graph-ui]** the provenance graph that replaced the Trace tab as the primary judge view. Farm hexagon at the center; every node a fact (place/weather/KB source/crop/plan/finance/question); every edge labeled with the tool call that produced it. Deterministic radial layout (no physics), pan/zoom only, click a node to open `NodeInspector.jsx` with the raw params/result. Nests the old `TracePanel.jsx` underneath, collapsed, as "Raw log (n events)" — nothing was deleted, just demoted.
+- `src/components/NodeInspector.jsx` — **[new, graph-ui]** overlay (not a sidebar, so it never squeezes another pane — see LOG3 [12:50]'s finance-table lesson) showing one node's backing tool call: name, params, raw result, both timestamps, duration, redacted fields.
+- `src/lib/traceGraph.js` — **[new, graph-ui]** pure `buildGraph(trace) -> {nodes, edges, callsById}`. Pairs `tool_call`/`tool_result` by shared `id`, follows the `retrieval-{parentId}` convention `loop.py` uses for forced RAG calls to draw `source -> crop` / `source -> plan` edges, and keys every node on a stable fact (not a call id) so the same location/crop/source across three turns draws once, last-write-wins. No arithmetic — every sub-label quotes a server value or counts an array.
+- `src/lib/graphLayout.js` — **[new, graph-ui]** pure `layout()` — BFS depth from farm, fixed angular slices per category, two rings. No force simulation on purpose (deterministic, doesn't jitter mid-stream).
+- `src/components/TracePanel.jsx` — the raw chronological log, now nested inside GraphPanel rather than being its own tab. Still judge-facing/English, still shows already-redacted params/results and names the masked fields. Entries now default **collapsed**.
+- `src/components/EvidencePanel.jsx` — the Tier-0 capability checklist grid was removed here (the graph's legend + node coloring covers "which capability ran" now); the three evidence cards (forecast/ranked crops/KB sources) stay.
 - `src/api/sse.js` — SSE-over-fetch client, spec-correct framing (comments, multi-line `data:`, UTF-8 across chunk boundaries).
-- `src/index.css` / `App.css` — earthy design tokens, sunlight contrast, ≥44px touch targets.
+- `src/index.css` / `App.css` — earthy design tokens, sunlight contrast, ≥44px touch targets. `App.css` had two custom properties referenced but never declared (`--line`, `--muted` on `.plan-task`/`.task-category`) — mapped to `--border`/`--ink-faint` while touching this file for the graph-ui work.
 - **No service worker, on purpose** (PRD §9, NOTES #8): `injectRegister: null` + `devOptions.enabled: false` + `selfDestroying: true`, plus a dev-time eviction in `main.jsx`. If the UI behaves impossibly, check the console for the eviction warning first.
 - **The PWA manifest link only exists in the production build.** The phone install test must run `npm run build && npm run preview`, never `npm run dev`.
-- Plan/Finance tabs are deliberately **absent** until H9–H12 — an empty tab reads as a broken feature.
 
 ## tests/ — root-level, shared by file (CLAUDE.md rule 12)
 `test_units.py`, `test_redact.py`, `test_finance.py`, `test_payments.py`, `test_chat_seam.py` (B).
@@ -85,11 +89,10 @@ The shared root `.venv` now has A's pins too (`openai==2.48.0`), so one venv run
 - `data/raw/` — A. public yearbook extracts (empty, .gitkeep).
 - `data/crop.db` — A, generated in-event by `backend/kb/holt.py` from `agribase_clean.db`. Tables: holt_projections (crop_key, district, base_yield_kg_ha, band_kg_ha, n_points, trend, method, fitted_at) + meta (generated_at, git sha, source, disclaimer). 310 rows. Committed (meta-timestamped). Regenerate: `python -m backend.kb.holt`.
 - **CROP SET (from agribase_clean.db):** enabled = aman_rice, boro_rice, potato, mustard, lentil. **Wheat disabled (no source key), maize absent.** Diverges from PRD §3.2 six-crop (no wheat/maize; lentil is an extra). Rabi ranking candidates from data = boro/potato/mustard/lentil; kharif-2 = aman. OPEN for human A: confirm crop set or supply wheat/maize yield data.
-- `data/prices.md` — B (not yet created).
+- `data/prices.md` — filled from agristats.db + BARC/BARI PDFs as of LOG3 [15:05]. Both farm-gate price and input-cost tables have cited rows now; this line was stale (previously said "not yet created").
 
-## Still to build (B)
-`data/prices.md` (the cost/price numbers the finance engine is waiting for),
-Plan/Finance tabs + `/api/finance/recompute` (H9–H12), checkout UI.
+## Still to build
+Nothing from the original Tier 0 punch list — `data/prices.md`, Plan/Finance tabs, `/api/finance/recompute`, and checkout UI are all done (see LOG3.md). Current work is the Trace-tab -> provenance-graph refactor on branch `graph-ui`.
 
 **What A needs to drop in for the loop to light up:** `backend/agent/loop.py` exposing
 `async def run_turn(session_id, farm_id, message) -> AsyncIterator[dict]`, yielding PLAN §2

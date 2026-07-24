@@ -116,9 +116,9 @@
 }
 
 .plan-list { display: grid; gap: 12px; }
-.plan-task { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.plan-task { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
 .plan-task p { margin: 6px 0; }
-.task-category, .weather-note { display: block; color: var(--muted); font-size: .9rem; }
+.task-category, .weather-note { display: block; color: var(--ink-faint); font-size: .9rem; }
 
 /* --- chat --- */
 
@@ -434,6 +434,189 @@
   padding: 8px 0;
   color: var(--ink-soft);
   font-size: 0.78rem;
+}
+
+/* --- provenance graph (replaces the raw trace dump as the primary view) --- */
+
+.graph-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  gap: 10px;
+}
+
+.graph-svg {
+  flex: 1;
+  min-height: 260px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  touch-action: none; /* pan/zoom owns the gesture, not the page scroll */
+  cursor: grab;
+}
+
+.graph-svg:active {
+  cursor: grabbing;
+}
+
+.graph-node-label {
+  font: 650 12px var(--sans);
+}
+
+.graph-node-sub {
+  font-size: 10px;
+}
+
+.graph-node {
+  cursor: pointer;
+}
+
+.graph-node:focus-visible > circle:first-child {
+  outline: 3px solid var(--green);
+  outline-offset: 2px;
+}
+
+.graph-node.is-selected > circle:first-child {
+  outline: 2px solid var(--green);
+}
+
+.graph-edge-label {
+  font-size: 9px;
+}
+
+/* Entrance motion — only for genuinely new nodes/edges (GraphPanel.jsx tracks
+ * "seen" ids so a re-render never replays this). Explains the trace arriving,
+ * not decoration (CLAUDE.md frontend rules). */
+.graph-node.is-new {
+  animation: graph-node-in 220ms ease-out;
+}
+
+.graph-edge.is-new {
+  animation: graph-edge-in 300ms ease-out;
+}
+
+@keyframes graph-node-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes graph-edge-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graph-node.is-new,
+  .graph-edge.is-new {
+    animation: none;
+  }
+}
+
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 8px 0 0;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.graph-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+.graph-raw-log summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.graph-raw-log .trace {
+  max-height: 320px;
+}
+
+/* --- node inspector (overlay, never steals width — LOG3.md [12:50]) --- */
+
+.inspector-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 37, 27, 0.35);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  z-index: 20;
+}
+
+.inspector-panel {
+  width: 100%;
+  max-width: 520px;
+  max-height: 80svh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px 14px 0 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inspector-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.inspector-kind {
+  display: block;
+  color: var(--ink-faint);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.inspector-sub {
+  color: var(--ink-soft);
+}
+
+.inspector-tool {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .inspector-overlay {
+    align-items: center;
+  }
+
+  .inspector-panel {
+    border-radius: 14px;
+    max-height: 85vh;
+  }
 }
 
 /* --- misc --- */
@@ -902,26 +1085,39 @@
   font-size: 0.75rem;
 }
 
-/* --- desktop: trace becomes a side panel, the judge's view --- */
+/* --- desktop: the graph becomes a permanent side panel, the judge's view ---
+ *
+ * This used to hide .tabs entirely at this breakpoint, which meant Finance,
+ * Plan, Evidence and Checkout were unreachable on any screen wider than
+ * 900px — only Chat and Trace ever rendered. Fixed here: the tab bar stays
+ * visible and keeps switching the left column; the graph just never needs a
+ * tab of its own because it's always on screen. */
 
 @media (min-width: 900px) {
-  .tabs {
+  .tab-trace {
     display: none;
   }
 
-  .pane-chat,
+  /* The graph is docked permanently, unlike every other pane — it ignores
+   * .is-active on purpose, so it never disappears while a tab switches the
+   * left column. */
   .pane-trace {
     display: flex;
-  }
-
-  .pane-chat {
-    flex: 1 1 60%;
-  }
-
-  .pane-trace {
-    flex: 1 1 40%;
-    max-width: 460px;
+    flex: 1 1 46%;
+    min-width: 420px;
     border-left: 1px solid var(--border);
     padding-left: 20px;
+  }
+
+  /* Left column keeps obeying .is-active (tabs still switch it) — only the
+   * flex-basis changes for the two-column split. Matched on .is-active too
+   * so this ties the base ".pane.is-active { flex: 1 }" rule's specificity
+   * and wins on source order, instead of losing to it silently. */
+  .pane-chat.is-active,
+  .pane-finance.is-active,
+  .pane-plan.is-active,
+  .pane-evidence.is-active,
+  .pane-checkout.is-active {
+    flex: 1 1 54%;
   }
 }

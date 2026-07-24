@@ -1,19 +1,4 @@
-const CAPABILITIES = [
-  ['intake', 'তথ্য সংগ্রহ', 'ask_farmer'],
-  ['weather', 'লাইভ আবহাওয়া', 'get_forecast'],
-  ['knowledge', 'জ্ঞানভান্ডার', 'rag_query'],
-  ['ranking', 'ফসল বাছাই', 'crop_scorer'],
-  ['finance', 'আর্থিক হিসাব', 'finance_projection'],
-  ['plan', 'মৌসুম পরিকল্পনা', 'season_plan'],
-]
-
-export default function EvidencePanel({ trace, plan, finance }) {
-  const called = new Set(trace.filter((event) => event.type === 'tool_call').map((event) => event.name))
-  const complete = (key, tool) => {
-    if (key === 'finance') return Boolean(finance) || called.has(tool)
-    if (key === 'plan') return Boolean(plan) || called.has(tool)
-    return called.has(tool)
-  }
+export default function EvidencePanel({ trace }) {
   const scorer = [...trace].reverse().find((event) => event.type === 'tool_result' && event.name === 'crop_scorer')?.result_raw
   const forecast = [...trace].reverse().find((event) => event.type === 'tool_result' && event.name === 'get_forecast')?.result_raw
   const retrieval = [...trace].reverse().find((event) => event.type === 'tool_result' && event.name === 'rag_query')?.result_raw
@@ -21,15 +6,7 @@ export default function EvidencePanel({ trace, plan, finance }) {
 
   return (
     <div className="evidence">
-      <p className="evidence-intro">এই টার্নে যে প্রমাণ ব্যবহার হয়েছে। প্রতিটি কার্ডের বিস্তারিত Trace-এ দেখা যাবে।</p>
-      <div className="capability-grid">
-        {CAPABILITIES.map(([key, label, tool]) => (
-          <div className={`capability ${complete(key, tool) ? 'is-done' : ''}`} key={key}>
-            <strong>{complete(key, tool) ? '✓' : '○'} {label}</strong>
-            <span className="mono">{complete(key, tool) ? tool : 'এই টার্নে এখনও হয়নি'}</span>
-          </div>
-        ))}
-      </div>
+      <p className="evidence-intro">এই টার্নে যে প্রমাণ ব্যবহার হয়েছে। প্রতিটি কার্ডের বিস্তারিত Trace-এ দেখা যাবে।</p>
       {forecast?.daily?.[0] && (
         <section className="evidence-card">
           <h3>সাম্প্রতিক পূর্বাভাস</h3>
@@ -45,7 +22,7 @@ export default function EvidencePanel({ trace, plan, finance }) {
       )}
       {retrieval?.matches?.length > 0 && (
         <section className="evidence-card">
-          <h3>জ্ঞানভান্ডার থেকে পাওয়া উৎস</h3>
+          <h3>জ্ঞানভান্ডার থেকে পাওয়া উৎস</h3>
           {retrieval.matches.map((match) => <p key={match.id}>{match.source_title} — <span className="mono">{match.locator}</span></p>)}
         </section>
       )}

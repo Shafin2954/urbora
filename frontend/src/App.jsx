@@ -6,21 +6,26 @@ import CheckoutPanel from './components/CheckoutPanel.jsx'
 import FinancePanel from './components/FinancePanel.jsx'
 import PlanPanel from './components/PlanPanel.jsx'
 import EvidencePanel from './components/EvidencePanel.jsx'
-import TracePanel from './components/TracePanel.jsx'
+import GraphPanel from './components/GraphPanel.jsx'
 import { useChat } from './state/useChat.js'
 
 /**
- * One responsive page (PRD.md §9): chat primary, with Trace alongside.
+ * One responsive page (PRD.md §9): chat primary, with the provenance graph
+ * alongside.
  *
  * Tabs appear only when they have something real in them. An empty tab reads
  * as a broken feature, and a tab that appears mid-conversation is itself a
  * signal that the agent produced something. So Checkout shows up when there is
  * a basket; Plan and Finance when the agent emits plan_update/finance_update.
  *
- * Layout: on a phone, Chat and Trace are tabs, because the farmer needs the
- * whole screen for the conversation. From 900px the trace becomes a side
- * panel, because that is the judge's view and they want to watch tool calls
- * land while the answer is still being written.
+ * Layout: on a phone, tabs switch between Chat/Finance/Plan/Evidence/Checkout
+ * and the graph, because the farmer needs the whole screen for one thing at a
+ * time. From 900px the graph becomes a permanent side panel and the tab bar
+ * stays visible to switch the left column — a judge on a laptop can still
+ * reach Finance/Plan/Evidence, and watches tool calls land in the graph while
+ * the answer is still being written. (The tab bar used to vanish entirely at
+ * this breakpoint, which made those panes unreachable on a laptop — fixed
+ * alongside this graph refactor.)
  */
 
 const HEALTH_POLL_MS = 10000
@@ -155,7 +160,7 @@ export default function App() {
         )}
         <section className={`pane pane-evidence ${tab === 'evidence' ? 'is-active' : ''}`} aria-label="Tier 0 evidence">
           <h2 className="pane-title">Tier 0 প্রমাণ</h2>
-          <EvidencePanel trace={chat.trace} plan={chat.plan} finance={chat.finance} />
+          <EvidencePanel trace={chat.trace} />
         </section>
 
         {basket && (
@@ -171,8 +176,8 @@ export default function App() {
           className={`pane pane-trace ${tab === 'trace' ? 'is-active' : ''}`}
           aria-label="Agent trace"
         >
-          <h2 className="pane-title">Agent trace</h2>
-          <TracePanel trace={chat.trace} usage={chat.usage} />
+          <h2 className="pane-title">Agent trace — provenance</h2>
+          <GraphPanel trace={chat.trace} usage={chat.usage} />
         </aside>
       </div>
 

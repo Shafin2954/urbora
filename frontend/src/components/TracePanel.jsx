@@ -3,6 +3,11 @@ import { useState } from 'react'
 /**
  * The visible agent trace — Tier 0 item 8, and 20 of the agentic points.
  *
+ * No longer the primary trace surface: GraphPanel.jsx renders the
+ * provenance graph and nests this component, collapsed, as "Raw log (n
+ * events)" underneath it. Kept as-is (and still exported standalone) so the
+ * exhaustive chronological view is demoted, not lost.
+ *
  * Rules this panel exists to satisfy:
  *   - every tool call shows name, params, raw result, timestamp (CLAUDE.md §2.5)
  *   - the panel is English, unlike the rest of the UI (PRD.md §9)
@@ -40,7 +45,7 @@ export default function TracePanel({ trace, usage }) {
 }
 
 function TraceEntry({ event }) {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const isCall = event.type === 'tool_call'
   const body = isCall ? event.params : event.result_raw
   const redacted = event.redacted ?? []
