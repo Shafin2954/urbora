@@ -26,15 +26,19 @@ Must also be stated in the README (NOTES #9). Detail and reasoning: `backend/uni
 
 ## backend/api/ — B (FastAPI, SSE, sessions)
 - `main.py` — the app. `GET /api/health`; `GET`+`POST /api/hello/stream` (transport self-test); mounts `chat.py`'s router.
-- `chat.py` — `POST /api/chat`, B's route wrapping **A's agent loop**, imported lazily from `backend.agent.loop:run_turn`. Until that module exists the endpoint emits an honest `error` event instead of pretending. Also `/api/dev/harness*` — dev-only UI harnesses emitting contract-shaped events with deliberately synthetic English content (never farmer advice).
+- `chat.py` — `POST /api/chat`, B's route wrapping **A's agent loop**, imported lazily from `backend.agent.loop:run_turn` (so a missing or broken agent module degrades to an honest `error` event instead of taking the API down). Also `/api/dev/harness*` — dev-only UI harnesses emitting contract-shaped events with deliberately synthetic English content (never farmer advice).
+- `sessions.py` — B. In-process `session_id → {farm_id, messages, lock}`. A's `run_turn` is stateless and mutates the history in place, so B keeps it between requests. **Not** the memory feature (that's A's `backend/memory/`, H9–H12); this is a dict that dies with the process. One lock per session so a double-tapped send can't interleave two turns into one history.
+- `agent_bridge.py` — B. Runs A's **synchronous** generator on a worker thread and feeds its events back over a queue, so blocking LLM/tool I/O never stalls the event loop. Re-raises the generator's exceptions in the consumer so the route can emit an honest `error`; sets a stop flag when the consumer leaves (one in-flight HTTP call may still finish).
 - `sse.py` — SSE wire format + streaming plumbing (event constructors, heartbeat, client-disconnect teardown). `tool_call`/`tool_result` **redact by construction**.
 - `redact.py` — trace redaction (NOTES #19). password/appId/key/token/secret → `***`; phone/subscriberId → last 3 digits; secrets in URL query strings scrubbed. Returns the masked field paths, so a redaction is visible rather than silent.
 - `config.py` — env-driven settings (host, port, CORS origins, heartbeat). No secret defaults.
 - `requirements-api.txt` — B's exactly-pinned deps (fastapi, uvicorn[standard], python-dotenv, pytest + transitives).
 
-**Two API facts worth knowing before touching it:**
+**Four API facts worth knowing before touching it:**
 - **Wire format:** every SSE event is one `data:` line holding one JSON object, discriminator `type` *inside* the JSON (matches PLAN §2). The SSE `event:` field is deliberately unused.
 - **Transport is POST + fetch streaming, not EventSource** — EventSource cannot POST, and the contract is `POST /api/chat` with a JSON body.
+- **The A↔B call shape:** `run_turn(messages, client=None, system=…)` — a sync generator over a message history, yielding pydantic events. B supplies the history and the thread. **`farm_id` has nowhere to go** — B stores it on the session, but the loop takes no such parameter, so the agent cannot yet know which farm it is discussing (open item for A, LOG2 [04:45]).
+- **Redaction is enforced in `format_sse`, not only in the constructors** — A emits raw trace events by design. Events already masked carry a `redacted` list and are passed through untouched, because re-masking a phone (`***678` → `***`) is lossy.
 
 ## backend/finance/ — B (the only place money arithmetic happens)
 - `engine.py` — `project(...)` returns a full `FinanceProjection` (3 scenarios, break-even yield + price, assumptions); `CostLine` is the per-hectare input row; `min_cost_per_ha()` is what the scorer's budget exclusion must use so the two can't disagree.
@@ -68,8 +72,10 @@ Area (bigha/katha/decimal/acre/ha/sq_m/sq_ft) and mass (maund/seer/kg/quintal/to
 - Plan/Finance tabs are deliberately **absent** until H9–H12 — an empty tab reads as a broken feature.
 
 ## tests/ — root-level, shared by file (CLAUDE.md rule 12)
-`test_units.py`, `test_redact.py`, `test_finance.py`, `test_payments.py` (B). **A's `test_crop_scorer.py` belongs here too.**
-Run from the repo root: `.venv/Scripts/python -m pytest tests/ -q` — 214 green as of LOG2 [04:20].
+`test_units.py`, `test_redact.py`, `test_finance.py`, `test_payments.py`, `test_chat_seam.py` (B).
+A's live in `backend/tests/` instead. Run both from the repo root:
+`.venv/Scripts/python -m pytest tests/ backend/tests -q` — **227 + 28 green** as of LOG2 [04:45].
+The shared root `.venv` now has A's pins too (`openai==2.48.0`), so one venv runs everything.
 
 ## data/
 - `data/raw/` — A. public yearbook extracts (empty, .gitkeep).
