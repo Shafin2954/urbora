@@ -47,6 +47,8 @@ Rule: never edit outside your directories. Cross-boundary need → log entry + t
 # {type:"finance_update", finance}
 # {type:"alert", alert}
 # {type:"done", usage:{in_tokens, out_tokens, cost_usd}}
+# {type:"input_request", field, prompt_bn, input_kind:"chips"|"dropdown"|"number"|"number_unit"|"text",
+#                        options:[{value,label_bn}]|null, unit_options:[str]|null}
 # {type:"error", message}
 
 # --- Core models (pydantic) ---
@@ -77,7 +79,7 @@ A fills models; B renders. Finance is B's pure function exposed to A as a tool �
 | Hours | A (agent/tools/kb/memory) | B (api/ui/finance/payments) | Sync |
 |---|---|---|---|
 | H0–H1 | Scaffold backend, venv, pinned requirements. schemas.py drafted. Claude client (single, env-var model switch). | Scaffold Vite React (no SW). FastAPI skeleton + hello-world SSE reaching browser — kills CORS friction now. units.py started. | **H1: schemas frozen. SSE confirmed in browser.** |
-| H1–H3 | Agent loop with get_forecast + get_climatology (labeled source_type). Geocode tool with candidate-confirm + 64-district fallback. Loop guards: max 12 iters, cost per turn. Weather wrapper: retry → labeled cached fallback. | Chat UI + SSE wiring. Redacting trace emitter + unit test (fake bdapps payload). units.py tests done. | H3: A's loop streams through B's UI end to end. |
+| H1–H3 | Agent loop with get_forecast + get_climatology (labeled source_type). Geocode tool with candidate-confirm + 64-district fallback. Loop guards: max 12 iters, cost per turn. Weather wrapper: retry → labeled cached fallback. | Chat UI + SSE wiring incl. input_request widgets (chips, dropdowns, number+unit). Redacting trace emitter + unit test (fake bdapps payload). units.py tests done. | H3: A's loop streams through B's UI end to end. |
 | H3–H6 | KB curation, 3 demo crops deep (**cap 3h total incl. yearbook tables**): BARC/DAE docs + hand-curate from BBS Yearbook: crop calendar (Ch1.8), demo-region AEZ soil rows (Ch1), optional district damage (Ch4). parse_agribase.py + holt.py written + run → crop.db generated in-event (meta timestamps). ingest.py → Chroma index in-event. rag_query + cropdb_sql + aez_soil_check tools. | Finance engine: 3 scenarios, provenance on every item, break-even yield+price, consistency tests. bdapps simulator twin (exact shapes incl. E1326 path) + confirmation step + mode toggle. prices.md hand-curated from Yearbook Ch10 (prices) + Ch7.5 (wages), table/page cited. | H6: agent retrieves KB + crop.db numbers, visible in trace with provenance. |
 | H6–H9 | crop_scorer.py (exclusions + 5 components) + unit tests. Intake state machine: gap detection, Bangla follow-ups. Budget-exclusion → replan path. | Checkout UI + receipt (Bengali). One responsive page: Plan/Finance/Trace tabs, provenance on tap. Bangla labels + Noto Sans Bengali. Manifest PWA. | H9: intake → ≥3 ranked crops, real numbers, exclusions with reasons. |
 | H9–H12 | Season plan generation (KB calendars + climatology dates, tasks flagged depends_on_weather). Memory: save/load FarmProfile, resume sessions, alerts table. | Finance view editable inputs → /recompute live. Mobile responsive pass. plan_update/finance_update/alert events wired. | **H12: TIER 0 END-TO-END. Nothing else until this passes.** |
