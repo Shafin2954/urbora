@@ -4,6 +4,8 @@ A Bangla-first web app where a smallholder farmer talks to an autonomous agent t
 produces a costed, weather-grounded season plan for their specific farm — and
 every number in that plan carries provenance you can inspect.
 
+The demo is live at [https://team-fixeth-agri-sense--Shafin54.replit.app](https://team-fixeth-agri-sense--Shafin54.replit.app).
+
 Built for the IUT 12th ICT Fest Bdapps Agentic AI Hackathon, 24–25 July 2026.
 
 ---
