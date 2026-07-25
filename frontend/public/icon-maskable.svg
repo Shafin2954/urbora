@@ -1,6 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="AgriSense">
-  <!-- Maskable: full bleed, no rounded corners (the launcher supplies the mask).
-       Artwork sits inside the centre 80% safe zone so Android never crops the sprout. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  
   <rect width="512" height="512" fill="#2f6b3f"/>
   <g transform="translate(256 256) scale(0.72) translate(-256 -256)">
     <path d="M256 412 V 236" fill="none" stroke="#f7f4ec" stroke-width="26" stroke-linecap="round"/>
