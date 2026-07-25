@@ -32,7 +32,7 @@ trace, to you. That honesty is the product, not a limitation of it.
 
 ## Agent System Architecture
 
-[agrisense_agent_architecture.png](https://raw.githubusercontent.com/Shafin54/agrisense/main/docs/agrisense_agent_architecture.png)
+![Architecture](<agrisense_agent_architecture (1).svg>)
 
 ---
 
