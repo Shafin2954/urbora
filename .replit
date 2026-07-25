@@ -2,6 +2,49 @@ modules = ["python-3.12", "nodejs-20", "web"]
 
 [nix]
 channel = "stable-25_05"
+packages = ["cargo", "libiconv", "libxcrypt", "libyaml", "rustc"]
 
 [agent]
 expertMode = true
+
+[deployment]
+deploymentTarget = "cloudrun"
+
+[userenv]
+
+[userenv.shared]
+AGRISENSE_MAX_ITERATIONS = "12"
+AGRISENSE_TEMPERATURE = "0.0"
+API_HOST = "0.0.0.0"
+API_PORT = "8000"
+BDAPPS_BASE_URL = "https://developer.bdapps.com"
+BDAPPS_MODE = "simulator"
+CORS_ORIGINS = "http://localhost:5000,http://127.0.0.1:5000"
+OPENAI_MAX_TOKENS = "4000"
+OPENAI_MODEL = "gpt-4o"
+VITE_API_BASE = ""
+VITE_DEMO_GUEST = "false"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "bash start.sh"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"

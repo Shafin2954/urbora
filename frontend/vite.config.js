@@ -68,8 +68,10 @@ export default defineConfig({
     }),
   ],
   server: {
-    port: 5173,
-    strictPort: true, // fail loudly rather than drifting to :5174 mid-demo
+    port: 5000,
+    strictPort: true, // fail loudly rather than drifting to another port
+    // Replit's preview pane proxies through a different origin; allow all hosts.
+    allowedHosts: true,
     proxy: {
       '/api': {
         // 8000 is the documented port (README.md, backend/api/config.py
