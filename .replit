@@ -1,3 +1,4 @@
+run = "bash start.sh"
 modules = ["python-3.12", "nodejs-20", "web"]
 
 [nix]
