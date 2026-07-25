@@ -139,28 +139,61 @@ export function layout({ nodes, edges }, opts = {}) {
 }
 
 /**
- * Calm chronological layout for the live provenance view. New facts enter at
- * the right; GraphPanel keeps that newest node centred, so prior work moves
- * left like a readable timeline instead of rebalancing a whole radial graph.
+ * Calm chronological layout for the live provenance view — one tool call per
+ * row, oldest at the top, newest at the bottom.
+ *
+ * This used to lay the same sequence out *horizontally* with every node on
+ * `y = 0`. That was the single cause of the overlap: labels are wider than the
+ * 170px pitch, so adjacent captions collided, and any edge spanning more than
+ * one step (farm -> finance, twelve nodes apart) drew a straight line straight
+ * through every node in between along with its own mid-point label. A serial
+ * run of tool calls therefore buried its own earlier calls — which breaks the
+ * one thing this panel exists to guarantee (competition.md Tier 0 item 8: a
+ * judge must be able to see every call).
+ *
+ * Vertically there is no such conflict. Rows are separated by `step`, labels
+ * run rightward into empty space instead of into the next node, and the column
+ * grows downward the way a log reads.
+ *
+ * Long-range edges bow out to the LEFT, deliberately away from the labels on
+ * the right, and carry their own midpoint so the tool caption sits on the bow
+ * rather than on top of the nodes it passes.
  */
-export function linearLayout({ nodes, edges }, opts = {}) {
-  const step = opts.step ?? 170
-  const positionedNodes = nodes.map((node, index) => ({ ...node, x: index * step, y: 0 }))
+export function verticalLayout({ nodes, edges }, opts = {}) {
+  const step = opts.step ?? 78
+  const positionedNodes = nodes.map((node, index) => ({ ...node, x: 0, y: index * step, row: index }))
   const posById = new Map(positionedNodes.map((node) => [node.id, node]))
+  let maxBow = 0
   const positionedEdges = edges
     .filter((edge) => posById.has(edge.from) && posById.has(edge.to))
     .map((edge) => {
       const a = posById.get(edge.from)
       const b = posById.get(edge.to)
-      return { ...edge, x1: a.x, y1: a.y, x2: b.x, y2: b.y, mx: (a.x + b.x) / 2, my: 0 }
+      const span = Math.abs(b.row - a.row)
+      // Neighbours connect straight down; anything longer bows, and bows wider
+      // the further it reaches, so two long edges can't trace the same curve.
+      const bow = span <= 1 ? 0 : Math.min(150, 26 + span * 13)
+      maxBow = Math.max(maxBow, bow)
+      const ymid = (a.y + b.y) / 2
+      const d = bow === 0
+        ? `M ${a.x} ${a.y} L ${b.x} ${b.y}`
+        : `M ${a.x} ${a.y} Q ${-bow} ${ymid} ${b.x} ${b.y}`
+      return {
+        ...edge,
+        x1: a.x, y1: a.y, x2: b.x, y2: b.y,
+        // Quadratic midpoint B(0.5) = ¼P0 + ½C + ¼P2 — on the bow, not the chord.
+        mx: -bow / 2, my: ymid,
+        d, bow, span,
+      }
     })
   const last = positionedNodes.at(-1) ?? { x: 0, y: 0 }
-  const pad = 90
+  const pad = 60
   return {
     nodes: positionedNodes,
     edges: positionedEdges,
     last,
-    bbox: { minX: -pad, minY: -pad, maxX: last.x + pad, maxY: pad },
+    // Asymmetric on purpose: bows live left of the column, labels right of it.
+    bbox: { minX: -maxBow - pad, minY: -pad, maxX: 230, maxY: last.y + pad },
   }
 }
 

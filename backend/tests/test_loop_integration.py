@@ -79,7 +79,9 @@ def _use_temp_db(tmp_path, monkeypatch):
 def test_run_turn_matches_chat_py_contract_shape():
     import inspect
     sig = inspect.signature(run_turn)
-    assert list(sig.parameters) == ["session_id", "farm_id", "message", "client"]
+    # `language` is additive with a default, so chat.py may pass it or not.
+    assert list(sig.parameters) == ["session_id", "farm_id", "message", "client", "language"]
+    assert sig.parameters["language"].default == "bn"  # Bangla-first, CLAUDE.md rule 10
     assert inspect.isasyncgenfunction(run_turn)
 
 

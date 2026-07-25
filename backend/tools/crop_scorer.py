@@ -689,7 +689,141 @@ def crop_scorer_tool(
 
     return {
         "candidates": [c.model_dump() for c in results],
+        "risk_basis": _risk_basis(),
+        "profit_basis": _profit_basis(crops, finance),
         "degraded": degraded,
+    }
+
+
+def _profit_basis(crops: list[str], finance: dict[str, CropFinance] | None) -> dict:
+    """Per crop: is `est_profit_bdt` a profit estimate, or only a ceiling?
+
+    This exists because the two are not the same measurement and were being
+    shown as if they were. `_profit()` already refuses to SCORE a crop whose
+    cost line is a fertiliser-only minimum bound — mustard and lentil, see
+    prices.md §2 — because revenue minus a subset of costs cannot be min-max
+    normalised against BBS's complete aggregate expenditure. But it still
+    returns the figure, `CropCandidate.est_profit_bdt` carries it to the UI
+    under a name meaning "estimated profit", and the agent duly printed
+    "সম্ভাব্য লাভ ৳160,040" for mustard against boro's honest ৳34,991.
+
+    That output argues with itself: the crops showing the largest profit rank
+    lowest, and the `degraded` line explaining why sits under the table where
+    it loses to a big number at the top of each entry.
+
+    Arithmetically the figure is revenue minus a strict SUBSET of costs, which
+    makes it a strict upper bound on profit — a precise claim, not a hedge. So
+    it stays on screen and travels with the label that says what it is. The
+    agent's narration rules (prompts.py) key on `comparable` here.
+
+    Top-level rather than a field on CropCandidate: `schemas.py` is the frozen
+    H1 contract, and the tool's result dict is free-form — same reasoning as
+    `risk_basis` above.
+    """
+    if finance is None:
+        return {
+            "available": False,
+            "reason_en": "no finance data for any candidate; est_profit_bdt is 0 throughout",
+            "crops": {},
+        }
+
+    per_crop: dict[str, dict] = {}
+    for crop in crops:
+        if crop not in finance:
+            continue
+        basis = finance[crop].get("cost_basis", "complete")
+        complete = basis == "complete"
+        per_crop[crop] = {
+            "comparable": complete,
+            "cost_basis": basis,
+            "means": (
+                "profit estimate (all input costs)"
+                if complete
+                else "UPPER BOUND only — revenue minus fertiliser cost; seed, labour, "
+                     "irrigation, land preparation and all other costs are NOT deducted"
+            ),
+            # The exact words the farmer should see next to the number, so the
+            # caveat cannot drift into a footnote or get paraphrased away.
+            "label_bn": (
+                "সম্ভাব্য লাভ"
+                if complete
+                else "সর্বোচ্চ সম্ভাব্য লাভ — সব খরচ ধরা হয়নি"
+            ),
+        }
+
+    incomparable = sorted(c for c, row in per_crop.items() if not row["comparable"])
+    return {
+        "available": True,
+        "crops": per_crop,
+        "incomparable_crops": incomparable,
+        "rule_en": (
+            "A crop with comparable=false must NEVER be given a bare profit figure, "
+            "and its number must not be compared against a comparable crop's profit "
+            "as though they were the same measurement."
+        ),
+    }
+
+
+def _risk_basis() -> dict:
+    """What `risk_level` on each candidate actually measures — and what it doesn't.
+
+    competition.md Tier 0 item 3 asks for a risk level per crop, and a farmer
+    hearing "high risk" reasonably assumes it covers the three things that can
+    cost them the season: a bad yield, a pest outbreak, and a weather disaster.
+    Ours covers exactly one of those. Shipping the bare word would let the model
+    imply the other two, so the scope travels with the number.
+
+    The two gaps are stated with their reasons because both are real and neither
+    is a shortcut:
+
+    - Pest/disease risk is not *missing*, it is not yet *computable*. Every rule
+      in pest_risk.py keys on days-after-sowing, and at ranking time no crop has
+      been chosen, so there is no sowing date. It becomes available the moment a
+      season plan exists — which is why the agent is told to call `pest_risk`
+      then, rather than being given a placeholder now.
+    - Extreme-weather risk was planned from agristats.db's fact_crop_damage
+      (2,368 rows, all weather causes). On inspection the table has ZERO
+      district-level rows carrying a crop name — the crop sits in free-text
+      `event_name` and the crop-named rows are national/division level only. A
+      district x crop damage frequency is therefore not derivable from it, and
+      a national average presented as this farm's risk would be a different
+      number wearing this one's label.
+    """
+    return {
+        "covers": ["yield_variability"],
+        "does_not_cover": ["pest_disease", "extreme_weather"],
+        "yield_variability": {
+            "available": True,
+            "basis_en": (
+                "Coefficient of variation of this district's observed yield history "
+                "for the crop, ranked into terciles against the other candidates "
+                "(fixed 0.10/0.20 thresholds when fewer than 3 crops have a CV)."
+            ),
+            "source_id": "agribase_clean:crop_yield_observations",
+        },
+        "pest_disease": {
+            "available": False,
+            "reason_en": (
+                "Pest/disease rules key on days-after-sowing; no crop is chosen and "
+                "no sowing date exists at ranking time."
+            ),
+            "reason_bn": (
+                "পোকা ও রোগের ঝুঁকি বপনের তারিখের উপর নির্ভর করে — ফসল বাছাইয়ের "
+                "সময় সেটা জানা থাকে না।"
+            ),
+            "next_step": "call pest_risk once a season plan with a sowing date exists",
+        },
+        "extreme_weather": {
+            "available": False,
+            "reason_en": (
+                "agristats.db fact_crop_damage has no district-level rows carrying a "
+                "crop name, so a district-and-crop specific damage frequency cannot "
+                "be computed from it."
+            ),
+            "reason_bn": (
+                "জেলাভিত্তিক ফসলওয়ারি দুর্যোগ-ক্ষতির পরিসংখ্যান আমাদের উৎসে নেই।"
+            ),
+        },
     }
 
 

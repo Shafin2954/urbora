@@ -73,6 +73,7 @@ async def chat(payload: ChatRequest, request: Request):
                 session_id=payload.session_id,
                 farm_id=payload.farm_id,
                 message=payload.message,
+                language=payload.language,
             ):
                 yield sse.from_agent_event(event)
         except Exception as exc:  # noqa: BLE001

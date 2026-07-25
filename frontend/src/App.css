@@ -24,16 +24,72 @@
 .danger { color: var(--clay); }
 .modal-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: rgba(23,37,27,.35); }
 
+/* --- account row + settings (shared across both sidebar breakpoints) --- */
+
+/* 44px square: the minimum touch target this project holds itself to, kept
+   even though these two read as small glyphs. */
+.icon-button {
+  min-width: 44px; min-height: 44px; padding: 0;
+  display: grid; place-items: center;
+  background: transparent; color: var(--ink-soft);
+  border: 1px solid transparent; border-radius: 8px;
+  font-size: 1.05rem; line-height: 1;
+}
+.icon-button:hover:not(:disabled) { background: var(--green-tint); color: var(--green-dark); }
+
+.settings-card {
+  width: min(480px, 100%);
+  max-height: min(86vh, 720px);
+  overflow-y: auto;
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+.settings-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.settings-head h2 { font-size: 1.05rem; }
+.settings-foot { display: flex; gap: 8px; justify-content: flex-end; }
+
+.setting { display: grid; gap: 8px; }
+.setting-label { font-weight: 650; font-size: .9rem; }
+.setting-note { color: var(--ink-soft); font-size: .78rem; }
+
+/* Segmented control: every option visible without a tap, which a <select>
+   cannot do, and each segment is a full-height target. */
+.segmented { display: flex; gap: 6px; }
+.segment {
+  flex: 1; min-height: 48px; padding: 0 10px;
+  background: transparent; color: var(--ink);
+  border: 1px solid var(--border); border-radius: 10px;
+}
+.segment.is-on {
+  background: var(--green); color: #fff; border-color: var(--green);
+}
+.segment.is-on:hover:not(:disabled) { background: var(--green-dark); }
+
+.slider-row { display: grid; gap: 6px; font-size: .82rem; color: var(--ink-soft); }
+.slider-row input[type="range"] { width: 100%; min-height: 32px; }
+
 @media (min-width: 900px) {
   .app { flex-direction: row; gap: 0; }
   .sidebar { width: 230px; display: flex; flex-direction: column; gap: 12px; padding: 4px 16px 4px 0; border-right: 1px solid var(--border); overflow: hidden; }
   .sidebar-head { display: grid; gap: 10px; }
   .sidebar-head button { padding: 0 10px; }
-  .crop-list { display: grid; gap: 4px; overflow-y: auto; }
+  /* align-content: start stops a single row from stretching to fill the grid —
+     that stretch, plus the flex-grow below, is what turned one session into a
+     tall empty card. */
+  .crop-list { display: grid; gap: 4px; overflow-y: auto; align-content: start; }
   .sidebar-section { display: grid; gap: 6px; min-height: 0; }
   .sidebar-section h2 { font-size: .8rem; color: var(--ink-soft); }
-  .sidebar-section:first-of-type { flex: 1 1 auto; }
-  .sidebar-crops { flex: 0 1 36%; border-top: 1px solid var(--border); padding-top: 10px; }
+  /* Recent chats sits directly under New chat at its own content height, and
+     starts scrolling rather than growing. It must NOT take the leftover space:
+     the crops section below and the account row are what the rest belongs to. */
+  .sidebar-recent { flex: 0 1 auto; }
+  .sidebar-recent .crop-list { max-height: 34vh; }
+  .sidebar-crops { flex: 0 1 auto; border-top: 1px solid var(--border); padding-top: 10px; }
+  .sidebar-crops .crop-list { max-height: 26vh; }
   .sidebar-empty { color: var(--ink-faint); font-size: .78rem; }
   .crop-row { display: flex; align-items: center; border-radius: 10px; }
   .crop-row.is-active { background: var(--green-tint); }
@@ -47,17 +103,23 @@
   .saved-crop:hover:not(:disabled) { background: var(--green-tint); }
   .saved-crop span:last-child { min-width: 0; display: grid; }
   .saved-crop small { color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .signout { margin-top: auto; color: var(--ink-soft); background: transparent; border-color: var(--border); }
+  /* Account row, pinned to the bottom by margin-top:auto — the same job the old
+     lone sign-out button did, now carrying identity and settings with it. */
+  .sidebar-account { margin-top: auto; display: flex; align-items: center; gap: 6px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .avatar { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #fff; font-weight: 700; font-size: .82rem; }
+  .account-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .8rem; color: var(--ink-soft); }
   .sidebar-toggle { display: none; }
   .app-main { padding-left: 20px; }
 }
 
 @media (max-width: 899px) {
   .sidebar.is-open { position: fixed; z-index: 10; inset: 0 auto 0 0; width: min(85vw, 320px); padding: 20px; display: flex; flex-direction: column; gap: 12px; background: var(--bg); border-right: 1px solid var(--border); }
-  .sidebar.is-open .crop-list { display: grid; gap: 4px; overflow-y: auto; }
+  .sidebar.is-open .crop-list { display: grid; gap: 4px; overflow-y: auto; align-content: start; }
   .sidebar.is-open .sidebar-section { display: grid; gap: 6px; min-height: 0; }
-  .sidebar.is-open .sidebar-section:first-of-type { flex: 1 1 auto; }
-  .sidebar.is-open .sidebar-crops { flex: 0 1 36%; border-top: 1px solid var(--border); padding-top: 10px; }
+  .sidebar.is-open .sidebar-recent { flex: 0 1 auto; }
+  .sidebar.is-open .sidebar-recent .crop-list { max-height: 38vh; }
+  .sidebar.is-open .sidebar-crops { flex: 0 1 auto; border-top: 1px solid var(--border); padding-top: 10px; }
+  .sidebar.is-open .sidebar-crops .crop-list { max-height: 26vh; }
   .sidebar.is-open .sidebar-section h2 { font-size: .8rem; color: var(--ink-soft); }
   .sidebar.is-open .crop-row { display: flex; align-items: center; }
   .sidebar.is-open .crop-select { flex: 1; min-height: 34px; display: flex; gap: 6px; align-items: center; padding: 3px 6px; color: var(--ink); background: transparent; text-align: left; }
@@ -67,7 +129,7 @@
   .sidebar.is-open .saved-crop { min-height: 34px; display: flex; gap: 6px; align-items: center; padding: 3px 6px; color: var(--ink); background: transparent; text-align: left; }
   .sidebar.is-open .saved-crop span:last-child { display: grid; }
   .sidebar.is-open .saved-crop small { color: var(--ink-soft); }
-  .sidebar.is-open .signout { margin-top: auto; background: transparent; color: var(--ink); border-color: var(--border); }
+  .sidebar.is-open .sidebar-account { margin-top: auto; display: flex; align-items: center; gap: 6px; padding-top: 10px; border-top: 1px solid var(--border); }
 }
 
 @media (min-width: 900px) {
@@ -201,6 +263,9 @@
   min-height: 0;
 }
 
+.chat-head { display: flex; justify-content: flex-end; padding: 6px 2px 0; }
+.chat-head button { min-height: 34px; padding: 0 10px; font-size: .82rem; }
+
 .transcript {
   flex: 1;
   overflow-y: auto;
@@ -290,12 +355,67 @@
 .composer {
   position: sticky;
   bottom: 0;
-  display: flex;
-  gap: 8px;
+  display: grid;
+  gap: 6px;
   padding: 12px 2px max(12px, env(safe-area-inset-bottom));
   background: var(--bg);
   border-top: 1px solid var(--border);
 }
+
+/* One pill holding field + mic + send. The controls sit INSIDE the field's
+   outline rather than beside it so the whole thing reads as a single target on
+   a phone, and the text keeps the full width when there is no mic to show. */
+.composer-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px 4px 14px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.composer-bar:focus-within { border-color: var(--green); }
+
+/* Listening is stated by the border, not by a spinner: the farmer is talking
+   and cannot be watching an animation. */
+.composer-bar.is-listening { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-tint); }
+
+.composer-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+}
+.composer-input:focus { outline: none; }
+
+.composer-mic, .composer-send {
+  flex: none;
+  width: 44px; height: 44px;
+  min-height: 44px; padding: 0;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  font-size: 1rem;
+}
+.composer-mic { background: transparent; color: var(--ink-soft); border: 1px solid transparent; }
+.composer-mic:hover:not(:disabled) { background: var(--green-tint); color: var(--green-dark); }
+.composer-mic.is-on { background: var(--green); color: #fff; }
+
+.composer-send { background: var(--green); color: #fff; }
+.composer-send:disabled { background: var(--border); color: var(--ink-faint); }
+
+/* Read-aloud button, tucked at the reply's trailing edge. */
+.msg-speak {
+  min-height: 32px; min-width: 32px; padding: 0 6px;
+  margin-top: 6px;
+  background: transparent; color: var(--ink-soft);
+  border: 1px solid var(--border); border-radius: 8px;
+  font-size: .8rem;
+}
+.msg-speak:hover:not(:disabled) { background: var(--green-tint); color: var(--green-dark); }
 
 .field {
   flex: 1;
@@ -533,6 +653,22 @@
   cursor: grabbing;
 }
 
+/* The whole eased-zoom effect. The wheel handler jumps the transform straight
+ * to its cursor-anchored target and this carries it there over ~140ms, which
+ * is why there is no rAF loop in GraphPanel. Killed mid-drag, where easing
+ * would just make the canvas lag behind the pointer. */
+.graph-viewport {
+  transition: transform 140ms cubic-bezier(.22, .61, .36, 1);
+}
+
+.graph-viewport.is-dragging {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graph-viewport { transition: none; }
+}
+
 .graph-node-label {
   font: 650 11px var(--sans);
 }
@@ -568,6 +704,7 @@
 }
 
 .graph-toolbar > :last-child { justify-self: end; }
+.graph-buttons { display: flex; gap: 6px; }
 .graph-active-tool { min-height: 28px; display: grid; place-items: center; color: var(--green-dark); font-size: .82rem; }
 .graph-active-tool.is-active::before { content: '◈'; margin-right: 5px; color: var(--leaf); animation: tool-indicator 800ms ease-in-out infinite; }
 @keyframes tool-indicator { 50% { transform: scale(1.3); color: var(--green); } }
@@ -1237,3 +1374,26 @@
     flex: 1 1 54%;
   }
 }
+
+/* Leaf-photo diagnosis, shown above the composer. */
+.composer-attachment { padding: 8px 12px; background: var(--green-tint); border-radius: 12px; }
+.diagnosis { display: grid; gap: 6px; }
+.diagnosis-conf { color: var(--ink-soft); font-size: .82rem; }
+/* An out-of-scope guess is bordered in clay, the same colour every other
+   "this is degraded, do not lean on it" state in this app uses. */
+.diagnosis.is-out-of-scope { border-left: 3px solid var(--clay); padding-left: 10px; }
+.diagnosis .detail { color: var(--ink-faint); font-size: .72rem; }
+.composer-attach {
+  flex: none; width: 44px; height: 44px; min-height: 44px; padding: 0;
+  display: grid; place-items: center; border-radius: 50%;
+  background: transparent; color: var(--ink-soft);
+  border: 1px solid transparent; font-size: 1.3rem; line-height: 1;
+}
+.composer-attach:hover:not(:disabled) { background: var(--green-tint); color: var(--green-dark); }
+
+/* Recording: a slow pulse, because the farmer is talking and cannot watch the
+   screen — the state has to be readable from the corner of the eye. */
+.composer-mic.is-on { animation: mic-pulse 1.4s ease-in-out infinite; }
+@keyframes mic-pulse { 50% { box-shadow: 0 0 0 6px var(--green-tint); } }
+.composer-mic.is-working { color: var(--green-dark); font-size: 1.2rem; }
+@media (prefers-reduced-motion: reduce) { .composer-mic.is-on { animation: none; } }

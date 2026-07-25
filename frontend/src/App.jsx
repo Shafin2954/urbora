@@ -1,16 +1,20 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
 import { apiUrl, fetchHealth } from './api/client.js'
 import ChatPanel from './components/ChatPanel.jsx'
 import FinancePanel from './components/FinancePanel.jsx'
 import PlanPanel from './components/PlanPanel.jsx'
 import AlertPanel from './components/AlertPanel.jsx'
+import CheckoutPanel from './components/CheckoutPanel.jsx'
 import GraphPanel from './components/GraphPanel.jsx'
 import AuthScreen from './components/AuthScreen.jsx'
 import Sidebar from './components/Sidebar.jsx'
+import SettingsModal from './components/SettingsModal.jsx'
 import { useChat } from './state/useChat.js'
 import { useAuth } from './state/useAuth.js'
 import { useCrops } from './state/useCrops.js'
+import { useSettings } from './state/useSettings.js'
+import { translator } from './i18n.js'
 
 /**
  * One responsive page (PRD.md §9): chat primary, with the provenance graph
@@ -44,7 +48,18 @@ const HEALTH_POLL_MS = 10000
 // degrade honestly rather than crash; see AuthScreen.jsx (not owned here) for
 // the real sign-in path.
 const GUEST_USER = { id: 'guest', email: 'guest@demo' }
-const GUEST_SESSION = { user: GUEST_USER, access_token: 'guest-demo-token' }
+
+// The checkout basket is derived from the finance projection the agent already
+// computed, not composed here — so what the farmer is asked to pay for is the
+// same priced, cited input list that produced the cost breakdown on screen.
+//
+// Only *purchasable* lines qualify. BBS's boro/aman/potato cost rows are a
+// single aggregate expenditure figure carrying `unit: "ha"` — real data, but
+// not something a farmer can order from a supplier. Listing "1 ha of total
+// cultivation cost" as a basket item would be inventing a product, so those
+// crops simply get no checkout tab. Mustard and lentil, whose cost rows are
+// actual fertiliser quantities in kg, do.
+const BUYABLE_UNITS = new Set(['kg', 'l', 'litre', 'liter', 'g', 'gm'])
 
 function guestRequestedByUrlOrEnv() {
   try {
@@ -54,12 +69,16 @@ function guestRequestedByUrlOrEnv() {
 }
 
 export default function App() {
+  const settings = useSettings()
+  const t = useMemo(() => translator(settings.language), [settings.language])
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const realAuth = useAuth()
   const [guestMode, setGuestMode] = useState(() => guestRequestedByUrlOrEnv())
+  const [guestSession, setGuestSession] = useState(null)
   const auth = guestMode
     ? {
         user: GUEST_USER,
-        session: GUEST_SESSION,
+        session: null,
         loading: false,
         configured: true,
         signIn: realAuth.signIn,
@@ -67,20 +86,57 @@ export default function App() {
         signOut: () => setGuestMode(false),
       }
     : realAuth
-  const crops = useCrops(auth.session)
-  const { activeCropId, update: updateCrop } = crops
+  // Guest mode deliberately has no Supabase token and never touches the
+  // authenticated crop index. /api/chat accepts the generated session id.
+  const crops = useCrops(guestMode ? null : auth.session)
+  const { activeCropId, create: createCrop, update: updateCrop } = crops
+  const startGuestSession = useCallback(() => {
+    setGuestSession({ session_id: crypto.randomUUID(), farm_id: null })
+    setTab('chat')
+  }, [])
+  const handleNewChat = useCallback(() => {
+    if (guestMode) return startGuestSession()
+    return createCrop()
+  }, [createCrop, guestMode, startGuestSession])
   const nameActiveCrop = useCallback((crop) => {
-    if (crop && activeCropId) updateCrop(activeCropId, { crop }).catch(() => {})
-  }, [activeCropId, updateCrop])
+    if (!guestMode && crop && activeCropId) updateCrop(activeCropId, { crop }).catch(() => {})
+  }, [activeCropId, guestMode, updateCrop])
   const nameActiveChat = useCallback((title) => {
-    if (title && activeCropId) updateCrop(activeCropId, { title }).catch(() => {})
-  }, [activeCropId, updateCrop])
-  const chat = useChat({ farmId: crops.activeCrop?.farm_id, sessionId: crops.activeCrop?.session_id, accessToken: auth.session?.access_token, onCropName: nameActiveCrop, onChatTitle: nameActiveChat })
+    if (!guestMode && title && activeCropId) updateCrop(activeCropId, { title }).catch(() => {})
+  }, [activeCropId, guestMode, updateCrop])
+  const chat = useChat({
+    farmId: guestMode ? guestSession?.farm_id : crops.activeCrop?.farm_id,
+    sessionId: guestMode ? guestSession?.session_id : crops.activeCrop?.session_id,
+    accessToken: guestMode ? undefined : auth.session?.access_token,
+    language: settings.language,
+    onCropName: nameActiveCrop,
+    onChatTitle: nameActiveChat,
+  })
   const [health, setHealth] = useState({ state: 'checking', text: 'checking…' })
   const [tab, setTab] = useState('chat')
   // The chat and the Finance tab must key on the SAME farm, or the tab's area
   // edit would recompute a projection the agent never made.
   const farmId = chat.farmId
+
+  const basket = useMemo(() => {
+    const items = chat.finance?.scenarios?.base?.items ?? []
+    const buyable = items
+      .filter((item) => BUYABLE_UNITS.has(String(item.unit ?? '').toLowerCase()))
+      .map((item) => ({
+        name: item.name,
+        qty: item.qty,
+        unit: item.unit,
+        unit_price_bdt: item.unit_cost,
+      }))
+    if (!buyable.length || !farmId) return null
+    const amount = buyable.reduce((sum, item) => sum + item.qty * item.unit_price_bdt, 0)
+    return {
+      farmId,
+      items: buyable,
+      amount: Math.round(amount * 100) / 100,
+      label: 'হিসাব থেকে নেওয়া সারের তালিকা — দাম প্রতি হেক্টর।',
+    }
+  }, [chat.finance, farmId])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -115,11 +171,11 @@ export default function App() {
         fontWeight: 600, cursor: 'pointer',
       }}
     >
-      অতিথি হিসেবে দেখুন (ডেমো) — Continue as guest
+      অতিথি হিসেবে দেখুন
     </button>
   )
 
-  if (auth.loading) return <main className="auth-screen"><p>লোড হচ্ছে…</p></main>
+  if (auth.loading) return <main className="auth-screen"><p>{t('app.loading')}</p></main>
   if (!auth.configured) return <main className="auth-screen"><p className="error">Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.</p>{guestButton}</main>
   if (!auth.user) return <>
     <AuthScreen auth={auth} />
@@ -128,15 +184,19 @@ export default function App() {
 
   return (
     <div className="app">
-      <Sidebar
+      {!guestMode && <Sidebar
         crops={crops.crops}
         activeCropId={crops.activeCropId}
         onSelect={crops.setActiveCropId}
-        onCreate={crops.create}
+        onCreate={handleNewChat}
         onUpdate={crops.update}
         onDelete={crops.remove}
         onSignOut={auth.signOut}
-      />
+        user={auth.user}
+        t={t}
+        onOpenSettings={() => setSettingsOpen(true)}
+      />}
+      {settingsOpen && <SettingsModal settings={settings} t={t} onClose={() => setSettingsOpen(false)} />}
       <div className="app-main">
       <header className="topbar">
         <div className="brand">
@@ -151,6 +211,7 @@ export default function App() {
           )}
         </div>
       </header>
+      {!guestMode && crops.error && <p className="error" role="alert">{crops.error}</p>}
 
       {/* Tabs are how you switch panes on a phone; on desktop the trace is
           always visible, so the trace tab hides itself there via CSS. */}
@@ -161,7 +222,7 @@ export default function App() {
           className={`tab ${tab === 'chat' ? 'is-active' : ''}`}
           onClick={() => setTab('chat')}
         >
-          কথা বলুন
+          {t('tab.chat')}
         </button>
         {chat.finance && (
           <button
@@ -170,12 +231,17 @@ export default function App() {
             className={`tab ${tab === 'finance' ? 'is-active' : ''}`}
             onClick={() => setTab('finance')}
           >
-            হিসাব
+            {t('tab.finance')}
           </button>
         )}
         {chat.plan && (
           <button role="tab" aria-selected={tab === 'plan'} className={`tab ${tab === 'plan' ? 'is-active' : ''}`} onClick={() => setTab('plan')}>
-            পরিকল্পনা
+            {t('tab.plan')}
+          </button>
+        )}
+        {basket && (
+          <button role="tab" aria-selected={tab === 'checkout'} className={`tab ${tab === 'checkout' ? 'is-active' : ''}`} onClick={() => setTab('checkout')}>
+            {t('tab.checkout')}
           </button>
         )}
         <button
@@ -184,11 +250,11 @@ export default function App() {
           className={`tab tab-trace ${tab === 'trace' ? 'is-active' : ''}`}
           onClick={() => setTab('trace')}
         >
-          চিত্র{chat.trace.length > 0 ? ` (${chat.trace.length})` : ''}
+          {t('tab.graph')}{chat.trace.length > 0 ? ` (${chat.trace.length})` : ''}
         </button>
       </nav>
 
-      {!crops.activeCrop ? <main className="empty-crop"><h2>শুরু করুন</h2><p>{crops.error ?? 'একটি নতুন আলাপ শুরু করুন।'}</p><button onClick={crops.create}>+ নতুন আলাপ</button></main> : <div className="workspace">
+      {!(guestMode ? guestSession : crops.activeCrop) ? <main className="empty-crop"><h2>{t('start.title')}</h2><p>{crops.error ?? t('start.body')}</p>{guestMode ? <button onClick={handleNewChat}>{t('sidebar.newChat')}</button> : <p className="muted">{t('start.useSidebar')}</p>}</main> : <div className="workspace">
         <main className={`pane pane-chat ${tab === 'chat' ? 'is-active' : ''}`}>
           <ChatPanel
             messages={chat.messages}
@@ -197,6 +263,9 @@ export default function App() {
             error={chat.error}
             onSend={chat.send}
             onAnswerInput={chat.answerInput}
+            onNewChat={guestMode ? handleNewChat : undefined}
+            t={t}
+            settings={settings}
           />
         </main>
 
@@ -205,7 +274,7 @@ export default function App() {
             className={`pane pane-finance ${tab === 'finance' ? 'is-active' : ''}`}
             aria-label="Finance"
           >
-            <h2 className="pane-title">হিসাব</h2>
+            <h2 className="pane-title">{t('pane.finance')}</h2>
             <FinancePanel
               finance={chat.finance}
               farmId={farmId}
@@ -215,16 +284,21 @@ export default function App() {
         )}
         {chat.plan && (
           <section className={`pane pane-plan ${tab === 'plan' ? 'is-active' : ''}`} aria-label="Season plan">
-            <h2 className="pane-title">মৌসুম পরিকল্পনা</h2>
+            <h2 className="pane-title">{t('pane.plan')}</h2>
             <PlanPanel plan={chat.plan} />
             <AlertPanel farmId={farmId} alerts={chat.alerts} onAlerts={chat.setAlerts} />
+          </section>
+        )}
+        {basket && (
+          <section className={`pane pane-checkout ${tab === 'checkout' ? 'is-active' : ''}`} aria-label="Checkout">
+            <CheckoutPanel basket={basket} onDone={() => setTab('chat')} />
           </section>
         )}
         <aside
           className={`pane pane-trace ${tab === 'trace' ? 'is-active' : ''}`}
           aria-label="কাজের চিত্র"
         >
-          <h2 className="pane-title">কাজের চিত্র</h2>
+          <h2 className="pane-title">{t('pane.graph')}</h2>
           <GraphPanel trace={chat.trace} usage={chat.usage} streaming={chat.streaming} />
         </aside>
       </div>}

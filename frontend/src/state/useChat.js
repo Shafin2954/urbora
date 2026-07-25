@@ -23,7 +23,7 @@ const westernDigits = (text) => String(text).replace(/[০-৯]/g, (digit) => '0
  * recalling a returning farmer instead of starting cold. Override with
  * VITE_FARM_ID to talk to a different one.
  */
-export function useChat({ farmId, sessionId, accessToken, onCropName, onChatTitle } = {}) {
+export function useChat({ farmId, sessionId, accessToken, language = 'bn', onCropName, onChatTitle } = {}) {
   const [messages, setMessages] = useState([])
   const [trace, setTrace] = useState([])
   const [inputRequest, setInputRequest] = useState(null)
@@ -154,6 +154,9 @@ export function useChat({ farmId, sessionId, accessToken, onCropName, onChatTitl
             session_id: sessionRef.current,
             farm_id: farmId,
             message: trimmed,
+            // Reply language from the settings panel. Optional on the wire and
+            // defaulted to 'bn' server-side, so an older client still works.
+            language,
           },
           signal: controller.signal,
           onEvent: handleEvent,
@@ -166,7 +169,7 @@ export function useChat({ farmId, sessionId, accessToken, onCropName, onChatTitl
         setStreaming(false)
       }
     },
-    [farmId, handleEvent, streaming],
+    [farmId, handleEvent, language, streaming],
   )
 
   /** Answer an input_request widget. Sent as ordinary text so the agent needs

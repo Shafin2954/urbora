@@ -35,8 +35,12 @@ def test_forecast_labels_source_type_forecast(monkeypatch):
     assert r["source_type"] == "forecast"
     assert r["cached"] is False
     assert len(r["daily"]) == 2
+    # humidity_pct is None, not absent and not 0: this fake response carries no
+    # relative_humidity_2m_mean, and pest_risk must be able to tell "dry air"
+    # from "we were not told".
     assert r["daily"][0] == {"date": "2026-07-24", "tmax_c": 33.1,
-                             "tmin_c": 26.0, "precip_mm": 12.0}
+                             "tmin_c": 26.0, "precip_mm": 12.0,
+                             "humidity_pct": None}
 
 
 def test_climatology_labels_and_aggregates(monkeypatch):

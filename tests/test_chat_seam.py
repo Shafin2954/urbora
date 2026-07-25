@@ -106,9 +106,9 @@ def test_non_trace_events_pass_through_untouched():
 def fake_agent(events, record=None):
     """A stand-in for the loop, with its real signature and dict output."""
 
-    async def run_turn(session_id, farm_id, message, client=None):
+    async def run_turn(session_id, farm_id, message, client=None, language='bn'):
         if record is not None:
-            record.append({"session_id": session_id, "farm_id": farm_id, "message": message})
+            record.append({"session_id": session_id, "farm_id": farm_id, "message": message, "language": language})
         for event in events:
             yield event
 
@@ -161,7 +161,7 @@ def test_route_forwards_the_request_fields_unchanged(monkeypatch):
     with TestClient(app) as client:
         post(client, "কেমন আছেন", session_id="s7", farm_id="farm-1")
 
-    assert seen == [{"session_id": "s7", "farm_id": "farm-1", "message": "কেমন আছেন"}]
+    assert seen == [{"session_id": "s7", "farm_id": "farm-1", "message": "কেমন আছেন", "language": "bn"}]
 
 
 def test_a_missing_agent_degrades_honestly(monkeypatch):
@@ -178,7 +178,7 @@ def test_a_missing_agent_degrades_honestly(monkeypatch):
 def test_a_failing_turn_reports_the_error_instead_of_truncating(monkeypatch):
     """A stream that just stops is indistinguishable from a dead network."""
 
-    async def exploding(session_id, farm_id, message, client=None):
+    async def exploding(session_id, farm_id, message, client=None, language='bn'):
         yield sse.token("Harness reply — ")
         raise RuntimeError("provider refused the request")
 
@@ -195,7 +195,7 @@ def test_a_failure_before_the_first_yield_is_still_reported(monkeypatch):
     """The real case: a missing OPENAI_API_KEY raises at client construction,
     which happens above the loop's own try block and escapes it entirely."""
 
-    async def dead_on_arrival(session_id, farm_id, message, client=None):
+    async def dead_on_arrival(session_id, farm_id, message, client=None, language='bn'):
         raise RuntimeError("Missing credentials")
         yield  # pragma: no cover — makes this an async generator
 

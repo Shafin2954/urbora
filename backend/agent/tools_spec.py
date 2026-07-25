@@ -23,6 +23,8 @@ from ..tools.geocode import geocode
 from ..tools.weather import get_climatology, get_forecast
 from ..tools.season_plan import season_plan
 from ..tools.plan_conflicts import check_plan_conflicts
+from ..tools.pest_risk import pest_risk
+from ..tools.market_price import market_price
 from ..tools.care_scheduler import care_schedule
 from ..tools.scenario import simulate_budget
 from ..kb.retrieval import rag_query
@@ -43,6 +45,55 @@ TOOL_DEFS: list[dict[str, Any]] = [
         "name": "check_plan_conflicts",
         "description": "Check the saved season plan against the live Open-Meteo forecast. It only flags weather-dependent tasks in the forecast horizon and persists traceable alerts; never invent a weather conflict.",
         "input_schema": {"type": "object", "properties": {"farm_id": {"type": "string"}}, "required": ["farm_id"]},
+    },
+    {
+        "name": "market_price",
+        "description": (
+            "Historical monthly market-price pattern for a crop, plus a deterministic "
+            "sell-now / consider-storing reading. Use it when the farmer asks when to "
+            "sell, whether to store, or what the crop is worth over the year. You must "
+            "NEVER work out the seasonal pattern or the percentage yourself. Three "
+            "things you MUST say when narrating it: (1) it is a HISTORICAL PATTERN "
+            "averaged over past years, not a forecast — word it like climatology, "
+            "never as a prediction; (2) these are WHOLESALE prices, not what the "
+            "farmer is paid, so they must not be used as revenue (revenue comes from "
+            "finance_projection); (3) storage cost and spoilage are NOT included "
+            "because no source prices them, so a 'store' reading is an upside before "
+            "costs, not a net gain."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "crop": {"type": "string", "enum": ["boro_rice", "aman_rice", "potato", "mustard", "lentil"]},
+                "month": {"type": "integer", "description": "1-12, the month being decided in; defaults to now"},
+            },
+            "required": ["crop"],
+        },
+    },
+    {
+        "name": "pest_risk",
+        "description": (
+            "Deterministic pest and disease risk for a crop at its CURRENT growth "
+            "stage, scored against the live 16-day forecast. You must NEVER judge "
+            "pest risk yourself — call this and narrate it. Pass farm_id and it "
+            "recovers the crop, sowing date and district from the saved plan and "
+            "farm profile. Each risk returns low/medium/high, the stage window, "
+            "which forecast days favoured the organism, and cited prevention/"
+            "treatment text with doses. Risks whose susceptible window starts "
+            "beyond the 16-day horizon come back as status='upcoming' with NO "
+            "risk level — report that as 'নজর রাখুন', never as a prediction. "
+            "treatment_cost_bdt is always null: no citable pesticide price exists "
+            "in our sources, so say the cost is unknown and never estimate one."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "crop": {"type": "string", "enum": ["boro_rice", "aman_rice", "potato", "mustard", "lentil"]},
+                "farm_id": {"type": "string", "description": "fills crop/sowing_date/district from memory"},
+                "district": {"type": "string", "description": "canonical district name"},
+                "sowing_date": {"type": "string", "description": "confirmed YYYY-MM-DD sowing/transplant date"},
+            },
+        },
     },
     {
         "name": "rag_query",
@@ -361,6 +412,8 @@ _DISPATCH: dict[str, Callable[..., dict]] = {
     "ask_farmer": ask_farmer,
     "remember_farm": remember_farm,
     "check_plan_conflicts": check_plan_conflicts,
+    "pest_risk": pest_risk,
+    "market_price": market_price,
     "care_schedule": care_schedule,
     "simulate_budget": simulate_budget,
 }

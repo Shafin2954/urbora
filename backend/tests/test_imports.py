@@ -19,7 +19,7 @@ def test_agent_import():
     assert SYSTEM_PROMPT.strip()
     assert {t["name"] for t in TOOL_DEFS} == {
         "geocode", "get_forecast", "get_climatology", "cropdb_sql", "crop_scorer", "rag_query",
-            "finance_projection", "season_plan", "ask_farmer", "remember_farm", "check_plan_conflicts", "care_schedule", "simulate_budget", "agri_inputs",
+            "finance_projection", "season_plan", "ask_farmer", "remember_farm", "check_plan_conflicts", "care_schedule", "simulate_budget", "agri_inputs", "pest_risk", "market_price",
     }
 
 

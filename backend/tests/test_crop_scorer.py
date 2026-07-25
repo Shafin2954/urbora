@@ -585,3 +585,44 @@ def test_crop_scorer_tool_schema_never_exposes_hectare_input():
     assert "area_unit" in properties
     assert "area_ha" not in properties
     assert "NEVER convert" in properties["area"]["description"]
+
+
+# ── profit_basis: an upper bound must never travel as a profit estimate ──────
+#
+# Regression guard for the 2026-07-25 fix. `_profit` correctly refuses to SCORE
+# mustard and lentil (fertiliser-only cost data), but est_profit_bdt was still
+# reaching the UI under a name meaning "estimated profit", so the agent printed
+# mustard at ৳160,040 against boro's honest ৳34,991 — the crops showing the most
+# profit ranking lowest. profit_basis is what the narration keys on.
+
+def test_profit_basis_marks_fertiliser_only_crops_incomparable():
+    result = cs.crop_scorer_tool(
+        district=RAJSHAHI, soil_type="clay_loam", water_source="tubewell",
+        season="rabi", area=1, area_unit="hectare",
+    )
+    basis = result["profit_basis"]
+    assert basis["available"] is True
+    assert set(basis["incomparable_crops"]) == {"lentil", "mustard"}
+    assert basis["crops"]["boro_rice"]["comparable"] is True
+
+
+def test_incomparable_crops_carry_the_ceiling_wording():
+    """The Bangla label ships with the data so the caveat cannot be paraphrased
+    away or demoted to a footnote by the model."""
+    result = cs.crop_scorer_tool(
+        district=RAJSHAHI, soil_type="clay_loam", water_source="tubewell",
+        season="rabi", area=1, area_unit="hectare",
+    )
+    for crop, row in result["profit_basis"]["crops"].items():
+        if row["comparable"]:
+            assert row["label_bn"] == "সম্ভাব্য লাভ", crop
+        else:
+            assert "সর্বোচ্চ" in row["label_bn"], crop
+            assert "সব খরচ ধরা হয়নি" in row["label_bn"], crop
+            assert "UPPER BOUND" in row["means"], crop
+
+
+def test_profit_basis_reports_honestly_when_there_is_no_finance_data():
+    basis = cs._profit_basis(["boro_rice"], None)
+    assert basis["available"] is False
+    assert basis["crops"] == {}

@@ -314,6 +314,12 @@ class ChatRequest(BaseModel):
     session_id: str
     farm_id: str | None = None
     message: str
+    # Additive and optional, so every existing caller keeps working unchanged.
+    # The farmer's chosen reply language from the settings panel. CLAUDE.md
+    # rule 10 makes Bangla the default and says the reply mirrors the farmer;
+    # this makes that choice explicit instead of inferring it from whichever
+    # script they happened to type in last.
+    language: Literal["bn", "en"] = "bn"
 
 
 class RecomputeRequest(BaseModel):

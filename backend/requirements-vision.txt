@@ -1,0 +1,21 @@
+# Optional: leaf-photo disease detection (competition.md Tier 2).
+#
+# Kept OUT of requirements.txt on purpose. torch is a ~200 MB download and this
+# is one bonus feature — a judge cloning the repo to check Tier 0 should not pay
+# that cost. Everything else works without it: backend/tools/leaf_diagnosis.py
+# imports transformers lazily, GET /api/diagnose/status reports `available:
+# false`, and the frontend hides the camera button rather than offering an
+# upload that will fail.
+#
+# Install (CPU-only wheels — no CUDA needed, and CUDA wheels are far larger):
+#   pip install -r backend/requirements-vision.txt \
+#     --index-url https://download.pytorch.org/whl/cpu \
+#     --extra-index-url https://pypi.org/simple
+#
+# Pinned exactly, per CLAUDE.md rule 7.
+
+torch==2.9.1
+torchvision==0.24.1
+transformers==4.57.1
+pillow==11.3.0
+python-multipart==0.0.20

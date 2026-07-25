@@ -22,6 +22,8 @@ from .finance import router as finance_router
 from .plans import router as plans_router
 from .alerts import router as alerts_router
 from .crops import router as crops_router
+from .diagnose import router as diagnose_router
+from .transcribe import router as transcribe_router
 
 app = FastAPI(
     title="AgriSense API",
@@ -46,6 +48,8 @@ app.include_router(finance_router)
 app.include_router(plans_router)
 app.include_router(alerts_router)
 app.include_router(crops_router)
+app.include_router(diagnose_router)
+app.include_router(transcribe_router)
 
 
 @app.get("/api/health")

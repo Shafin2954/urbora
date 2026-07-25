@@ -26,6 +26,12 @@ import httpx
 _FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 _ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive"
 _DAILY_VARS = "temperature_2m_max,temperature_2m_min,precipitation_sum"
+# Humidity is requested for the forecast only, because pest/disease risk rules
+# key on it (leaf wetness drives blight far more than rainfall totals do). It is
+# appended rather than folded into _DAILY_VARS so that if Open-Meteo ever stops
+# serving this variable, the retry below drops it and the other four tools that
+# share _DAILY_VARS are untouched.
+_HUMIDITY_VAR = "relative_humidity_2m_mean"
 _TIMEOUT = 12.0
 _RETRIES = 2
 
@@ -83,7 +89,7 @@ def get_forecast(lat: float, lon: float, days: int = 16) -> dict:
     params = {
         "latitude": lat,
         "longitude": lon,
-        "daily": _DAILY_VARS,
+        "daily": f"{_DAILY_VARS},{_HUMIDITY_VAR}",
         "forecast_days": days,
         "timezone": "auto",
     }
@@ -94,20 +100,32 @@ def get_forecast(lat: float, lon: float, days: int = 16) -> dict:
         "locator": _FORECAST_URL,
     }
     try:
-        data = _get_json(_FORECAST_URL, params)
+        try:
+            data = _get_json(_FORECAST_URL, params)
+        except RuntimeError:
+            # Humidity is a nice-to-have for pest risk; the forecast itself is
+            # Tier 0. If the variable is rejected, drop it and keep the tool
+            # working rather than degrading the whole weather path.
+            data = _get_json(_FORECAST_URL, {**params, "daily": _DAILY_VARS})
         d = data.get("daily", {})
+        times = d.get("time", [])
+        humidity = d.get(_HUMIDITY_VAR) or [None] * len(times)
         daily = [
             {
                 "date": date,
                 "tmax_c": tmax,
                 "tmin_c": tmin,
                 "precip_mm": precip,
+                # None (not 0) when unavailable — pest_risk must be able to tell
+                # "dry air" from "we don't know", and say so.
+                "humidity_pct": rh,
             }
-            for date, tmax, tmin, precip in zip(
-                d.get("time", []),
+            for date, tmax, tmin, precip, rh in zip(
+                times,
                 d.get("temperature_2m_max", []),
                 d.get("temperature_2m_min", []),
                 d.get("precipitation_sum", []),
+                humidity,
             )
         ]
         result = {**base, "lat": lat, "lon": lon, "daily": daily,

@@ -30,8 +30,13 @@ export function useCrops(session) {
 
   useEffect(() => { refresh() }, [refresh])
   const create = useCallback(async () => {
-    const crop = await request('/api/crops', token, { method: 'POST' })
-    setCrops((old) => [crop, ...old]); setActiveCropId(crop.id); return crop
+    try {
+      const crop = await request('/api/crops', token, { method: 'POST' })
+      setCrops((old) => [crop, ...old]); setActiveCropId(crop.id); setError(null); return crop
+    } catch (err) {
+      setError(err.message)
+      return null
+    }
   }, [token])
   const update = useCallback(async (id, changes) => {
     const crop = await request(`/api/crops/${id}`, token, { method: 'PATCH', body: JSON.stringify(changes) })

@@ -413,6 +413,7 @@ async def run_turn(
     farm_id: str | None,
     message: str,
     client: ChatBackend | None = None,
+    language: str = "bn",
 ) -> AsyncIterator[dict]:
     """The real agent entrypoint — this is what backend/api/chat.py imports.
 
@@ -471,6 +472,28 @@ async def run_turn(
                 "budget_bdt / season that is NOT listed here and not already "
                 "known from earlier in this conversation.\n"
                 f"{json.dumps(extracted, ensure_ascii=False)}"
+            ),
+        })
+
+    # Reply language, chosen by the farmer in the settings panel (SettingsModal).
+    # Injected every turn, because it can change mid-conversation and a note left
+    # only at the start would be overridden by the surrounding Bangla context.
+    #
+    # Only the farmer-facing prose switches. Tool parameters, RAG queries and the
+    # trace stay English (CLAUDE.md rule 10) — they are read by us and by judges,
+    # not by the farmer — and Western numerals stay mandatory in both languages.
+    if language == "en":
+        messages.append({
+            "role": "system",
+            "content": (
+                "The farmer has set their language to ENGLISH. Write every "
+                "farmer-facing sentence in plain English, simple enough for a "
+                "smallholder farmer. This overrides the Bangla-by-default rule "
+                "for your prose ONLY: tool parameters, rag_query queries and all "
+                "internal reasoning stay English as always, Bangla text returned "
+                "inside tool results may be translated for the farmer, and "
+                "numerals stay Western. If the farmer writes in Bangla, mirror "
+                "them back to Bangla — an explicit message beats this setting."
             ),
         })
 

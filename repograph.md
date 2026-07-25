@@ -181,3 +181,89 @@ real names per BDAPPS-API-REFERENCE.md are `BDAPPS_APP_ID` / `BDAPPS_PASSWORD` (
 - `20260725032500_crop_titles.sql` adds the persistent crop-record `title`.
   The agent emits a hidden first-reply Bangla title marker; `useChat.js` strips
   and saves it, while `Sidebar.jsx` uses it only for the chat list.
+- Guest demo mode in `App.jsx` is completely client-side: `?guest=1` hides the
+  sidebar and creates an ephemeral `{ session_id, farm_id: null }`, bypassing
+  the RLS-protected crop API while retaining the public chat flow.
+- `frontend/vite.config.js` proxies `/api` to the intended FastAPI port 8000.
+  If `/api/crops` returns 404 there, restart the current API application rather
+  than relying on an old listener.
+
+
+## New in the final session (2026-07-25 07:00–08:35)
+
+Backend — agent tools (A's territory, edited under the suspended A/B split, LOG2 [07:05]):
+- `backend/tools/pest_risk.py` — Tier 1 pest/disease risk. 11 rules across the 5 crops
+  keyed to `data/kb/corpus.json` passages. Inputs: crop + sowing date (recovered from the
+  saved plan's `sowing` task) + district. Scores forecast days inside each organism's
+  days-after-sowing window. `treatment_cost_bdt` is ALWAYS null — no citable pesticide
+  price exists in any source here. Tests: `backend/tests/test_pest_risk.py` (10).
+- `backend/tools/market_price.py` — Tier 2 market price intelligence over
+  `agristats.db :: v_prices` (wholesale, Taka/Quintal -> Tk/kg). 12-month seasonal curve
+  plus sell-now / consider-storing. Flagged `not_a_forecast` and `is_farm_gate: false`;
+  MUST NOT reach the revenue path (that is `data/prices.md` via `finance/catalog.py`).
+  Tests: `backend/tests/test_market_price.py` (9).
+- `backend/tools/weather.py` — `get_forecast` now also returns `humidity_pct` per day
+  (`relative_humidity_2m_mean`), None when unavailable. Retries without the variable if
+  Open-Meteo rejects it, so the forecast itself can never be degraded by this addition.
+- `backend/tools/crop_scorer.py` — the tool result gained a top-level `risk_basis` block
+  stating what `risk_level` covers (yield variability) and what it does not (pest,
+  extreme weather) with the reason for each. `_risk_level` itself is unchanged.
+- `backend/agent/tools_spec.py` — 16 tools now (added `pest_risk`, `market_price`).
+- `backend/agent/prompts.py` — new sections: "Risk level", pest_risk and market_price
+  narration rules under Tier 1 follow-up actions.
+- `backend/agent/loop.py` — `run_turn` takes `language` ("bn"/"en"); injects an English
+  system note every turn when set to en. Tool params / RAG queries / trace stay English.
+- `backend/schemas.py` — **`ChatRequest.language`** added (Literal["bn","en"], default
+  "bn"). Additive and defaulted; the only frozen-contract change this session.
+- `backend/api/chat.py` — forwards `payload.language` to `run_turn`.
+
+Frontend:
+- `frontend/src/i18n.js` — `translator(language)` -> `t(key)`. UI chrome only (~70 keys,
+  bn + en); Bangla is the fallback. Farmer-facing ADVICE is never translated here — the
+  agent writes it in the chosen language.
+- `frontend/src/state/useSettings.js` — language / fontSize / voiceURI / voiceRate in
+  localStorage (the app's only localStorage use). Applies root font-size and lang attr.
+  Exports `FONT_PX` (small 13.5 / medium 15 / large 18; medium = the existing default).
+- `frontend/src/state/useVoice.js` — `useDictation` (SpeechRecognition) and `useSpeech`
+  (speechSynthesis). Both feature-detected; unsupported browsers get NO control, not a
+  disabled one. Brave disables SpeechRecognition by default — demo in Chrome or Edge.
+- `frontend/src/components/SettingsModal.jsx` — language / text size / voice + speed.
+- `frontend/src/components/Sidebar.jsx` — rebuilt: new-chat, recent chats, my crops,
+  bottom account row (avatar, email, settings gear, sign out).
+- `frontend/src/lib/graphLayout.js` — `linearLayout` REPLACED by `verticalLayout`
+  (one node per row top-to-bottom; long edges bow left; edges carry `d` + bow midpoint).
+  `layout()` (radial) and `fitTransform()` remain unused.
+- `frontend/src/components/GraphPanel.jsx` — cursor-anchored exponential zoom eased by a
+  CSS transition on `.graph-viewport`; `userMovedRef` is now read so auto-follow stops
+  after the first user gesture; captions right-anchored; recentre button.
+- `frontend/src/components/ChatPanel.jsx` — pill composer with mic + send inside the
+  field; read-aloud button on finished assistant replies; takes `t` and `settings`.
+- `frontend/src/App.jsx` — renders `CheckoutPanel` behind a কেনাকাটা tab; the basket is
+  derived from `chat.finance.scenarios.base.items` filtered to purchasable units
+  (`BUYABLE_UNITS`), so boro/aman/potato (single `ha` aggregate cost line) get no tab.
+
+Still absent (verified, not stubbed): plant disease image detection — no upload route,
+no model, no vision call anywhere in the tree.
+
+Also landed after the repograph note above: backend/tools/leaf_diagnosis.py
+(PlantVillage MobileNetV2, CPU, lazy import) and backend/api/diagnose.py
+(POST /api/diagnose/image, GET /api/diagnose/status), registered in
+backend/api/main.py. Optional deps in backend/requirements-vision.txt -- the
+backend starts fine without torch and the UI hides the camera button.
+Tests: backend/tests/test_leaf_diagnosis.py.
+
+Post-submission fixes (2026-07-25 09:20-09:40):
+- backend/api/transcribe.py -- POST /api/transcribe, GET /api/transcribe/status.
+  MediaRecorder blob -> OpenAI gpt-4o-transcribe. NOT whisper-1: whisper-1 returns
+  Devanagari for Bangla and rejects language=bn. Extension is derived from the part
+  content type (_EXTENSION_FOR / _base_type), because a mismatched suffix is
+  rejected upstream as a corrupt file. Tests: backend/tests/test_transcribe.py.
+- frontend/src/state/useVoice.js -- useDictation is now MediaRecorder-based with
+  three states (idle / listening / transcribing) and Bangla+English error text.
+  useSpeech (read-aloud) is unchanged and still browser-native.
+- backend/tools/crop_scorer.py -- _profit_basis() -> top-level profit_basis key.
+  Marks mustard/lentil non-comparable (fertiliser-only costs) and carries the
+  exact Bangla ceiling wording the agent must print beside the number.
+- backend/agent/prompts.py -- crop-ranking narration rules rewritten: profit
+  labelling, season, climatology-not-forecast wording, water need is a crop fact,
+  excluded crops must be named.
