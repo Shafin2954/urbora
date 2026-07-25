@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
+    "aiofiles>=25.1.0",
     "annotated-types==0.8.0",
     "anyio==4.14.2",
     "bijoy2unicode==0.1.1",

@@ -8,7 +8,9 @@ packages = ["cargo", "libiconv", "libxcrypt", "libyaml", "rustc"]
 expertMode = true
 
 [deployment]
-deploymentTarget = "cloudrun"
+deploymentTarget = "autoscale"
+run = ["python", "-m", "uvicorn", "backend.api.main:app", "--host", "0.0.0.0", "--port", "5000"]
+build = ["bash", "-c", "cd frontend && npm install && npm run build"]
 
 [userenv]
 

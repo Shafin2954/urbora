@@ -11,9 +11,12 @@ Run from the repo root:
 
 import asyncio
 from collections.abc import AsyncIterator
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from . import config, sse
 from .chat import router as chat_router
@@ -102,3 +105,22 @@ async def hello_stream_post(request: Request):
 async def hello_stream_get(request: Request):
     """GET twin of the above, for curl and EventSource smoke tests."""
     return sse.sse_response(_selftest_events(), request)
+
+
+# --- Static frontend (production) -------------------------------------------
+
+# In dev the Vite dev server runs separately and proxies /api here, so this
+# block is a no-op (dist/ won't exist). In production the frontend is built
+# first (`npm run build`) and FastAPI serves it directly on port 5000, making
+# the whole app a single process with no cross-origin issues.
+
+_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+
+if _DIST.exists():
+    # Serve hashed asset bundles. Vite puts them under dist/assets/.
+    app.mount("/assets", StaticFiles(directory=_DIST / "assets"), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def spa_fallback(full_path: str) -> FileResponse:
+        """Return index.html for every non-API path so the React router works."""
+        return FileResponse(_DIST / "index.html")
