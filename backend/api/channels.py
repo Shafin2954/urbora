@@ -22,7 +22,7 @@ import json
 import logging
 import os
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
 from backend.channels import flows, sms
@@ -182,3 +182,107 @@ async def alerts_scan(request: Request) -> dict:
         _require_bridge_token(request)
     from backend.channels import alerts_job
     return await asyncio.to_thread(alerts_job.scan_once)
+
+
+# --- USSD ----------------------------------------------------------------------
+
+
+class EmulatorUssd(BaseModel):
+    session_id: str
+    msisdn: str
+    text: str | None = None
+    init: bool = False
+
+
+@router.post("/emulator/ussd")
+async def emulator_ussd(payload: EmulatorUssd) -> dict:
+    """The browser phone dials *code# (init) and answers menus."""
+    _require_emulator()
+    from backend.channels.ussd import ussd_request
+    try:
+        screen = await ussd_request(payload.session_id, payload.msisdn, payload.text, payload.init)
+    except InvalidMsisdnError as exc:
+        raise HTTPException(422, str(exc))
+    return {"mode": "simulator", "text": screen.text, "end": screen.end}
+
+
+def _bdapps_ussd_send(session_id: str, address: str, message: str, end: bool) -> dict:
+    """bdapps MT reply (reference §5.1). Live only when BDAPPS_MODE=live; in
+    simulator mode the exact body is returned for inspection, not sent."""
+    body = {
+        "applicationId": os.environ.get("BDAPPS_APP_ID", ""),
+        "password": os.environ.get("BDAPPS_PASSWORD", ""),
+        "message": message,
+        "sessionId": session_id,
+        "ussdOperation": "mt-fin" if end else "mt-cont",
+        "destinationAddress": address,
+        "encoding": "16",
+        "version": "1.0",
+    }
+    if os.environ.get("BDAPPS_MODE", "simulator").strip().lower() != "live":
+        return {"mode": "simulator", "would_send": {**body, "password": "***"}}
+    import httpx
+    base = os.environ.get("BDAPPS_BASE_URL", "https://developer.bdapps.com").rstrip("/")
+    r = httpx.post(f"{base}/ussd/send", json=body, timeout=10)
+    return {"mode": "live", "status": r.status_code}
+
+
+@router.post("/ussd/bdapps")
+async def bdapps_ussd(request: Request) -> dict:
+    """bdapps USSD MO: `mo-init` when the farmer dials, `mo-cont` per reply."""
+    from backend.channels.ussd import ussd_request
+    body = await request.json()
+    address = str(body.get("sourceAddress", ""))
+    session_id = str(body.get("sessionId", ""))
+    is_init = body.get("ussdOperation") == "mo-init"
+    try:
+        screen = await ussd_request(session_id, address.removeprefix("tel:"), body.get("message"), is_init)
+    except InvalidMsisdnError:
+        return {"statusCode": "E1325", "statusDetail": "unusable address"}
+    sent = await asyncio.to_thread(_bdapps_ussd_send, session_id, address, screen.text, screen.end)
+    return {"statusCode": "S1000", "statusDetail": "Success", "reply": sent}
+
+
+# --- voice ---------------------------------------------------------------------
+
+
+_MAX_CLIP_BYTES = 10 * 1024 * 1024
+
+
+@router.get("/voice/status")
+async def voice_status() -> dict:
+    from backend.channels.voice import speech
+    return speech.status()
+
+
+@router.post("/emulator/voice/turn")
+async def emulator_voice_turn(
+    msisdn: str = Form(...), call_id: str = Form(...), file: UploadFile = File(...),
+) -> dict:
+    """One push-to-talk turn from the browser phone's call screen."""
+    _require_emulator()
+    from backend.channels.voice.turn import voice_turn
+    audio = await file.read()
+    if not audio:
+        raise HTTPException(400, "empty recording")
+    if len(audio) > _MAX_CLIP_BYTES:
+        raise HTTPException(413, "recording too long")
+    try:
+        return await voice_turn(msisdn, call_id, audio, file.content_type or "audio/webm")
+    except InvalidMsisdnError as exc:
+        raise HTTPException(422, str(exc))
+
+
+class HangUp(BaseModel):
+    msisdn: str
+    call_id: str
+
+
+@router.post("/emulator/voice/hangup")
+async def emulator_voice_hangup(payload: HangUp) -> dict:
+    _require_emulator()
+    from backend.channels.voice.turn import hang_up
+    try:
+        return await asyncio.to_thread(hang_up, payload.msisdn, payload.call_id)
+    except InvalidMsisdnError as exc:
+        raise HTTPException(422, str(exc))

@@ -123,6 +123,17 @@ async def transcribe(
     buffer = io.BytesIO(payload)
     buffer.name = f"speech.{_EXTENSION_FOR.get(_base_type(file.content_type), 'webm')}"
 
+    # Bangla goes to Sarvam when its key is configured (LOG4: 6.9% vs 28.7% CER
+    # on a 1,001-clip Bangla benchmark); English and key-less deployments keep
+    # the July-verified gpt-4o-transcribe path below.
+    from backend.channels.voice import speech  # noqa: PLC0415
+    if lang == "bn" and speech.stt_provider() == "sarvam":
+        try:
+            text, _ = speech.transcribe(payload, file.content_type or "audio/webm", provider="sarvam")
+        except speech.SpeechError as exc:
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
+        return {"text": text, "language": lang, "model": "sarvam"}
+
     try:
         result = _client().audio.transcriptions.create(
             model=_MODEL,
