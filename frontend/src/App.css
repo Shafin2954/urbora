@@ -1402,3 +1402,25 @@
 .error-detail { margin-top: 6px; font-size: 0.8rem; }
 .error-detail summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
 .error-detail code { display: block; white-space: pre-wrap; word-break: break-word; }
+
+/* Links to the marketplace and the button-phone emulator (LOG4). */
+.topnav {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.topnav a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  color: var(--green-dark);
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.topnav a:hover {
+  background: var(--green-tint);
+}

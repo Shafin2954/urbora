@@ -16,6 +16,25 @@ from backend.market import inputs, produce
 router = APIRouter(prefix="/api/market", tags=["market"])
 
 
+def _farm(farm_id: str | None, msisdn: str | None) -> str:
+    """A web farmer acts by phone number (so order/offer SMS reach them) or by
+    an existing farm id. The number becomes the same salted-hash id every
+    phone channel uses, so a web order shows up in the farmer's SMS inbox."""
+    if msisdn:
+        from backend.channels.identity import InvalidMsisdnError, farm_id_for, mask, normalise
+        from backend.memory import store
+        try:
+            local = normalise(msisdn)
+        except InvalidMsisdnError as exc:
+            raise HTTPException(422, str(exc))
+        fid = farm_id_for(local)
+        store.upsert_contact(fid, local, mask(local), "web")
+        return fid
+    if farm_id:
+        return farm_id
+    raise HTTPException(422, "farm_id or msisdn is required")
+
+
 def _fail(exc: Exception) -> HTTPException:
     return HTTPException(422, str(exc))
 
@@ -32,7 +51,8 @@ async def find(product: str, district: str, quantity: float | None = None) -> di
 
 
 class OrderIn(BaseModel):
-    farm_id: str
+    farm_id: str | None = None
+    msisdn: str | None = None
     product_id: str
     packs: int
     payment: str = "cod"
@@ -41,24 +61,26 @@ class OrderIn(BaseModel):
 @router.post("/orders")
 async def order(payload: OrderIn) -> dict:
     try:
-        return inputs.place_order(payload.farm_id, payload.product_id, payload.packs, payload.payment)
+        return inputs.place_order(_farm(payload.farm_id, payload.msisdn), payload.product_id, payload.packs,
+                                  payload.payment)
     except inputs.MarketError as exc:
         raise _fail(exc)
 
 
 @router.get("/orders")
-async def orders(farm_id: str) -> dict:
-    return {"orders": inputs.farm_orders(farm_id)}
+async def orders(farm_id: str | None = None, msisdn: str | None = None) -> dict:
+    return {"orders": inputs.farm_orders(_farm(farm_id, msisdn))}
 
 
 class FarmAction(BaseModel):
-    farm_id: str
+    farm_id: str | None = None
+    msisdn: str | None = None
 
 
 @router.post("/orders/{order_id}/cancel")
 async def cancel(order_id: int, payload: FarmAction) -> dict:
     try:
-        return inputs.set_order_status(order_id, "cancelled", farm_id=payload.farm_id)
+        return inputs.set_order_status(order_id, "cancelled", farm_id=_farm(payload.farm_id, payload.msisdn))
     except inputs.MarketError as exc:
         raise _fail(exc)
 
@@ -67,7 +89,8 @@ async def cancel(order_id: int, payload: FarmAction) -> dict:
 
 
 class ListingIn(BaseModel):
-    farm_id: str
+    farm_id: str | None = None
+    msisdn: str | None = None
     crop: str
     qty_kg: float
     asking_price_per_kg: float | None = None
@@ -77,15 +100,15 @@ class ListingIn(BaseModel):
 @router.post("/listings")
 async def create_listing(payload: ListingIn) -> dict:
     try:
-        return produce.create_listing(payload.farm_id, payload.crop, payload.qty_kg,
+        return produce.create_listing(_farm(payload.farm_id, payload.msisdn), payload.crop, payload.qty_kg,
                                       payload.asking_price_per_kg, payload.district)
     except produce.ProduceError as exc:
         raise _fail(exc)
 
 
 @router.get("/listings")
-async def my_listings(farm_id: str) -> dict:
-    return {"listings": produce.farm_listings(farm_id)}
+async def my_listings(farm_id: str | None = None, msisdn: str | None = None) -> dict:
+    return {"listings": produce.farm_listings(_farm(farm_id, msisdn))}
 
 
 @router.get("/price-guide")
@@ -94,14 +117,15 @@ async def guide(crop: str) -> dict:
 
 
 class OfferResponse(BaseModel):
-    farm_id: str
+    farm_id: str | None = None
+    msisdn: str | None = None
     accept: bool
 
 
 @router.post("/offers/{offer_id}/respond")
 async def respond(offer_id: int, payload: OfferResponse) -> dict:
     try:
-        return produce.respond_to_offer(payload.farm_id, offer_id, payload.accept)
+        return produce.respond_to_offer(_farm(payload.farm_id, payload.msisdn), offer_id, payload.accept)
     except produce.ProduceError as exc:
         raise _fail(exc)
 
@@ -221,3 +245,19 @@ async def buyer_offer(payload: OfferIn, x_buyer_token: str | None = Header(defau
                                   payload.qty_kg, payload.pickup_date)
     except produce.ProduceError as exc:
         raise _fail(exc)
+
+
+@router.get("/districts")
+async def districts() -> dict:
+    """The 64 districts, Bangla-labelled, for marketplace forms."""
+    from backend.tools.ask import district_options
+    return {"districts": district_options()}
+
+
+@router.get("/catalog")
+async def catalog() -> dict:
+    """Generic inputs the marketplace lists, with Bangla names."""
+    from backend.market.catalog import CATEGORY_BN, GENERICS
+    return {"inputs": [{"generic": g, "label_bn": v["bn"], "category": v["category"],
+                        "category_bn": CATEGORY_BN.get(v["category"], v["category"]), "unit": v["unit"]}
+                       for g, v in GENERICS.items()]}

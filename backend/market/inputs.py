@@ -130,7 +130,9 @@ def place_order(farm_id: str, product_id: str, packs: int, payment: str = "cod",
     if packs > p["stock_packs"]:
         raise MarketError(f"only {p['stock_packs']} packs in stock")
     dealer = _dealer(p["dealer_id"])
-    name = f"{label_bn(p['generic'])} ({p['brand_name']}, {p['pack_size']:g} {p['pack_unit']})"
+    label = label_bn(p["generic"])
+    brand = p["brand_name"] if label in p["brand_name"] else f"{label} {p['brand_name']}"
+    name = f"{brand}, {p['pack_size']:g} {p['pack_unit']}"
     totals = money.order_totals([{"product_id": product_id, "name": name, "packs": packs,
                                   "price_per_pack": p["price_bdt"]}]).as_dict()
     ts = db.now()

@@ -204,6 +204,10 @@ export default function App() {
           <img src="/icon.svg" alt="" width="30" height="30" />
           <h1>{BRAND_NAME}</h1>
         </div>
+        <nav className="topnav" aria-label="অন্য পাতা">
+          <a href="#/market">বাজার</a>
+          <a href="#/phone">বাটন ফোন</a>
+        </nav>
         <div className="health" title={apiUrl('/api/health')}>
           <span className={`dot dot-${health.state}`} aria-hidden="true" />
           <span className="mono">{health.text}</span>
