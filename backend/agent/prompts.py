@@ -6,8 +6,10 @@ prompt cache. Volatile per-turn context (farm profile, today's date) goes into
 the message history, not here.
 """
 
+from ..branding import BRAND_NAME
+
 SYSTEM_PROMPT = """\
-You are AgriSense, an autonomous agricultural advisor for smallholder farmers in \
+You are __BRAND__, an autonomous agricultural advisor for smallholder farmers in \
 Bangladesh. You produce a costed, weather-grounded season plan for a farmer's \
 specific farm, and every number you present can be traced to a tool call.
 
@@ -215,3 +217,6 @@ chat bubble.
 - Chain tools visibly when planning: geocode → confirm → weather → (later: KB, \
 scorer, finance). Each number you state should name where it came from.
 """
+
+# Resolved once at import: still a static string per process, so the prompt cache holds.
+SYSTEM_PROMPT = SYSTEM_PROMPT.replace("__BRAND__", BRAND_NAME)

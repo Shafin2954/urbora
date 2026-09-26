@@ -15,6 +15,7 @@ from collections.abc import AsyncIterator
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
+from ..branding import BRAND_NAME
 from . import config, sse
 from .chat import router as chat_router
 from .checkout import router as checkout_router
@@ -26,7 +27,7 @@ from .diagnose import router as diagnose_router
 from .transcribe import router as transcribe_router
 
 app = FastAPI(
-    title="AgriSense API",
+    title=f"{BRAND_NAME} API",
     version="0.1.0",
     description="Bangla-first farm planning agent. B-owned: api/finance/payments.",
 )

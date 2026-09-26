@@ -15,6 +15,7 @@ import { useAuth } from './state/useAuth.js'
 import { useCrops } from './state/useCrops.js'
 import { useSettings } from './state/useSettings.js'
 import { translator } from './i18n.js'
+import { BRAND_NAME } from './branding.js'
 
 /**
  * One responsive page (PRD.md §9): chat primary, with the provenance graph
@@ -201,7 +202,7 @@ export default function App() {
       <header className="topbar">
         <div className="brand">
           <img src="/icon.svg" alt="" width="30" height="30" />
-          <h1>AgriSense</h1>
+          <h1>{BRAND_NAME}</h1>
         </div>
         <div className="health" title={apiUrl('/api/health')}>
           <span className={`dot dot-${health.state}`} aria-hidden="true" />

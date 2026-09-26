@@ -7,10 +7,9 @@ import { verticalLayout, clamp } from '../lib/graphLayout.js'
  *
  * Farm at the center. Every node is a fact the plan rests on; every edge is
  * labeled with the tool call that produced it. Walking an edge inward answers
- * "where did this number come from" without reading a single line of JSON —
- * click the node and the raw params/result are still right there
- * (NodeInspector), so the judge-facing guarantee in TracePanel.jsx's own
- * comment ("a tool that doesn't appear here doesn't exist") still holds.
+ * "where did this number come from" without reading a single line of JSON.
+ * The raw params/results stay in `trace` (useChat.js), redacted, so
+ * "a tool that doesn't appear here doesn't exist" still holds.
  *
  * No physics, no dragging: frontend/src/lib/graphLayout.js is a fixed
  * chronological layout, so the same trace always draws the same picture and

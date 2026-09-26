@@ -2,7 +2,7 @@
  * traceGraph.js — turns the flat SSE trace array into a provenance graph.
  *
  * Pure, no React, no DOM. `buildGraph(trace)` reads the same `tool_call` /
- * `tool_result` events TracePanel.jsx renders as JSON and turns them into:
+ * `tool_result` events useChat.js accumulates and turns them into:
  *
  *   - nodes: facts the plan rests on (the farm, a place, a weather reading, a
  *     retrieved source, a ranked crop, the season plan, the finance summary,

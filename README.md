@@ -204,9 +204,9 @@ params/result inspector, and that a chronological raw log sits nested
 underneath the graph. **That was true of an earlier build and is not what
 ships.** `App.jsx` renders exactly one trace surface, `GraphPanel.jsx`; two
 components that used to provide node-level and raw-JSON drilldown
-(`NodeInspector.jsx`, `TracePanel.jsx`) still exist as files but are not
-imported anywhere and are not reachable from the UI (removed deliberately —
-see `LOG2.md`, "the previous graph was too dense and English-heavy for the
+(`NodeInspector.jsx`, `TracePanel.jsx`) were deleted in LOG4 (they had been
+unreachable from the UI since
+`LOG2.md`, "the previous graph was too dense and English-heavy for the
 requested product surface").
 
 What the shipped graph panel actually does: every tool call still fires
@@ -336,9 +336,11 @@ Supabase session and works normally.
 
 ### Payments
 
-Not part of this submission — see the Tier 2 table above. `backend/payments/` exists
-in the tree from earlier in the event but is not called by the agent or reachable from
-the UI; no checkout flow ships.
+Ships in **simulator mode** — see the Tier 2 table above. The `কেনাকাটা` tab appears when
+the finance projection has purchasable input lines, and runs quote → confirmation → charge
+→ Bangla SMS receipt through `POST /api/checkout/quote` and `POST /api/checkout`. The
+confirmation gate is enforced server-side (409 without a matching, unexpired quote).
+No real money moves; the mode badge reads `GET /api/checkout/mode`.
 
 ---
 
@@ -353,7 +355,7 @@ backend/
   kb/         holt.py (Holt yield projections) · retrieval.py (rag_query's 52-passage
               corpus) · crop_facts.py (curated agronomic facts the scorer reads directly)
   finance/    engine.py (Decimal, the only place money math happens) + catalog.py
-  payments/   bdapps client + simulator twin + confirmation gate (built, not shipped — see above)
+  payments/   bdapps client + simulator twin + server-enforced confirmation gate (simulator mode)
   memory/     SQLite WAL: conversation history and farm profiles
   api/        FastAPI routes, SSE transport, redacting trace emitter, Supabase-proxying crop index
   units.py    bigha/katha/maund conversions
