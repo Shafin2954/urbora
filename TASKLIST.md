@@ -1,37 +1,27 @@
-# Remaining task list
+# Task list — GP FutureMakers round
 
-This list reflects the completed work recorded in `LOG1.md`, `LOG2.md`, and
-`LOG3.md`. Keep Tier 0 stable before starting optional or gated work.
+Done items and the reasoning live in `LOG4.md`. This list is what is still open.
 
-## Tier 0 completion
+## Needs the team (cannot be done from code)
 
-- [x] Curate the `crop_facts` knowledge-base data from the staged source PDFs:
-  crop seasons, allowed soil and water classes, and climate ranges for the five
-  supported crops. Cite each source.
-- [x] Feed those cited facts into `crop_scorer` so season/soil/water exclusions,
-  Agronomic Fit, and Climate Fit become available; retain honest degradation for
-  any missing evidence.
-- [x] Build the sourced season-plan calendar only after the crop facts are
-  curated; do not invent dates or pest checkpoints.
-- [x] Run an end-to-end chat turn through the API after the current
-  unit-contract fix, including trace, provenance, and the budget replan path.
-- [x] Audit every rendered number for provenance, then run the required finance,
-  units, scorer, and trace-redactor tests before the next merge.
+- [ ] **Pick the final name.** "AgriBase" and "Krishak Sathi / KrishiSathi" are already
+  taken on the Play Store (LOG4 [23:35]). Set `BRAND_NAME` / `VITE_BRAND_NAME`, then
+  sweep internal provenance titles ("AgriSense crop scorer").
+- [ ] **Keys on this machine:** `backend/.env` (`OPENAI_API_KEY`) and root `.env`
+  (Supabase, `CHANNEL_ID_SALT`). No live agent turn has run on this machine yet.
+- [ ] **`SARVAM_API_KEY`** (and/or Azure Speech) — then re-run the district-name STT
+  test and a TTS listening test before claiming voice quality.
+- [ ] **Android phone** with SMSGate + USB debugging — first real SMS round trip and
+  missed-call bridge run.
+- [ ] **Quectel EC20/EC25 USB modem + SIM** for real voice calls (driver waits for it).
+- [ ] Answer the concept-note comment: buyer pays the produce fee (assumed) vs split.
+- [ ] Push `futuremakers` and the `tier0-stable` tag to origin.
 
-## Demo hardening
+## Build, once the above lands
 
-- [x] Rehearse the seeded Rajshahi Rabi farm flow twice, including geocode
-  confirmation, a live bigha-area change, the reduced-budget recovery, and the
-  simulator insufficient-balance path.
-- [x] Confirm the README and demo use the actual five-crop universe
-  (boro rice, aman rice, potato, mustard, lentil), not the superseded six-crop
-  plan.
-- [ ] Tag `tier0-stable` only when the end-to-end flow is green.
-
-## Deferred / requires an explicit scope decision
-
-- [ ] Consider reintroducing wheat only if its crop.db data, facts, costs, and
-  tests are curated together. Maize remains excluded because its available data
-  is corrupt.
-- [ ] Start any gated Tier 1 work only after `tier0-stable` exists and main is
-  green.
+- [ ] Modem voice transport (`backend/channels/voice/modem.py`): AT call control +
+  USB-audio, VAD, spoken filler cues from `tool_call` events (Pipecat here).
+- [ ] Live verification: one full SMS plan, one USSD plan, one voice call, with the
+  real agent; update README statuses from "simulator" to "verified".
+- [ ] Dealer/buyer auth: phone OTP instead of registration tokens.
+- [ ] Encrypt the `contacts` table at rest before real farmers' numbers are stored.

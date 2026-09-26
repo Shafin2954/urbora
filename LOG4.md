@@ -110,3 +110,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Seen working in a browser:** order urea with the confirmation step → SMS to farmer and dealer; list 500 kg potato with the cited guide (খামার-দাম ৳7/কেজি, 2026-04-03) → demo buyer offers ৳21/kg on the buyer page → farmer sees "আপনি পাবেন ৳10,500" → accept → contact-exchange SMS (demo number flagged "আসল নম্বর নয়") — all visible in the button-phone emulator's inbox. Dealer page confirms the order; product table fits a phone.
 **Rejected:** a paid-placement ranking term (breaks the trust story); escrow (out of scope, stated); letting the model compute totals or pick a dealer.
 **Impacts:** New env: `MARKET_COMMISSION_PCT`, `PRODUCE_FEE_PCT`. Run `python -m backend.market.seed_demo` once for demo data (`--reset` removes it). Dealer/buyer auth is a registration token — pilot-grade, stated; production moves to phone OTP.
+
+## [06:10] Docs for the round (Phase 8)
+**Did:** README — new intro (any phone, marketplaces, both events), a "New in the FutureMakers round" section (door-by-door status, marketplaces, what never changed, tool choices with the benchmark evidence), real-vs-demo rows for dealers/buyers, price guide, commission/fee, emulator transport, voice quality; setup for the emulator, SMSGate, the ADB bridge and alerts; tools table (17); architecture; test count 562. PRD — v4 addendum at the top (scope reversal of the July non-goals; still out of scope: escrow, logistics, disputes, a real short code/IVR). TASKLIST — rewritten as what is still open, split into "needs the team" and "build next". repograph — a FutureMakers section mapping every new file. Concept note — the four "this round" rows now say what is built and where it runs; test count updated.
+**Decision:** Statuses say "simulator" / "not yet verified" wherever a real device or key has not been used. Nothing is marked verified that was only unit-tested.
+**Why:** The README's real-vs-mock table is what judges read to decide whether to trust everything else.
+**Rejected:** none.
+**Impacts:** The branch and the `tier0-stable` tag are committed locally but NOT pushed — pushing is left to the team.
