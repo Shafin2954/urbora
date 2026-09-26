@@ -43,3 +43,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The team is renaming for FutureMakers. Checked the candidates: **"AgriBase" is taken** (Play Store app `app.agribase.mobile`, AgriBase Commodities in South Africa, agribase.co.za), and "Krishak Sathi" / "KrishiSathi" are both on the Play Store already.
 **Rejected:** Inventing a name ourselves (it's the team's call); renaming Python packages/repo (no user sees them; the repo/remote rename is left to the humans).
 **Impacts:** Internal provenance titles ("AgriSense crop scorer") still say AgriSense; they change with the final name in one sweep.
+
+## [23:55] First visual pass of the UI (never done in July) — one farmer-facing bug fixed
+**Did:** Drove the dev UI in headless Edge (Playwright from a scratch venv, not an app dependency) at 390×844 and 1440×900: login, guest mode, new chat, send, tabs. Fixed: a failed agent turn printed the raw developer exception to the farmer in English ("agent turn failed: OpenAIError: Missing credentials…"). `ChatPanel.jsx` now shows a Bangla apology (`chat.failed` in `i18n.js`, English variant too) with the raw text folded under "কারিগরি তথ্য" for debugging; styles in `App.css` (44px summary target).
+**Decision:** Keep the raw error reachable rather than hiding it — it's how we debug a live demo.
+**Why:** The farmer is the reader of that line; an English stack message reads as "the app is broken" and gives them nothing to do.
+**Rejected:** Mapping each backend exception to its own Bangla message (the farmer's action is the same for all of them: try again later).
+**Impacts:** Seen and fine: guest mode, the chat layout at both widths, the docked graph on laptop, the tab switch on phone. **Not yet seen with live data** (graph filled, plan/finance tabs, checkout): this machine has no `.env`/`backend/.env`, so there is no OpenAI key or Supabase config here. Needs the keys from whoever holds them.
