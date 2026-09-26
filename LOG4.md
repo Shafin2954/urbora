@@ -50,3 +50,31 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The farmer is the reader of that line; an English stack message reads as "the app is broken" and gives them nothing to do.
 **Rejected:** Mapping each backend exception to its own Bangla message (the farmer's action is the same for all of them: try again later).
 **Impacts:** Seen and fine: guest mode, the chat layout at both widths, the docked graph on laptop, the tab switch on phone. **Not yet seen with live data** (graph filled, plan/finance tabs, checkout): this machine has no `.env`/`backend/.env`, so there is no OpenAI key or Supabase config here. Needs the keys from whoever holds them.
+
+# 2026-09-27
+
+## [00:40] Pitch pack published (Phase 1)
+**Did:** Concept note for the FutureMakers judges as a shared doc: https://claude.ai/code/artifact/05d405ed-5f54-4166-a3fe-2162909d0a87 — problem (sourced), solution (one agent, four doors), why AI / where AI is kept out, vs ChatGPT and 16123, built vs this round, architecture diagram, business model, roadmap, metrics and risks, sources.
+**Decision:** Every figure in it was opened at its source page: 16.8M farming households (Agriculture Census 2019), 26% rural smartphone ownership (GSMA SOMIC 2024), GP 86.3M subscribers with data penetration just above 60% (Q2 2026 call), 92,094 calls to 16123 in FY2025-26 (BSS), producers' share 27–45% (ADB, 2020). No invented market sizes or revenue projections; commission/fee rates are listed as "to set in the pilot".
+**Why:** The submission round is idea/pitch only; judges will check numbers.
+**Rejected:** Revenue projections with assumed rates (would be invented data under rule 2).
+**Impacts:** Open question left as a doc comment: buyer pays the produce fee (assumed) vs split.
+
+## [01:30] Channel core + SMS channel (Phases 2–3)
+**Did:**
+- `backend/channels/identity.py` — phone -> `ph-<HMAC-SHA256>` farm id (salted with `CHANNEL_ID_SALT`); SMS/USSD session per phone per day, voice per call.
+- `backend/channels/adapter.py` — drains `run_turn` into a `ChannelReply` (text, numbered `Menu` from `ask_farmer` chips, plan/finance, redacted events); a digit reply ("2") maps back to the option's Bangla label, same as the web widget; failures become a Bangla apology.
+- `backend/agent/loop.py` — `run_turn(..., channel=)` + `CHANNEL_NOTES` (sms/ussd/voice style: ≤3 lines or ≤4 spoken sentences, no markdown, no title marker, numbers only from tools, say টাকা not ৳ on voice).
+- `backend/channels/sms_text.py` — exact GSM-7/UCS-2 segment counting (Bangla = 70/67 chars), `fit()` to a part budget, and `plan_summary_sms()` built only from plan/finance payloads (ceiling label for fertiliser-only crops via the catalog's `cost_basis`).
+- `backend/channels/sms.py` — providers: `smsgate` (Android phone, `POST /message`, Basic auth), `bdapps` (existing client, encoding 16), `simulator` (default). `send_sms(farm_id, …)` trims, sends, logs.
+- `backend/channels/flows.py` — inbound SMS -> agent -> reply SMS + summary SMS; missed call -> welcome SMS; marketplace keyword hook (`backend/market/sms_commands.py`, empty until Phase 6/7).
+- `backend/channels/alerts_job.py` — proactive rain alerts by SMS from `check_plan_conflicts`, each alert texted once (`alert_sms` table), template text with the forecast mm from provenance. Loop opt-in via `ALERT_SMS_ENABLED`; manual `POST /api/channels/alerts/scan`.
+- `backend/channels/bridge/adb.py` — laptop process polling the phone's call log over ADB for new missed calls -> `POST /api/channels/bridge/missed-call` (needs `BRIDGE_TOKEN`).
+- `backend/api/channels.py` — SMSGate webhook (HMAC verified when `SMSGATE_SIGNING_KEY` set; answers 200 immediately, agent runs in background), bdapps MO, emulator SMS/missed-call/inbox (only in simulator mode — reading an inbox by number must never work on real traffic), status, and the monitor's session list/trace (masked numbers only).
+- `backend/memory/store.py` — tables `contacts` (the only place a number is stored), `channel_turns`, `sms_log`, `ussd_sessions`, `alert_sms`.
+- `backend/api/main.py` — lifespan handler for the alert loop (replaces deprecated `on_event`).
+- Tests: `test_channels_core.py` (26), `test_channels_sms.py` (16). Suite: **500 passed**. `test_loop_integration` signature pin updated for `channel`.
+**Decision:** No `ChatRequest` schema change: the web route stays `channel="web"`; channels call `run_turn` directly.
+**Why:** Rule 15 in practice — hashed ids everywhere, the raw number in one table, redacted traces, template numbers.
+**Rejected:** Keeping raw numbers out of the DB entirely (impossible — an SMS reply needs the number); encrypting the contacts table now (new dependency; noted for production).
+**Impacts:** New env vars in `.env.example` (SMS_PROVIDER, SMSGATE_*, CHANNEL_ID_SALT, BRIDGE_TOKEN, ALERT_SMS_*). Not yet verified against a real phone: SMSGate send/webhook and the ADB call-log query are written to the documented shapes and unit-tested with fakes; first live run needs the Android phone.

@@ -408,12 +408,48 @@ async def _sync_iter_to_async(sync_gen: Iterator[Any]) -> AsyncIterator[Any]:
         yield item
 
 
+# How to write for each phone channel. The web app renders markdown, tables and
+# a provenance graph; a button phone shows ~70 Bangla characters per SMS
+# segment and a caller hears every word. The rules that do not change: tools
+# still run, numbers still come only from tool results, Western numerals.
+_PHONE_COMMON = (
+    "Numbers still come ONLY from tool results, in Western numerals. Never use "
+    "markdown, tables, bullet symbols, emoji or links. Do not emit the "
+    "[[CHAT_TITLE: ...]] marker on this channel. Ask at most one question per "
+    "reply. If you call ask_farmer, keep prompt_bn under 60 characters and give "
+    "at most 6 short options."
+)
+CHANNEL_NOTES: dict[str, str] = {
+    "sms": (
+        "The farmer is on a basic phone, talking to you by SMS. Reply in at most "
+        "3 short lines (about 190 Bangla characters in total). Give the single "
+        "most useful answer; the full plan is sent separately as a summary. "
+        + _PHONE_COMMON
+    ),
+    "ussd": (
+        "The farmer reached you from a USSD menu on a basic phone; your reply "
+        "is delivered by SMS. Reply in at most 3 short lines (about 190 Bangla "
+        "characters in total). " + _PHONE_COMMON
+    ),
+    "voice": (
+        "The farmer is on a PHONE CALL; every word you write is spoken aloud by "
+        "text-to-speech. Speak in short, plain Bangla sentences, at most 4 "
+        "sentences per reply. Say 'টাকা' instead of the ৳ sign and say units in "
+        "words. Never read out source names, ids or URLs; say 'সরকারি তথ্য "
+        "অনুযায়ী' if a source must be mentioned. Before the first plan, confirm "
+        "the district and land size you heard. A summary SMS is sent after the "
+        "call. " + _PHONE_COMMON
+    ),
+}
+
+
 async def run_turn(
     session_id: str,
     farm_id: str | None,
     message: str,
     client: ChatBackend | None = None,
     language: str = "bn",
+    channel: str = "web",
 ) -> AsyncIterator[dict]:
     """The real agent entrypoint — this is what backend/api/chat.py imports.
 
@@ -496,6 +532,12 @@ async def run_turn(
                 "them back to Bangla — an explicit message beats this setting."
             ),
         })
+
+    # Phone channels (LOG4): same agent, same tools, different screen. Injected
+    # every turn for the same reason as the language note.
+    channel_note = CHANNEL_NOTES.get(channel)
+    if channel_note:
+        messages.append({"role": "system", "content": channel_note})
 
     messages.append({"role": "user", "content": message})
 
