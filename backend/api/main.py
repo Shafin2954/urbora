@@ -28,6 +28,7 @@ from .crops import router as crops_router
 from .diagnose import router as diagnose_router
 from .transcribe import router as transcribe_router
 from .channels import router as channels_router
+from .market import router as market_router
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -69,6 +70,7 @@ app.include_router(crops_router)
 app.include_router(diagnose_router)
 app.include_router(transcribe_router)
 app.include_router(channels_router)
+app.include_router(market_router)
 
 
 @app.get("/api/health")

@@ -28,6 +28,7 @@ from ..tools.market_price import market_price
 from ..tools.care_scheduler import care_schedule
 from ..tools.scenario import simulate_budget
 from ..kb.retrieval import rag_query
+from ..market.inputs import find_inputs
 
 # Anthropic tool definitions (input_schema = JSON Schema, English descriptions).
 TOOL_DEFS: list[dict[str, Any]] = [
@@ -397,6 +398,29 @@ TOOL_DEFS: list[dict[str, Any]] = [
             "required": ["crop", "district", "area"],
         },
     },
+    {
+        "name": "find_inputs",
+        "description": (
+            "Marketplace: ranked nearby dealer offers for ONE input the farmer needs "
+            "(fertiliser, fungicide, insecticide), with each pack price, distance and "
+            "stock. Call it after you have recommended an input from a cited source "
+            "(KB dose, pest_risk treatment) and the farmer wants to buy, or asks where "
+            "to get it or what it costs. The ranking is deterministic — never re-rank "
+            "or compute totals yourself; quote `for_quantity` when present. Offers "
+            "with is_demo=true are seeded demo dealers: say 'ডেমো দোকান'. You do not "
+            "place orders: tell the farmer to tap the order button in the app, use "
+            "USSD menu 4, or ask again by SMS."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "product": {"type": "string", "description": "generic input name in English, e.g. urea, tsp, mop, mancozeb, tricyclazole"},
+                "district": {"type": "string", "description": "the farm's district, canonical English (from geocode / farm profile)"},
+                "quantity": {"type": "number", "description": "amount needed in kg or litres, copied from a tool result; omit if unknown"},
+            },
+            "required": ["product", "district"],
+        },
+    },
 ]
 
 _DISPATCH: dict[str, Callable[..., dict]] = {
@@ -416,6 +440,7 @@ _DISPATCH: dict[str, Callable[..., dict]] = {
     "market_price": market_price,
     "care_schedule": care_schedule,
     "simulate_budget": simulate_budget,
+    "find_inputs": find_inputs,
 }
 
 

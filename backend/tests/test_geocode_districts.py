@@ -62,3 +62,9 @@ def test_fallback_marks_static_table_and_needs_confirmation():
 def test_fallback_no_match_returns_empty_candidates_not_fabricated():
     r = _fallback("nowhere-village-xyz")
     assert r["candidates"] == []  # never fabricate a location
+
+
+def test_empty_district_name_is_unknown_not_the_first_district():
+    from backend.tools.districts import lookup_district
+    assert lookup_district("") is None
+    assert lookup_district("   ") is None
