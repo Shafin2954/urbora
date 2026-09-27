@@ -89,6 +89,37 @@ def _short_date(iso: str) -> str:
     return f"{d.day}/{d.month}"
 
 
+SEASON_BN = {"rabi": "রবি", "kharif1": "খরিপ-১", "kharif2": "খরিপ-২"}
+
+
+def ranking_summary_sms(brand: str, scorer: dict | None, season: str | None = None,
+                        *, max_crops: int = 3, max_parts: int = 3) -> str | None:
+    """The crop ranking as an SMS, built only from the crop_scorer result.
+
+    A crop whose costs are incomplete (profit_basis comparable=false) gets the
+    ceiling wording on the same line as its number, never a bare "লাভ"."""
+    if not scorer or not scorer.get("candidates"):
+        return None
+    basis = (scorer.get("profit_basis") or {}).get("crops", {})
+    ranked = [c for c in scorer["candidates"] if not c.get("excluded") and c.get("composite_score", 0) > 0]
+    excluded = [c for c in scorer["candidates"] if c not in ranked]
+    if not ranked:
+        return None
+    head = f"{brand}: " + (f"{SEASON_BN.get(season, season)} মৌসুমে " if season else "") + "ফসলের ক্রম"
+    lines = [head]
+    for i, c in enumerate(ranked[:max_crops], 1):
+        name = CROP_BN.get(c["crop"], c["crop"])
+        line = f"{i}. {name} — স্কোর {round(c['composite_score'])}"
+        profit = c.get("est_profit_bdt")
+        if profit:
+            comparable = basis.get(c["crop"], {}).get("comparable", True)
+            line += f", লাভ {_money(profit)}" if comparable else f", সর্বোচ্চ লাভ {_money(profit)} (সব খরচ নয়)"
+        lines.append(line)
+    if excluded:
+        lines.append("বাদ: " + ", ".join(CROP_BN.get(c["crop"], c["crop"]) for c in excluded))
+    return fit("\n".join(lines), max_parts=max_parts)
+
+
 def plan_summary_sms(
     brand: str,
     plan: dict | None,

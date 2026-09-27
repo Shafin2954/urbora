@@ -24,13 +24,17 @@ WELCOME_SMS = (
 
 
 def send_summary(reply: ChannelReply) -> sms.SendResult | None:
-    """If the turn produced a plan or a finance projection, text the farmer a
-    template summary (numbers from tool payloads only)."""
+    """Text the farmer the figures this turn produced, from a template: the
+    plan/finance summary, else the crop ranking. The agent's own SMS prose
+    carries no figures (CLAUDE.md rule 15; CHANNEL_NOTES in loop.py)."""
     crop = (reply.plan or {}).get("crop") or reply.finance_crop
     body = sms_text.plan_summary_sms(
         BRAND_NAME, reply.plan, reply.finance, crop,
         cost_complete=cost_is_complete(crop), max_parts=sms.max_parts(),
     )
+    if body is None:
+        body = sms_text.ranking_summary_sms(BRAND_NAME, reply.ranking, reply.ranking_season,
+                                            max_parts=sms.max_parts())
     return sms.send_sms(reply.farm_id, body) if body else None
 
 

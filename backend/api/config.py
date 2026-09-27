@@ -6,12 +6,13 @@ Env names are documented in .env.example. Nothing here has a secret default.
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
 
 # repo root = backend/api/config.py -> api -> backend -> root
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-load_dotenv(REPO_ROOT / ".env")
+from backend.env import load as _load_env
+
+_load_env()  # .env.local > backend/.env > .env (see backend/env.py)
 
 
 def _csv(name: str, default: str) -> list[str]:

@@ -34,6 +34,18 @@ _ROW = re.compile(r"number=([^,]*),.*?date=(\d+),.*?type=(\d+)")
 MISSED = "3"  # android.provider.CallLog.Calls.MISSED_TYPE
 
 
+def find_adb() -> str:
+    """`adb` from ADB env, PATH, or the default Android SDK location on Windows."""
+    import shutil
+    from pathlib import Path
+    if os.environ.get("ADB"):
+        return os.environ["ADB"]
+    if shutil.which("adb"):
+        return "adb"
+    sdk = Path(os.environ.get("LOCALAPPDATA", "")) / "Android" / "Sdk" / "platform-tools" / "adb.exe"
+    return str(sdk) if sdk.is_file() else "adb"
+
+
 def parse_call_log(output: str) -> list[tuple[str, int]]:
     """`content query` rows -> [(number, epoch_ms)] for missed calls only."""
     calls = []
@@ -56,10 +68,12 @@ def read_missed_calls(adb: str = "adb", serial: str | None = None) -> list[tuple
 
 
 def main(argv: list[str] | None = None) -> int:
+    from backend.env import load
+    load()  # BRIDGE_TOKEN etc. from .env.local
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--backend", default=os.environ.get("BRIDGE_BACKEND_URL", "http://127.0.0.1:8000"))
     ap.add_argument("--interval", type=float, default=5.0, help="seconds between call-log polls")
-    ap.add_argument("--adb", default=os.environ.get("ADB", "adb"))
+    ap.add_argument("--adb", default=find_adb())
     ap.add_argument("--serial", default=os.environ.get("ANDROID_SERIAL"))
     args = ap.parse_args(argv)
 

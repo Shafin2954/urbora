@@ -120,6 +120,15 @@ def test_summary_is_none_with_nothing_sourced():
 
 # --- menus ----------------------------------------------------------------------
 
+def test_question_is_not_shown_twice_when_the_agent_already_asked_it():
+    from backend.channels.adapter import ChannelReply
+    r = ChannelReply("s", "f", "***1", text="আপনার জেলা কোনটি?",
+                     menu=Menu("district", "আপনার জেলা কোনটি? (জেলার নাম লিখুন)", [], free_entry=True))
+    assert r.display_text() == "আপনার জেলা কোনটি?\n(জেলার নাম লিখুন)"
+    r2 = ChannelReply("s", "f", "***1", text="ঠিক আছে।", menu=Menu("soil_type", "মাটি কেমন?", [("loam", "দোআঁশ")]))
+    assert r2.display_text() == "ঠিক আছে।\nমাটি কেমন?\n1. দোআঁশ"
+
+
 def test_chips_become_numbered_options_and_digits_map_back():
     menu = menu_from_input_request({"field": "soil_type", "prompt_bn": "মাটি কেমন?", "input_kind": "chips",
                                     "options": [{"value": "loam", "label_bn": "দোআঁশ"},
@@ -197,3 +206,63 @@ def test_adapter_apologises_in_bangla_when_the_agent_fails(monkeypatch):
     monkeypatch.setattr(loop, "run_turn", broken)
     reply = asyncio.run(run_channel_turn("01812345678", "hi", "sms"))
     assert reply.error and "দুঃখিত" in reply.text
+
+
+# --- ranking summary (rule 15: figures by template only) -------------------------
+
+def _scorer():
+    return {
+        "candidates": [
+            {"crop": "boro_rice", "composite_score": 83.22, "excluded": False, "est_profit_bdt": 9362.2},
+            {"crop": "lentil", "composite_score": 52.4, "excluded": False, "est_profit_bdt": 30560.51},
+            {"crop": "mustard", "composite_score": 43.76, "excluded": False, "est_profit_bdt": 42820.36},
+            {"crop": "potato", "composite_score": 0.0, "excluded": True, "est_profit_bdt": 0.0},
+        ],
+        "profit_basis": {"crops": {"boro_rice": {"comparable": True}, "lentil": {"comparable": False},
+                                   "mustard": {"comparable": False}}},
+    }
+
+
+def test_ranking_sms_labels_ceilings_and_names_exclusions():
+    out = sms_text.ranking_summary_sms("Brand", _scorer(), "rabi")
+    assert out.splitlines()[0] == "Brand: রবি মৌসুমে ফসলের ক্রম"
+    assert "1. বোরো ধান — স্কোর 83, লাভ ৳9,362" in out
+    assert "2. মসুর — স্কোর 52, সর্বোচ্চ লাভ ৳30,561 (সব খরচ নয়)" in out
+    assert "বাদ: আলু" in out and sms_text.segments(out) <= 3
+
+
+def test_ranking_sms_is_none_without_candidates():
+    assert sms_text.ranking_summary_sms("B", None) is None
+    assert sms_text.ranking_summary_sms("B", {"candidates": []}) is None
+
+
+def test_adapter_keeps_the_ranking_and_flows_text_it(monkeypatch):
+    from backend.agent import loop
+    from backend.api import sse
+    from backend.channels import flows, sms
+
+    class Rec:
+        name, mode = "rec", "simulator"
+        sent = []
+
+        def send(self, local, text):
+            self.sent.append(text)
+            return sms.SendResult("rec", "sent")
+
+    rec = Rec()
+    sms.set_provider(rec)
+    params = {"district": "Rajshahi", "season": "rabi"}
+
+    async def fake(session_id, farm_id, message, client=None, language="bn", channel="web"):
+        yield sse.tool_call("c1", "crop_scorer", params)
+        yield sse.tool_result("c1", "crop_scorer", _scorer())
+        yield sse.token("বোরো ধান সবচেয়ে উপযুক্ত। হিসাব পরের SMS-এ।")
+
+    monkeypatch.setattr(loop, "run_turn", fake)
+    try:
+        reply = asyncio.run(run_channel_turn("01812345678", "কী চাষ করব", "sms"))
+        assert reply.ranking_season == "rabi" and reply.ranking["candidates"][0]["crop"] == "boro_rice"
+        flows.send_summary(reply)
+        assert rec.sent[-1].startswith("Agrosfera: রবি মৌসুমে ফসলের ক্রম")
+    finally:
+        sms.set_provider(None)

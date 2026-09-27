@@ -39,8 +39,10 @@ class Menu:
     options: list[tuple[str, str]] = field(default_factory=list)  # (value, label_bn)
     free_entry: bool = False
 
-    def render(self) -> str:
-        lines = [self.prompt]
+    def render(self, include_prompt: bool = True) -> str:
+        lines = [self.prompt] if include_prompt else []
+        if not include_prompt and self.free_entry and "(" in self.prompt:
+            lines.append(self.prompt[self.prompt.index("("):])  # keep the "(জেলার নাম লিখুন)" hint
         for i, (_, label) in enumerate(self.options, start=1):
             lines.append(f"{i}. {label}")
         return "\n".join(lines)
@@ -94,15 +96,22 @@ class ChannelReply:
     plan: dict | None = None
     finance: dict | None = None
     finance_crop: str | None = None
+    ranking: dict | None = None          # the crop_scorer result, for the ranking SMS
+    ranking_season: str | None = None
     alerts: list[dict] = field(default_factory=list)
     events: list[dict] = field(default_factory=list)
     error: str | None = None
     usage: dict | None = None
 
     def display_text(self) -> str:
-        """What the phone shows / speaks: the reply, then the menu if any."""
-        parts = [p for p in (self.text.strip(), self.menu.render() if self.menu else "") if p]
-        return "\n".join(parts)
+        """What the phone shows / speaks: the reply, then the menu if any.
+        The agent usually repeats the question in its own words; when it did,
+        the menu shows only the options, so the farmer does not read it twice."""
+        menu = ""
+        if self.menu:
+            question = self.menu.prompt.split(" (")[0].strip()
+            menu = self.menu.render(include_prompt=question not in self.text)
+        return "\n".join(p for p in (self.text.strip(), menu) if p)
 
 
 def _pending_key(farm_id: str) -> str:
@@ -159,6 +168,12 @@ async def run_channel_turn(
             reply.events.append(event)
             if kind == "tool_call":
                 calls[event.get("id", "")] = (event.get("name", ""), event.get("params"))
+            elif kind == "tool_result" and event.get("name") == "crop_scorer":
+                result = event.get("result_raw")
+                if isinstance(result, dict) and result.get("candidates"):
+                    reply.ranking = result
+                    params = calls.get(event.get("id", ""), ("", {}))[1] or {}
+                    reply.ranking_season = params.get("season")
             elif kind == "plan_update":
                 reply.plan = event.get("plan")
             elif kind == "finance_update":

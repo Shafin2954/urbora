@@ -140,7 +140,7 @@ def _tts_sarvam(text: str) -> Audio:
     return Audio(base64.b64decode(audios[0]), "audio/wav")
 
 
-def _tts_azure(text: str) -> Audio:
+def _tts_azure(text: str, wav: bool = False) -> Audio:
     key, region = os.environ.get("AZURE_SPEECH_KEY", ""), os.environ.get("AZURE_SPEECH_REGION", "")
     if not (key and region):
         raise SpeechError("AZURE_SPEECH_KEY and AZURE_SPEECH_REGION are required")
@@ -150,15 +150,15 @@ def _tts_azure(text: str) -> Audio:
     r = httpx.post(
         f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1",
         headers={"Ocp-Apim-Subscription-Key": key, "Content-Type": "application/ssml+xml",
-                 "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3"},
+                 "X-Microsoft-OutputFormat": "riff-24khz-16bit-mono-pcm" if wav else "audio-24khz-48kbitrate-mono-mp3"},
         content=ssml.encode("utf-8"), timeout=TIMEOUT,
     )
     if r.status_code >= 300:
         raise SpeechError(f"Azure TTS HTTP {r.status_code}")
-    return Audio(r.content, "audio/mpeg")
+    return Audio(r.content, "audio/wav" if wav else "audio/mpeg")
 
 
-def _tts_openai(text: str) -> Audio:
+def _tts_openai(text: str, wav: bool = False) -> Audio:
     from backend.agent.config import AgentConfig
     from openai import OpenAI
 
@@ -166,17 +166,22 @@ def _tts_openai(text: str) -> Audio:
         resp = OpenAI(api_key=AgentConfig.from_env().api_key).audio.speech.create(
             model=os.environ.get("OPENAI_TTS_MODEL", "gpt-4o-mini-tts"),
             voice=os.environ.get("OPENAI_TTS_VOICE", "alloy"), input=text[:4000],
+            response_format="wav" if wav else "mp3",
         )
     except Exception as exc:  # noqa: BLE001
         raise SpeechError(f"OpenAI TTS: {type(exc).__name__}: {exc}") from exc
-    return Audio(resp.read(), "audio/mpeg")
+    return Audio(resp.read(), "audio/wav" if wav else "audio/mpeg")
 
 
-def synthesize(text: str, provider: str | None = None) -> tuple[Audio, str]:
-    """-> (audio, provider used)."""
+def synthesize(text: str, provider: str | None = None, wav: bool = False) -> tuple[Audio, str]:
+    """-> (audio, provider used). `wav=True` forces plain WAV (the Phone Link
+    bridge plays it straight to a sound device with no decoder)."""
     p = provider or tts_provider()
-    fn = {"sarvam": _tts_sarvam, "azure": _tts_azure}.get(p, _tts_openai)
-    return fn(text), p
+    if p == "sarvam":
+        return _tts_sarvam(text), p  # Sarvam always returns WAV
+    if p == "azure":
+        return _tts_azure(text, wav), p
+    return _tts_openai(text, wav), p
 
 
 def status() -> dict:

@@ -286,3 +286,50 @@ async def emulator_voice_hangup(payload: HangUp) -> dict:
         return await asyncio.to_thread(hang_up, payload.msisdn, payload.call_id)
     except InvalidMsisdnError as exc:
         raise HTTPException(422, str(exc))
+
+
+# --- Phone Link voice bridge (backend/channels/voice/phonelink.py) --------------
+
+
+@router.post("/bridge/voice/turn")
+async def bridge_voice_turn(request: Request, msisdn: str = Form(...), call_id: str = Form(...),
+                            file: UploadFile = File(...)) -> dict:
+    """One utterance from a real phone call bridged through Windows Phone Link.
+    Reply audio is plain WAV so the bridge can play it with no decoder."""
+    _require_bridge_token(request)
+    from backend.channels.voice.turn import voice_turn
+    audio = await file.read()
+    if not audio or len(audio) > _MAX_CLIP_BYTES:
+        raise HTTPException(400, "empty or oversized utterance")
+    try:
+        return await voice_turn(msisdn, call_id, audio, file.content_type or "audio/wav", wav=True)
+    except InvalidMsisdnError as exc:
+        raise HTTPException(422, str(exc))
+
+
+@router.post("/bridge/voice/hangup")
+async def bridge_voice_hangup(payload: HangUp, request: Request) -> dict:
+    _require_bridge_token(request)
+    from backend.channels.voice.turn import hang_up
+    try:
+        return await asyncio.to_thread(hang_up, payload.msisdn, payload.call_id)
+    except InvalidMsisdnError as exc:
+        raise HTTPException(422, str(exc))
+
+
+class Say(BaseModel):
+    text: str
+
+
+@router.post("/bridge/voice/say")
+async def bridge_voice_say(payload: Say, request: Request) -> dict:
+    """Fixed lines the bridge speaks (greeting, 'একটু অপেক্ষা করুন'), as WAV."""
+    _require_bridge_token(request)
+    import base64
+    from backend.channels.voice import speech
+    try:
+        audio, used = await asyncio.to_thread(speech.synthesize, payload.text[:500], None, True)
+    except speech.SpeechError as exc:
+        raise HTTPException(502, str(exc))
+    return {"audio_b64": base64.b64encode(audio.data).decode("ascii"), "audio_type": audio.content_type,
+            "tts": used}

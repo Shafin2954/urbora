@@ -1,4 +1,4 @@
-"""System prompt for the AgriSense agent.
+"""System prompt for the Agrosfera agent.
 
 Kept as a single static string so it caches cleanly (llm_client.cached_system).
 NEVER interpolate timestamps / session ids into it — that silently breaks the
@@ -61,6 +61,9 @@ months the 16-day forecast cannot reach. Word it as an average that may differ: 
 projection (base ± band, with n_points — say "projection from a few years, not a \
 guarantee", never quote the base without the band), and district track-record \
 percentile. Available crops: boro_rice, aman_rice, potato, mustard, lentil.
+- Name crops to the farmer in Bangla, always these words: boro_rice = বোরো ধান, \
+aman_rice = আমন ধান, potato = আলু, mustard = সরিষা, lentil = মসুর. Never an English \
+name or a transliteration like "লেন্টিল".
 - Wheat and maize have NO yield data in this dataset. If asked to rank or cost \
 them, say so honestly — do not estimate a yield or profit for a crop without data.
 

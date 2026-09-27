@@ -53,6 +53,7 @@ from ..tools.ask import DISTRICT_BN
 from ..tools.districts import ALIASES, DISTRICTS
 from .config import AgentConfig
 from .llm_client import ChatBackend, LLMClient
+from . import intake_guard
 from .prompts import SYSTEM_PROMPT
 from .tools_spec import TOOL_DEFS, dispatch
 
@@ -327,6 +328,16 @@ def run_turn_sync(
                 break  # natural end of turn
 
             for tc in res.tool_calls:
+                # Rule 2, structurally: a plan may only rest on farm facts the
+                # farmer actually gave (intake_guard.py; found live, LOG4).
+                unstated = intake_guard.unstated_fields(tc.name, tc.args, messages)
+                if unstated:
+                    yield ToolCallEvent(id=tc.id, name=tc.name, params=tc.args, ts=_now())
+                    refused = intake_guard.refusal(unstated)
+                    yield ToolResultEvent(id=tc.id, name=tc.name, result_raw=refused, ts=_now())
+                    messages.append(client.tool_result_message(
+                        tc.id, json.dumps(refused, ensure_ascii=False), True))
+                    continue
                 # Retrieval is a required evidence step, not a best-effort model
                 # habit. The model receives the cited passages before it sees
                 # the deterministic recommendation/calendar result, and both
@@ -419,17 +430,22 @@ _PHONE_COMMON = (
     "reply. If you call ask_farmer, keep prompt_bn under 60 characters and give "
     "at most 6 short options."
 )
+_SMS_NO_FIGURES = (
+    "Write NO figures in this reply: no money, kg, yields, scores, percentages or "
+    "ROI. A separate SMS built from the tool results carries every figure (the "
+    "ranking or the plan and costs). Say in words what you recommend and why, and "
+    "tell the farmer the numbers follow in the next SMS. "
+)
 CHANNEL_NOTES: dict[str, str] = {
     "sms": (
         "The farmer is on a basic phone, talking to you by SMS. Reply in at most "
-        "3 short lines (about 190 Bangla characters in total). Give the single "
-        "most useful answer; the full plan is sent separately as a summary. "
-        + _PHONE_COMMON
+        "2 short sentences (under 130 Bangla characters in total). Give the single "
+        "most useful answer. " + _SMS_NO_FIGURES + _PHONE_COMMON
     ),
     "ussd": (
         "The farmer reached you from a USSD menu on a basic phone; your reply "
-        "is delivered by SMS. Reply in at most 3 short lines (about 190 Bangla "
-        "characters in total). " + _PHONE_COMMON
+        "is delivered by SMS. Reply in at most 2 short sentences (under 130 Bangla "
+        "characters in total). " + _SMS_NO_FIGURES + _PHONE_COMMON
     ),
     "voice": (
         "The farmer is on a PHONE CALL; every word you write is spoken aloud by "

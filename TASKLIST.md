@@ -4,24 +4,24 @@ Done items and the reasoning live in `LOG4.md`. This list is what is still open.
 
 ## Needs the team (cannot be done from code)
 
-- [ ] **Pick the final name.** "AgriBase" and "Krishak Sathi / KrishiSathi" are already
-  taken on the Play Store (LOG4 [23:35]). Set `BRAND_NAME` / `VITE_BRAND_NAME`, then
-  sweep internal provenance titles ("AgriSense crop scorer").
-- [ ] **Keys on this machine:** `backend/.env` (`OPENAI_API_KEY`) and root `.env`
-  (Supabase, `CHANNEL_ID_SALT`). No live agent turn has run on this machine yet.
-- [ ] **`SARVAM_API_KEY`** (and/or Azure Speech) — then re-run the district-name STT
-  test and a TTS listening test before claiming voice quality.
-- [ ] **Android phone** with SMSGate + USB debugging — first real SMS round trip and
-  missed-call bridge run.
-- [ ] **Quectel EC20/EC25 USB modem + SIM** for real voice calls (driver waits for it).
+- [ ] **First real call through Phone Link:** pair the phone (Link to Windows ↔ Phone
+  Link, Calls on), set Phone Link's output/input to Voicemeeter (README → "Real voice
+  calls"), plug the phone in with USB debugging for call state, then run
+  `python -m backend.channels.voice.phonelink --test-playback`, `--test-capture`,
+  `--auto-answer`.
+- [ ] **First real SMS through the Android phone:** SMSGate from its official GitHub
+  releases (package `me.capcom.smsgateway`), Local Server on, then set `SMS_PROVIDER`,
+  `SMSGATE_*` and the `sms:received` webhook (README → "Real SMS").
+- [ ] Voice quality with real farmers' voices (Sarvam verified only on synthetic speech,
+  incl. 8 kHz); pick the TTS voice by ear (Sarvam default today; Azure `bn-BD` needs a key).
 - [ ] Answer the concept-note comment: buyer pays the produce fee (assumed) vs split.
-- [ ] Push `futuremakers` and the `tier0-stable` tag to origin.
+- [ ] Name check: "Agrosfera" is also a Ukrainian agrochemical company with a Play Store
+  app (`ua.agrosfera.app`) — decide whether that matters for the pitch.
 
-## Build, once the above lands
+## Build next
 
-- [ ] Modem voice transport (`backend/channels/voice/modem.py`): AT call control +
-  USB-audio, VAD, spoken filler cues from `tool_call` events (Pipecat here).
-- [ ] Live verification: one full SMS plan, one USSD plan, one voice call, with the
-  real agent; update README statuses from "simulator" to "verified".
+- [ ] Quectel USB-modem transport (only if a laptop-free setup is wanted; Phone Link
+  covers the pilot).
 - [ ] Dealer/buyer auth: phone OTP instead of registration tokens.
 - [ ] Encrypt the `contacts` table at rest before real farmers' numbers are stored.
+- [ ] Voice barge-in (the Phone Link line is half-duplex today).

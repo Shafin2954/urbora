@@ -1,4 +1,4 @@
-# AgriSense AI (working name)
+# Agrosfera (অ্যাগ্রোস্ফেরা)
 
 A Bangla-first farm advisor that a smallholder farmer can reach from **any phone**:
 a voice call, a USSD code, an SMS, or the web app. One autonomous agent produces a
@@ -13,8 +13,9 @@ The web demo is live at [https://team-fixeth-agri-sense--Shafin54.replit.app](ht
 - **September 2026:** entered in **Grameenphone FutureMakers 2026**, track
   *Digital Inclusion & Education*. This round added the button-phone channels and the
   two marketplaces — see [New in the FutureMakers round](#new-in-the-futuremakers-round)
-  and `LOG4.md`. The product name is being changed; it is one constant
-  (`backend/branding.py`, `frontend/src/branding.js`, or `BRAND_NAME` in `.env`).
+  and `LOG4.md`. The product was renamed from its hackathon working name, AgriSense,
+  to **Agrosfera**; the name is one constant (`backend/branding.py`,
+  `frontend/src/branding.js`, or `BRAND_NAME` in `.env`).
 
 ---
 
@@ -50,7 +51,7 @@ same tools:
 | SMS | any | **Working in the simulator; real SMS via an Android phone is built but not yet run on a device** | `backend/channels/sms.py`, `flows.py`; `POST /api/channels/sms/smsgate` |
 | Missed call → SMS | any | **Working in the simulator; ADB bridge built, not yet run on a device** | `backend/channels/bridge/adb.py` |
 | USSD `*code#` | any | **Working in the simulator** (a real short code needs operator provisioning); bdapps request/response shape implemented | `backend/channels/ussd.py`; `POST /api/channels/ussd/bdapps` |
-| Voice call | any | **Push-to-talk in the browser emulator.** Speech providers wired; **quality not yet verified** (needs `SARVAM_API_KEY` or Azure keys and an ear test). Real phone calls need a USB 4G modem — driver planned, waiting for hardware | `backend/channels/voice/` |
+| Voice call | any | **Push-to-talk in the browser emulator; real calls through Windows Phone Link built** (bridge + Voicemeeter, no root, no modem) — **the first real call on a paired phone is still to be run.** Sarvam speech verified live (below) | `backend/channels/voice/`, `phonelink.py` |
 | Proactive alerts by SMS | any | **Working** (opt-in loop) | `backend/channels/alerts_job.py` |
 
 And two marketplaces that turn advice into action:
@@ -69,18 +70,23 @@ the farmer's marketplace. Everything simulated is labelled **সিমুলে�
 Every channel runs the same agent under the same rules: numbers come only from tool
 results (the LLM never does arithmetic or ranks — crops *or* dealers), every price
 carries provenance, and a missing source is said out loud. SMS and USSD numbers are
-inserted by templates from tool payloads (`backend/channels/sms_text.py`), never
-written by the model. Phone numbers are stored in one table (`contacts`); everything
+inserted by templates from tool payloads (`backend/channels/sms_text.py`: the ranking
+and the plan/cost summary), never written by the model — the agent's SMS prose is told
+to carry no figures. And the agent may not plan on farm facts the farmer never gave:
+`backend/agent/intake_guard.py` refuses `crop_scorer` / `finance_projection` /
+`season_plan` / `simulate_budget` when the district, soil, water or season in their
+parameters is not in the farmer's messages or saved profile (found live: a garbled SMS
+had produced a ranking for an invented district). Phone numbers are stored in one table (`contacts`); everything
 else keys on a salted hash, and traces show the last 3 digits only.
 
 ### Tool choices (researched September 2026)
 
 | Need | Choice | Why |
 |---|---|---|
-| Bangla speech-to-text | **Sarvam** (`saaras`), OpenAI `gpt-4o-transcribe` as fallback | A Sep-2026 Bangla benchmark over 1,001 clips ([riverbornai](https://github.com/riverbornai/bangla-speech-to-text-benchmark/releases/tag/v1.0.0)) measured Sarvam at 6.9% CER vs 28.7% for `gpt-4o-transcribe`. Not yet re-verified on our own district-name sentence |
+| Bangla speech-to-text | **Sarvam** (`saaras:v3`), OpenAI `gpt-4o-transcribe` as fallback | A Sep-2026 Bangla benchmark over 1,001 clips ([riverbornai](https://github.com/riverbornai/bangla-speech-to-text-benchmark/releases/tag/v1.0.0)) measured Sarvam at 6.9% CER vs 28.7% for `gpt-4o-transcribe`. **Verified here 2026-09-28:** Sarvam TTS → Sarvam STT on the July district-name sentence ("আমার দিনাজপুরে এক বিঘা জমি আছে…") came back exact, also after squeezing the audio to 8 kHz telephone band (TTS 2.2 s, STT 1.2 s). That is synthetic speech; real farmers' voices are the next test |
 | Bangla text-to-speech | Sarvam Bulbul, Azure `bn-BD` (Dhaka accent) or OpenAI — a config switch | To be chosen by a listening test |
 | SMS gateway (pilot) | [SMSGate](https://github.com/capcom6/android-sms-gateway) on an Android phone (Apache-2.0, local-server REST + signed webhooks) | Free, real SMS |
-| Real phone calls (pilot) | Quectel EC2x USB 4G modem (planned) | An Android phone cannot hand call audio to an app without root |
+| Real phone calls (pilot) | **Windows Phone Link + Voicemeeter** (both free); a Quectel EC2x USB modem is the later, laptop-free option | An Android phone cannot hand call audio to an app without root, but Phone Link makes the laptop the phone's Bluetooth hands-free, and Voicemeeter turns its speaker/mic into cables the bridge can use |
 | USSD emulator, marketplace | Own code | Existing USSD simulators speak other operators' formats; a separate commerce stack (e.g. Medusa) would duplicate our Decimal finance engine |
 
 ## Agent System Architecture
@@ -370,7 +376,9 @@ default in `backend/api/config.py`) or the proxy has nothing to forward to.
 backend/.venv/Scripts/python.exe -m pytest tests backend/tests -q
 ```
 
-**562 passed** — verified on 2026-09-27 against this checkout (LOG4).
+**583 passed** — verified on 2026-09-28 against this checkout (LOG4). Tests are hermetic:
+an autouse fixture clears provider keys, so a developer's `.env.local` never sends test
+audio to Sarvam or turns on a live gateway.
 Coverage spans the finance engine, `units.py`, the trace redactor, crop
 scoring, retrieval, season-plan generation and persistence, plan-conflict
 checking, the care scheduler, scenario simulation, and agri-input lookups —
@@ -412,6 +420,23 @@ nothing leaves the machine and the emulator's inbox shows every SMS.
    `SMSGATE_SIGNING_KEY` so unsigned calls are refused.
 4. Missed calls: plug the phone in with USB debugging on, set `BRIDGE_TOKEN` on both
    sides, and run `python -m backend.channels.bridge.adb --backend http://<backend>`.
+
+**Real voice calls through Windows Phone Link** (pilot, no root, no modem):
+
+1. `python -m pip install -r backend/requirements-voice-bridge.txt`; install
+   [Voicemeeter](https://vb-audio.com/Voicemeeter/) (free) and adb (Android platform-tools;
+   the bridge also finds the Android SDK copy on its own).
+2. Phone: install **Link to Windows**; PC: **Phone Link** → Calls → pair over Bluetooth.
+   Make a test call from the PC to confirm call audio plays on the laptop.
+3. Windows Settings → Sound → Volume mixer → Phone Link: **output** = "Voicemeeter Input",
+   **input** = "Voicemeeter Out B2". In Voicemeeter: the VAIO strip → **B1** only, the AUX
+   strip → **B2** only (both → A1 too if you want to listen in).
+4. `BRIDGE_TOKEN` in `.env.local` (same value the backend reads), backend running, then:
+   `python -m backend.channels.voice.phonelink --test-playback` (you hear the Bangla
+   greeting when a call is up), `--test-capture` (speak on a call; the meter moves), and
+   finally `python -m backend.channels.voice.phonelink --auto-answer`.
+5. The caller's number comes from ADB when Android reveals it; if yours hides it, pass
+   `--caller <number>` for testing. One call at a time.
 
 A personal SIM is for a pilot only; production runs on the operator's IVR, USSD short
 code and bulk-SMS channels. `ALERT_SMS_ENABLED=true` turns on the proactive rain-alert

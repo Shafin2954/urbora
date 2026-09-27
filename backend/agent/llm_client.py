@@ -256,7 +256,7 @@ if __name__ == "__main__":
     # OpenAI() requires a key at construction; use a placeholder for the offline
     # print (cost_from_usage / tool translation never hit the network).
     client = OpenAIClient(cfg if cfg.api_key else replace(cfg, api_key="sk-offline-demo"))
-    print("AgriSense LLM client (OpenAI backend)")
+    print("Agrosfera LLM client (OpenAI backend)")
     print(f"  model          : {client.model}")
     print(f"  max_tokens     : {cfg.max_tokens}")
     print(f"  temperature    : {cfg.temperature}")

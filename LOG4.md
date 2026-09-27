@@ -117,3 +117,32 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The README's real-vs-mock table is what judges read to decide whether to trust everything else.
 **Rejected:** none.
 **Impacts:** The branch and the `tier0-stable` tag are committed locally but NOT pushed — pushing is left to the team.
+
+# 2026-09-28
+
+## [11:40] Name, local keys, hermetic tests
+**Did:** Product renamed to **Agrosfera** (অ্যাগ্রোস্ফেরা): `backend/branding.py`, `frontend/src/branding.js`, `vite.config.js`, provenance titles in `cropdb.py` / `geocode.py` / `crop_scorer.py` now read `BRAND_NAME`; docstrings, `.env.example`, README title, the concept note (title + body). New `backend/env.py` loads `.env.local` > `backend/.env` > `.env` for both configs. New `backend/tests/conftest.py` (+ root) clears provider env vars in every test. Generated `BRIDGE_TOKEN` and `CHANNEL_ID_SALT` appended to the gitignored `.env.local`.
+**Decision:** Agrosfera, the team's choice. Checked: "AgrooSphere"/"Agrosphere" are close to an existing Play Store crop-doctor app and a funded US company; "Agrosfera" is also a Ukrainian agrochemical company with an ordering app (`ua.agrosfera.app`). Flagged, not blocking.
+**Why:** With real keys present, 9 transcription tests would have sent test audio to Sarvam; tests must not depend on whose laptop runs them.
+**Rejected:** Renaming the repo / Python package (no user sees them).
+**Impacts:** Local test farms created before the salt was set are orphaned (dev data only).
+
+## [12:30] First live runs on this machine: Sarvam verified, agent verified, one real bug fixed
+**Did:**
+- Sarvam: TTS → STT of the July district-name sentence came back exact, also after resampling to 8 kHz telephone band (TTS 2.2 s, STT 1.2 s). Synthetic speech only — real voices still to test.
+- Live agent through the SMS emulator (OpenAI key): ranking from stated facts; then "আলু, 15 নভেম্বর" → `finance_projection` + `season_plan` → the template summary SMS with real figures (খরচ ৳42,156, আয় ৳48,846, লাভ ৳6,691).
+- **Bug (rule 2):** a garbled SMS ("???? …", from a curl encoding slip in my test) still produced `crop_scorer(district=Dinajpur, soil=loam, water=irrigated, season=rabi)` — every field invented — and a confident ranking. New `backend/agent/intake_guard.py`, called in `loop.py` before any planning tool: district/soil/water/season must appear in the farmer's messages (same deterministic extractor + district-name scan) or saved profile, else a traced tool error tells the agent to ask. Re-run live: the garbled SMS now gets "আপনার জেলা কোনটি?". Tests: `test_intake_guard.py` (7), built on the real failure.
+- Rule 15 tightened: SMS/USSD prose now carries **no figures** (`_SMS_NO_FIGURES` in `CHANNEL_NOTES`); new `sms_text.ranking_summary_sms` sends the ranking as a template SMS (score, profit, ceiling label for fertiliser-only crops, excluded crops named); `flows.send_summary` and the voice hang-up fall back to it. Live re-run: prose had no numbers, ranking SMS exact. SMS reply budget cut to 2 sentences (<130 chars) after replies were being trimmed at 3 parts.
+- Agent now names crops only in Bangla (it wrote "লেন্টিল" once). Duplicate question on SMS ("জেলা কোনটি?" twice) removed in `ChannelReply.display_text`.
+**Decision:** Voice keeps quoting tool figures in speech (a spoken plan with no numbers is useless); the SMS after the call is the authoritative record.
+**Why:** The prompt said "ask, don't guess" and the model guessed anyway — same lesson as the digit filter: guarantees go in code.
+**Rejected:** Rejecting any message with "?" runs (treats a symptom); checking numeric fields (false refusals on numbers typed differently outweigh the risk).
+**Impacts:** Suite 583. Cost of the live runs: ~$0.04 per SMS turn with gpt-4o.
+
+## [13:30] Real phone calls through Windows Phone Link (built; first real call pending)
+**Did:** `backend/channels/voice/audio.py` (pure: resample, WAV, webrtcvad segmenter with pre-roll/silence/max, ADB call-state parser), `backend/channels/voice/phonelink.py` (the bridge: ADB call state + optional auto-answer, greeting, VAD turns, "একটু অপেক্ষা করুন" filler while the agent thinks, reply played into Phone Link's mic, SMS summary on hang-up; `--list-devices`, `--test-capture`, `--test-playback`), token-protected `/api/channels/bridge/voice/{turn,hangup,say}` returning WAV, `speech.synthesize(..., wav=True)`, `find_adb()` (Android SDK copy found automatically). Deps: `numpy==2.5.3` in requirements; `sounddevice==0.5.6`, `webrtcvad-wheels==2.0.14` in optional `backend/requirements-voice-bridge.txt`. Tests: `test_channels_phonelink.py` (10).
+**Verified on this laptop:** Voicemeeter Potato is installed; the bridge finds "Voicemeeter Out B1" / "Voicemeeter AUX Input"; `--test-playback` fetched the Sarvam greeting through the backend and played it into AUX. adb found in the Android SDK; no phone attached yet.
+**Decision:** Routing: Phone Link output → Voicemeeter Input (VAIO) → B1 → bridge; bridge → AUX Input → B2 → Phone Link mic. Half-duplex (no barge-in) for the pilot. The Quectel modem becomes optional.
+**Why:** The team chose Phone Link (free, no root, no card, works for any caller on a normal local call).
+**Rejected:** Twilio trial (5 verified numbers, `<Stream>` blocked on trial), Vapi (US numbers only), Tasker/MacroDroid for audio (same Android restriction; fine as triggers).
+**Impacts:** Needs a person at the laptop with the phone paired for the first real call; README → "Real voice calls" has the steps.

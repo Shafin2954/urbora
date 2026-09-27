@@ -13,13 +13,9 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from dotenv import load_dotenv
+from backend.env import load as _load_env
 
-# Load backend/.env explicitly — a bare load_dotenv() from the repo root would look
-# for ./.env and miss it. Then fall back to the default search (repo-root .env /
-# real env vars); load_dotenv never overrides an already-set var.
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
-load_dotenv()
+_load_env()  # .env.local > backend/.env > .env (see backend/env.py)
 
 DEFAULT_MODEL = "gpt-4o"            # tool-calling must be reliable under this 14-tool
 # loop + long system prompt. gpt-4o-mini was the original baseline but was

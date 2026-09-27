@@ -1,1 +1,1 @@
-"""AgriSense API package (B-owned: FastAPI routes, SSE, sessions)."""
+"""Agrosfera API package (B-owned: FastAPI routes, SSE, sessions)."""

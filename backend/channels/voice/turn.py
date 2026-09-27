@@ -52,12 +52,14 @@ def _remember(call_id: str, reply: ChannelReply) -> None:
         state["plan"] = reply.plan
     if reply.finance:
         state["finance"], state["finance_crop"] = reply.finance, reply.finance_crop
+    if reply.ranking:
+        state["ranking"], state["ranking_season"] = reply.ranking, reply.ranking_season
     state["farm_id"], state["session_id"] = reply.farm_id, reply.session_id
     store.save_ussd_state(_call_key(call_id), reply.farm_id, state)
 
 
 async def voice_turn(msisdn: str, call_id: str, audio: bytes, content_type: str,
-                     *, speak: bool = True) -> dict:
+                     *, speak: bool = True, wav: bool = False) -> dict:
     local = normalise(msisdn)
     try:
         transcript, stt_used = await asyncio.to_thread(speech.transcribe, audio, content_type)
@@ -77,7 +79,7 @@ async def voice_turn(msisdn: str, call_id: str, audio: bytes, content_type: str,
            "audio_b64": None, "audio_type": None, "tts": None}
     if speak:
         try:
-            audio_out, tts_used = await asyncio.to_thread(speech.synthesize, text)
+            audio_out, tts_used = await asyncio.to_thread(speech.synthesize, text, None, wav)
             out.update(audio_b64=base64.b64encode(audio_out.data).decode("ascii"),
                        audio_type=audio_out.content_type, tts=tts_used)
         except speech.SpeechError as exc:
@@ -98,6 +100,9 @@ def hang_up(msisdn: str, call_id: str) -> dict:
     crop = (state.get("plan") or {}).get("crop") or state.get("finance_crop")
     body = sms_text.plan_summary_sms(BRAND_NAME, state.get("plan"), state.get("finance"), crop,
                                      cost_complete=cost_is_complete(crop), max_parts=sms.max_parts())
+    if body is None:
+        body = sms_text.ranking_summary_sms(BRAND_NAME, state.get("ranking"), state.get("ranking_season"),
+                                            max_parts=sms.max_parts())
     if body is None:
         turns = store.get_channel_turns(state["session_id"]) if state.get("session_id") else []
         if turns:

@@ -5,7 +5,13 @@ Map of the tree. Update after any unit of work so nothing has to be re-explored.
 
 ## FutureMakers round (September 2026) — read this first
 Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
-- `backend/branding.py`, `frontend/src/branding.js` — the product name (not final).
+- `backend/branding.py`, `frontend/src/branding.js` — the product name: **Agrosfera**.
+- `backend/env.py` — loads `.env.local` > `backend/.env` > `.env` (both configs use it).
+- `backend/agent/intake_guard.py` — refuses planning tools on district/soil/water/season the farmer never stated.
+- `backend/channels/voice/audio.py` (pure audio helpers + VAD segmenter + ADB call-state parser) and
+  `voice/phonelink.py` (real calls via Windows Phone Link + Voicemeeter; optional deps in
+  `backend/requirements-voice-bridge.txt`); routes `/api/channels/bridge/voice/*`.
+- `backend/tests/conftest.py` — clears provider env vars so tests stay hermetic.
 - `backend/channels/` — phone channels. `identity.py` (phone → `ph-<hmac>` farm id;
   sessions per phone per day, voice per call), `adapter.py` (`run_channel_turn`:
   drains `run_turn` into text + numbered `Menu` + plan/finance + redacted events;
