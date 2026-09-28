@@ -21,6 +21,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 import time
 from datetime import datetime, timezone
 
@@ -33,6 +34,7 @@ from backend.memory import store
 
 router = APIRouter(prefix="/api/channels", tags=["channels"])
 log = logging.getLogger("channels")
+_background: set[asyncio.Task] = set()  # fire-and-forget sends, kept alive until done
 
 
 def emulator_enabled() -> bool:
@@ -274,8 +276,15 @@ async def bdapps_ussd(request: Request) -> dict:
         screen = await ussd_request(session_id, address.removeprefix("tel:"), body.get("message"), is_init)
     except InvalidMsisdnError:
         return {"statusCode": "E1325", "statusDetail": "unusable address"}
-    sent = await asyncio.to_thread(_bdapps_ussd_send, session_id, address, screen.text, screen.end)
-    return {"statusCode": "S1000", "statusDetail": "Success", "reply": sent}
+    if os.environ.get("BDAPPS_MODE", "simulator").strip().lower() != "live":
+        sent = _bdapps_ussd_send(session_id, address, screen.text, screen.end)  # local; nothing leaves
+        return {"statusCode": "S1000", "statusDetail": "Success", "reply": sent}
+    # Live: acknowledge the MO at once and send the screen separately, so the
+    # gateway's request never waits on our outbound call (CHANNELS_RESEARCH.md §1).
+    task = asyncio.create_task(asyncio.to_thread(_bdapps_ussd_send, session_id, address, screen.text, screen.end))
+    _background.add(task)
+    task.add_done_callback(_background.discard)
+    return {"statusCode": "S1000", "statusDetail": "Success"}
 
 
 # --- voice ---------------------------------------------------------------------
@@ -368,3 +377,49 @@ async def bridge_voice_say(payload: Say, request: Request) -> dict:
         raise HTTPException(502, str(exc))
     return {"audio_b64": base64.b64encode(audio.data).decode("ascii"), "audio_type": audio.content_type,
             "tts": used}
+
+
+# --- keypad menu on a call (backend/channels/voice/ivr.py) ------------------------
+
+
+class Keys(BaseModel):
+    msisdn: str
+    call_id: str
+    keys: str                     # one key, or digits ended by '#'
+
+
+_KEYS = re.compile(r"^[0-9*#]{1,12}$")
+
+
+async def _ivr(payload: Keys, wav: bool) -> dict:
+    import base64
+
+    from backend.channels.voice import ivr, speech
+    if not _KEYS.match(payload.keys):
+        raise HTTPException(422, "keys must be 0-9, * or #")
+    try:
+        out = await ivr.keys(payload.msisdn, payload.call_id, payload.keys)
+    except InvalidMsisdnError as exc:
+        raise HTTPException(422, str(exc))
+    out.update(audio_b64=None, audio_type=None)
+    try:
+        audio, used = await asyncio.to_thread(speech.synthesize, out["text"], None, wav)
+        out.update(audio_b64=base64.b64encode(audio.data).decode("ascii"), audio_type=audio.content_type,
+                   tts=used)
+    except speech.SpeechError as exc:
+        out["tts_error"] = str(exc)  # the text still shows; say why there is no audio
+    return out
+
+
+@router.post("/emulator/voice/keys")
+async def emulator_voice_keys(payload: Keys) -> dict:
+    """Keypad presses during the browser phone's call."""
+    _require_emulator()
+    return await _ivr(payload, wav=False)
+
+
+@router.post("/bridge/voice/keys")
+async def bridge_voice_keys(payload: Keys, request: Request) -> dict:
+    """Keypad tones detected in a real call's audio by the Phone Link bridge."""
+    _require_bridge_token(request)
+    return await _ivr(payload, wav=True)

@@ -15,7 +15,9 @@ In Voicemeeter: VAIO strip -> B1 only; AUX strip -> B2 only (optionally both
 hear themselves) or AUX to B1 (the bridge would hear itself).
 
 The call is half-duplex: while the agent thinks and speaks, caller audio is
-ignored; after the reply the bridge listens again. The agent runs on the
+ignored; after the reply the bridge listens again. Keypad tones in the caller's
+audio are detected (audio.DtmfDetector) and drive the USSD menu, spoken
+(voice/ivr.py); speech still goes to the agent. The agent runs on the
 backend through the token-protected /api/channels/bridge/voice/* routes, so
 identity, memory, trace and the SMS summary are exactly the other channels'.
 
@@ -24,6 +26,7 @@ Run (repo root, backend already running, BRIDGE_TOKEN set on both sides):
     python -m backend.channels.voice.phonelink --list-devices
     python -m backend.channels.voice.phonelink --test-capture      # speak on a call; watch the meter
     python -m backend.channels.voice.phonelink --test-playback     # the caller should hear a Bangla line
+    python -m backend.channels.voice.phonelink --test-dtmf         # press keys on the calling phone
     python -m backend.channels.voice.phonelink --auto-answer       # the real thing
 
 Limits, stated plainly: one call at a time (one SIM); the caller's number comes
@@ -46,12 +49,15 @@ import uuid
 import httpx
 import numpy as np
 
-from .audio import (FRAME_SAMPLES, IDLE, OFFHOOK, RINGING, SAMPLE_RATE, Segmenter, frames,
+from .audio import (FRAME_SAMPLES, IDLE, OFFHOOK, RINGING, SAMPLE_RATE, DtmfDetector, Segmenter, frames,
                     from_wav, parse_call_state, resample, to_wav)
 
 DEFAULT_CAPTURE = "Voicemeeter Out B1"
 DEFAULT_PLAYBACK = "Voicemeeter AUX Input"
-GREETING = "আসসালামু আলাইকুম। {brand} কৃষি পরামর্শে স্বাগতম। আপনার জেলা, জমির পরিমাণ আর প্রশ্ন বলুন।"
+GREETING = ("আসসালামু আলাইকুম। {brand} কৃষি পরামর্শে স্বাগতম। আপনার জেলা, জমির পরিমাণ আর প্রশ্ন বলুন। "
+            "অথবা মেনু শুনতে যেকোনো বোতাম চাপুন।")
+NUMBER_PAUSE_S = 3.0    # number entry ends with # or this long a pause
+SPEECH_AFTER_KEY_S = 1.5  # an utterance this close to a key press is key noise, not speech
 FILLER = "একটু অপেক্ষা করুন, দেখছি।"
 SORRY = "দুঃখিত, এখন উত্তর দিতে পারছি না। আবার বলুন।"
 _HOSTAPI_PREFERENCE = ("Windows DirectSound", "MME", "Windows WASAPI")
@@ -123,6 +129,10 @@ class Bridge:
         self.call_id: str | None = None
         self.number: str | None = None
         self.peak = 0  # loudest captured sample since the last level report
+        self.dtmf = DtmfDetector()
+        self.digits = ""          # number entry in progress
+        self.expect_number = False
+        self.last_key = 0.0
 
     # --- audio --------------------------------------------------------------------
 
@@ -188,6 +198,7 @@ class Bridge:
         except httpx.HTTPError as exc:
             print(f"hang-up report failed: {type(exc).__name__}", file=sys.stderr)
         self.call_id = self.number = None
+        self.digits, self.expect_number = "", False
         self._drain()
 
     def turn(self, utterance: bytes) -> None:
@@ -214,19 +225,57 @@ class Bridge:
 
     # --- main loop ------------------------------------------------------------------------
 
-    def feed(self) -> bytes | None:
-        """Move captured audio through resampling and VAD; return a finished utterance."""
+    def feed(self) -> tuple[bytes | None, list[str]]:
+        """Move captured audio through resampling, the keypad-tone detector and VAD;
+        return a finished utterance (if any) and the keys pressed."""
         try:
             chunk = self.q.get(timeout=0.1)
         except queue.Empty:
-            return None
+            return None, []
         self.buffer = np.concatenate([self.buffer, resample(chunk, self.in_rate, SAMPLE_RATE)])
         whole = (self.buffer.size // FRAME_SAMPLES) * FRAME_SAMPLES
-        done = None
+        done, pressed = None, []
         for frame in frames(self.buffer[:whole]):
+            key = self.dtmf.push(np.frombuffer(frame, dtype=np.int16))
+            if key:
+                pressed.append(key)
+                self.segmenter.reset()  # a tone is not speech: drop the partial utterance
+                continue
             done = self.segmenter.push(frame) or done
         self.buffer = self.buffer[whole:]
-        return done
+        return done, pressed
+
+    # --- keypad menu -----------------------------------------------------------------------
+
+    def on_key(self, key: str) -> None:
+        self.last_key = time.monotonic()
+        print(f"  key: {key}")
+        if self.expect_number and key not in "*":
+            if key == "#":
+                self.send_keys(self.digits + "#")
+            else:
+                self.digits += key
+            return
+        self.send_keys(key)
+
+    def send_keys(self, keys: str) -> None:
+        self.digits = ""
+        if not keys.strip("#"):
+            return
+        try:
+            r = self.http.post("/api/channels/bridge/voice/keys",
+                               json={"msisdn": self.number, "call_id": self.call_id, "keys": keys})
+            r.raise_for_status()
+            body = r.json()
+        except (httpx.HTTPError, ValueError) as exc:
+            print(f"keys failed: {exc}", file=sys.stderr)
+            self.say(SORRY)
+            return
+        print(f"  menu:  {body.get('screen', '')!r}")
+        self.expect_number = bool(body.get("expects_number"))
+        if body.get("audio_b64"):
+            self.play(*from_wav(base64.b64decode(body["audio_b64"])))
+        self._drain()
 
     def run(self, always_on: bool) -> None:
         with self.sd.InputStream(device=self.capture, samplerate=self.in_rate, channels=1,
@@ -255,8 +304,14 @@ class Bridge:
                     # Shows whether the caller's audio reaches the bridge at all.
                     print(f"  capture level: {self.peak * 100 // 32768}%")
                     self.peak, last_level = 0, time.monotonic()
-                utterance = self.feed()
-                if utterance and self.call_id:
+                utterance, pressed = self.feed()
+                if not self.call_id:
+                    continue
+                for key in pressed:
+                    self.on_key(key)
+                if self.digits and time.monotonic() - self.last_key > NUMBER_PAUSE_S:
+                    self.send_keys(self.digits)
+                if utterance and not self.digits and time.monotonic() - self.last_key > SPEECH_AFTER_KEY_S:
                     self.turn(utterance)
 
 
@@ -271,6 +326,19 @@ def _test_capture(device: int, seconds: float = 8.0) -> None:
         print(f"\r  peak level so far: {level:3d}% ", end="")
     sd.wait()
     print("\n  0% means nothing arrives: check Phone Link's speaker -> Voicemeeter Input, VAIO -> B1.")
+
+
+def _test_dtmf(device: int, seconds: float = 30.0) -> None:
+    import sounddevice as sd
+    rate = int(sd.query_devices(device)["default_samplerate"])
+    det = DtmfDetector()
+    print(f"listening {seconds:g}s — press keys on the calling phone")
+    rec = sd.rec(int(seconds * rate), samplerate=rate, channels=1, dtype="int16", device=device)
+    sd.wait()
+    pcm = resample(rec[:, 0], rate, SAMPLE_RATE)
+    heard = [k for f in frames(pcm[: (pcm.size // FRAME_SAMPLES) * FRAME_SAMPLES])
+             if (k := det.push(np.frombuffer(f, dtype=np.int16)))]
+    print(f"  keys heard: {' '.join(heard) or '(none — tones do not survive this path; use speech)'}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -288,6 +356,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--list-devices", action="store_true")
     ap.add_argument("--test-capture", action="store_true")
     ap.add_argument("--test-playback", action="store_true")
+    ap.add_argument("--test-dtmf", action="store_true",
+                    help="print keypad tones heard on a call (checks they survive the phone network)")
     args = ap.parse_args(argv)
 
     import sounddevice as sd
@@ -299,6 +369,9 @@ def main(argv: list[str] | None = None) -> int:
     capture, playback = find_device(args.capture, "input"), find_device(args.playback, "output")
     if args.test_capture:
         _test_capture(capture)
+        return 0
+    if args.test_dtmf:
+        _test_dtmf(capture)
         return 0
 
     token = os.environ.get("BRIDGE_TOKEN", "")

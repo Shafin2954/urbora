@@ -54,6 +54,8 @@ same tools:
 | Crop-problem menu (USSD 2) | any | **Working in the simulator.** Crop → stage → where → what it looks like → how much, by digits; a deterministic KB-bounded table names the likely causes, the SMS answer is a template (doses only as the source states them, scaled to the farmer's bigha by `units.py`); no KB coverage → referral to SAAO / 16123. Reports aggregate by district as a pest signal | `backend/kb/triage.py`, `backend/channels/triage_menu.py`; `CHANNELS_RESEARCH.md` §4 |
 | Voice call | any | **Push-to-talk in the browser emulator; real calls through Windows Phone Link built** (bridge + Voicemeeter, no root, no modem) — **the first real call on a paired phone is still to be run.** Sarvam speech verified live (below) | `backend/channels/voice/`, `phonelink.py` |
 | Proactive alerts by SMS | any | **Working** (opt-in loop) | `backend/channels/alerts_job.py` |
+| SMS menu mode (text মেনু) | any | **Working in the simulator** — the USSD menu over plain SMS, so button-phone menus work today without a short code | `backend/channels/sms_menu.py` |
+| Keypad on the hotline | any | **Working in the browser emulator; DTMF detection tested on synthetic tones (noise, 8 kHz), not yet on a real call** | `backend/channels/voice/audio.py` (`DtmfDetector`), `voice/ivr.py` |
 
 And two marketplaces that turn advice into action:
 
@@ -432,6 +434,27 @@ The webhook is idempotent: SMSGate retries a failed delivery for ~2 days, so eac
 id is handled once, signatures older than 5 minutes are refused, and an SMS older than
 15 minutes is recorded but not answered.
 
+**Real USSD through bdapps** (Robi/Airtel SIMs; free developer account):
+
+1. Register at [dev.bdapps.com](https://dev.bdapps.com) and create an app with **USSD** (and
+   SMS) enabled. Registration is free; bdapps charges subscribers per menu (~Tk 1–2), so ask
+   for a free/test tariff for the pilot. The service code (`*213*…#`) is assigned on approval.
+2. bdapps must reach the backend at a public **HTTPS** URL, and its outbound `/ussd/send`
+   only accepts calls from a whitelisted IP. Replit autoscale changes IP on every deploy, so
+   run the backend on the laptop and expose it with a free Cloudflare quick tunnel:
+   `cloudflared tunnel --url http://localhost:8000` → portal USSD URL
+   `https://<name>.trycloudflare.com/api/channels/ussd/bdapps`, SMS-MO URL
+   `…/api/channels/sms/bdapps`. (A quick-tunnel URL changes on restart; a free named tunnel
+   keeps it.)
+3. Portal **Allowed Host List** = the laptop's public IP (`curl ifconfig.me`; re-check on a
+   new network — `BDAPPS-PREFLIGHT-CHECKLIST.md`).
+4. `.env.local`: `BDAPPS_APP_ID`, `BDAPPS_PASSWORD`, `BDAPPS_MODE=live`. Test in the bdapps
+   web simulator first, then from a Robi SIM. Every screen already fits one Bangla USSD page.
+
+**SMS menu mode** (no short code needed): text **মেনু** (or `menu`) to the gateway phone and
+the same USSD menu arrives by SMS; reply with digits. Free text leaves the menu and goes to
+the agent. An unfinished USSD walk from the last 30 minutes is offered back.
+
 **Real voice calls through Windows Phone Link** (pilot, no root, no modem):
 
 1. `python -m pip install -r backend/requirements-voice-bridge.txt`; install
@@ -452,7 +475,11 @@ id is handled once, signatures older than 5 minutes are refused, and an SMS olde
    `python -m backend.channels.voice.phonelink --test-playback` (you hear the Bangla
    greeting when a call is up), `--test-capture` (speak on a call; the meter moves), and
    finally `python -m backend.channels.voice.phonelink --auto-answer`.
-5. The caller's number comes from ADB when Android reveals it; if yours hides it, pass
+5. **Keypad:** during a call the caller may press keys instead of speaking — the USSD menu is
+   read aloud ("ফসল পরামর্শ, 1 চাপুন"), numbers end with # or a pause, * repeats. A
+   crop-problem answer is spoken on the call and sent by SMS. Check first that key tones
+   survive your phone network: `--test-dtmf`, then press keys on the calling phone.
+6. The caller's number comes from ADB when Android reveals it; if yours hides it, pass
    `--caller <number>` for testing. One call at a time.
 
 A personal SIM is for a pilot only; production runs on the operator's IVR, USSD short

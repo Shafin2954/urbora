@@ -19,7 +19,7 @@ log = logging.getLogger("channels")
 WELCOME_SMS = (
     f"{BRAND_NAME}: কৃষি পরামর্শ\n"
     "প্রশ্ন লিখে SMS করুন, যেমন: রাজশাহীতে 2 বিঘা, রবি মৌসুমে কী চাষ করব?\n"
-    "অথবা কল করুন।"
+    "মেনু পেতে লিখুন: মেনু। অথবা কল করুন।"
 )
 
 
@@ -49,18 +49,31 @@ async def handle_inbound_sms(msisdn: str, text: str, provider_name: str,
     farm_id = farm_id_for(local)
     text = (text or "").strip()
 
-    # Marketplace keywords are handled before the agent sees the message.
-    from backend.market import sms_commands
-    reply_text = sms_commands.try_handle(local, text)
-    if reply_text is not None:
-        from backend.memory import store
-        store.upsert_contact(farm_id, local, mask(local), "sms")
+    from backend.memory import store
+
+    from . import sms_menu
+    store.upsert_contact(farm_id, local, mask(local), "sms")
+
+    # "মেনু" starts the USSD menu over SMS; digit replies continue an open walk.
+    # A farmer who leaves the menu with free text falls through to the agent.
+    if sms_menu.is_trigger(text) or sms_menu.is_open(farm_id):
         sms.record_inbound(farm_id, text, provider_name, ref)
-        sms.send_sms(farm_id, reply_text)
-        return None
+        if await sms_menu.try_handle(local, farm_id, text):
+            return None
+        recorded = True
+    else:
+        recorded = False
+        # Marketplace keywords are handled before the agent sees the message.
+        from backend.market import sms_commands
+        reply_text = sms_commands.try_handle(local, text)
+        if reply_text is not None:
+            sms.record_inbound(farm_id, text, provider_name, ref)
+            sms.send_sms(farm_id, reply_text)
+            return None
 
     reply = await run_channel_turn(local, text, "sms")
-    sms.record_inbound(farm_id, text, provider_name, ref)
+    if not recorded:
+        sms.record_inbound(farm_id, text, provider_name, ref)
     sms.send_sms(farm_id, reply.display_text())
     send_summary(reply)
     return reply

@@ -428,6 +428,17 @@ def save_ussd_state(ussd_session_id: str, farm_id: str, state: dict) -> None:
         conn.close()
 
 
+def get_ussd_state_at(ussd_session_id: str) -> tuple[dict, str] | None:
+    """A walk's state with its last-touched time (SMS menu mode expires idle walks)."""
+    conn = _connect()
+    try:
+        row = conn.execute("SELECT state_json, updated_at FROM ussd_sessions WHERE ussd_session_id=?",
+                           (ussd_session_id,)).fetchone()
+        return (json.loads(row[0]), row[1]) if row else None
+    finally:
+        conn.close()
+
+
 def latest_ussd_state(farm_id: str, exclude: str | None = None) -> tuple[dict, str] | None:
     """The farm's most recently touched USSD walk (state, updated_at), other than `exclude`."""
     conn = _connect()
