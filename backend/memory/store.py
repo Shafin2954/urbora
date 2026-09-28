@@ -113,6 +113,14 @@ def _connect() -> sqlite3.Connection:
             updated_at TEXT NOT NULL
         )"""
     )
+    # Webhook deliveries already handled: SMSGate retries a webhook for ~2 days,
+    # and a retried sms:received must not earn the farmer a second answer.
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS webhook_seen (
+            event_id TEXT PRIMARY KEY,
+            seen_at TEXT NOT NULL
+        )"""
+    )
     return conn
 
 
@@ -332,10 +340,30 @@ def log_sms(
         conn.close()
 
 
+# Delivery events arrive once per SMS part and out of order, so a status only
+# moves forward: a late "sent" must not overwrite "delivered".
+_SMS_STATUS_RANK = {"queued": 0, "sent": 1, "failed": 2, "cancelled": 2, "delivered": 3}
+
+
 def update_sms_status(provider_ref: str, status: str) -> bool:
     conn = _connect()
     try:
+        row = conn.execute("SELECT status FROM sms_log WHERE provider_ref=?", (provider_ref,)).fetchone()
+        if not row or _SMS_STATUS_RANK.get(status, 0) <= _SMS_STATUS_RANK.get(row[0], 0):
+            return False
         cur = conn.execute("UPDATE sms_log SET status=? WHERE provider_ref=?", (status, provider_ref))
+        conn.commit()
+        return cur.rowcount > 0
+    finally:
+        conn.close()
+
+
+def mark_webhook_seen(event_id: str) -> bool:
+    """Record a webhook delivery id. False if it was already handled."""
+    conn = _connect()
+    try:
+        cur = conn.execute("INSERT OR IGNORE INTO webhook_seen (event_id, seen_at) VALUES (?,?)",
+                           (event_id, _now()))
         conn.commit()
         return cur.rowcount > 0
     finally:

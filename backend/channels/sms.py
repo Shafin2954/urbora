@@ -4,10 +4,12 @@ Three providers behind one interface, chosen by `SMS_PROVIDER`:
 
 - `smsgate`   — a real Android phone running SMS Gateway for Android™
                 (capcom6/android-sms-gateway, Apache-2.0) in Local Server mode:
-                `POST http://<phone-ip>:8080/message`, Basic auth, body
+                `POST http://127.0.0.1:8080/message` over USB (`adb forward`,
+                set up by `backend/channels/bridge/phone_up.py`), Basic auth, body
                 `{"textMessage":{"text":…},"phoneNumbers":[…]}`. Real SMS over
                 the phone's SIM. Inbound SMS arrive as signed `sms:received`
-                webhooks (see `verify_smsgate_signature`).
+                webhooks to `http://127.0.0.1:8000` through `adb reverse` — the
+                only plain-HTTP webhook URL the app accepts.
 - `bdapps`    — bdapps `/sms/send` (encoding 16 = Bengali), through the same
                 client and simulator twin checkout already uses.
 - `simulator` — the default. Nothing leaves the machine; the message lands in
@@ -64,15 +66,22 @@ class SmsGateProvider:
     name = "smsgate"
     mode = "live"
 
-    def __init__(self, base_url: str, username: str, password: str, timeout: float = 15.0):
+    def __init__(self, base_url: str, username: str, password: str, timeout: float = 15.0,
+                 sim_number: int | None = None):
         if not (base_url and username and password):
             raise ValueError("SMSGate needs SMSGATE_URL, SMSGATE_USER and SMSGATE_PASSWORD.")
         self._url = base_url.rstrip("/")
         self._auth = (username, password)
         self._timeout = timeout
+        self._sim = sim_number
 
     def send(self, local_msisdn: str, text: str) -> SendResult:
-        body = {"textMessage": {"text": text}, "phoneNumbers": [f"+88{local_msisdn}"]}
+        # ttl: an answer that could not go out within an hour (phone off, no
+        # signal) is dropped rather than arriving hours later out of context.
+        body: dict = {"textMessage": {"text": text}, "phoneNumbers": [f"+88{local_msisdn}"],
+                      "withDeliveryReport": True, "ttl": 3600}
+        if self._sim:
+            body["simNumber"] = self._sim
         try:
             r = httpx.post(f"{self._url}/message", json=body, auth=self._auth, timeout=self._timeout)
         except httpx.HTTPError as exc:
@@ -104,8 +113,10 @@ class BdappsSmsProvider:
 def build_provider(name: str | None = None) -> SmsProvider:
     name = (name or os.environ.get("SMS_PROVIDER", "simulator")).strip().lower()
     if name == "smsgate":
-        return SmsGateProvider(os.environ.get("SMSGATE_URL", ""), os.environ.get("SMSGATE_USER", ""),
-                               os.environ.get("SMSGATE_PASSWORD", ""))
+        sim = os.environ.get("SMSGATE_SIM", "").strip()
+        return SmsGateProvider(os.environ.get("SMSGATE_URL", "http://127.0.0.1:8080"),
+                               os.environ.get("SMSGATE_USER", ""), os.environ.get("SMSGATE_PASSWORD", ""),
+                               sim_number=int(sim) if sim.isdigit() else None)
     if name == "bdapps":
         return BdappsSmsProvider()
     return SimulatorProvider()

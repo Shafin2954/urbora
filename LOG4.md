@@ -175,3 +175,30 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** STT, the agent and TTS all need the network mid-call.
 **Rejected:** Pre-recording every reply (the replies are generated).
 **Impacts:** ~40 min so far. README's Voicemeeter Potato steps need a Standard variant (this one). Windows default mic is Voicemeeter Out B1 during testing — old default (Microphone Array) saved; restore after.
+
+## [17:30] Plan for the channel push: real phone first, USSD hardened, three new features
+**Did:** Reviewed the state of every channel; committed the afternoon's Phone Link fixes (`8833326`). No new code yet.
+**Decision:** (team's answers)
+- Calls: the laptop gets internet from other Wi-Fi or a second phone; the Samsung only takes calls.
+- New features approved: **crop-problem triage menu** (USSD + IVR, digits only, answer by SMS from the KB), **keypad digits on the hotline** (DTMF detected in the call audio, beside speech), **SMS menu mode** (the USSD menu over plain SMS — works on any real phone with no short code).
+- Not approved now: missed-call callback.
+- Real USSD: team will create a bdapps account; emulator until it is approved. I write the portal steps.
+- Bug to fix first: USSD screens are tested at ≤182 chars, which is the GSM-7 limit; Bangla goes as UCS-2, where one screen holds ~80 code units (160 octets / 2). Most Bangla screens would be cut on a real network.
+**Why:** Button-phone farmers cannot type Bangla free text, so the "প্রশ্ন করুন" menu does not work for them; most 16123 calls are pest/disease questions, which the triage menu covers.
+**Rejected:** Twilio or any paid telephony (no budget); rooting the phone.
+**Impacts:** Order: SMS over USB (adb forward/reverse) → USSD screen budget + resume → triage → SMS menu → DTMF → docs/merge.
+
+## [18:05] SMS gateway hardened and set up over USB only
+**Did:**
+- `backend/channels/bridge/phone_up.py` (new): one command brings the phone up as the SMS gateway — waits for ADB, exempts `me.capcom.smsgateway` from battery optimisation, `adb forward tcp:8080` (laptop → phone API) + `adb reverse tcp:8000` (phone → backend), checks both ends, registers the 4 webhooks with fixed ids (re-run replaces, never duplicates), prints a checklist with the fix for each failure. `--watch` re-applies after a USB reconnect.
+- `backend/api/channels.py` webhook: signed webhooks must carry a timestamp within ±5 min; each event `id` handled once (`webhook_seen` table in `store.py`); an `sms:received` older than 15 min is recorded but not answered; `sms:cancelled` handled.
+- `store.update_sms_status` only moves forward (queued < sent < failed/cancelled < delivered) — delivery events arrive per part and out of order.
+- `sms.py`: `withDeliveryReport`, `ttl: 3600`, optional `SMSGATE_SIM`; `SMSGATE_URL` defaults to `http://127.0.0.1:8080`.
+- `bridge/adb.py`: UTF-8 decoding (same cp1252 crash as the call bridge).
+- README "Real SMS" rewritten for the USB route; "Real voice calls" now documents the Voicemeeter Standard route that worked, and the internet rule. `.env.example` updated.
+- `CHANNELS_RESEARCH.md` (new): the three research reports — USSD limits/timing, 16123 + rural context, SMSGate API facts, the KB-bounded crop-problem tree.
+- Tests: 6 new in `test_channels_sms.py`. Suite **588 passed**.
+**Decision:** Everything phone-side goes over USB (adb forward/reverse). No Wi-Fi, no tunnel, no TLS certificate.
+**Why:** SMSGate refuses plain-HTTP webhooks except to `http://127.0.0.1`, and the phone's hotspot is unreliable (drops during calls). USB is the one link that is always there when the phone is plugged in. SMSGate retries webhooks for ~2 days, so without the id check a backend restart could send a farmer a second answer, days late.
+**Rejected:** cloudflared/ngrok tunnel for webhooks (another moving part and an internet dependency); the phone's Wi-Fi IP (changes, and the laptop may not share its network).
+**Impacts:** Not yet run against the real phone (it was unplugged). First run: `python -m backend.channels.bridge.phone_up --watch` with SMSGATE_USER/PASSWORD in `.env.local`.

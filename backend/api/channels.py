@@ -21,12 +21,14 @@ import asyncio
 import json
 import logging
 import os
+import time
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
 from backend.channels import flows, sms
-from backend.channels.identity import InvalidMsisdnError, farm_id_for, normalise
+from backend.channels.identity import InvalidMsisdnError, farm_id_for, mask, normalise
 from backend.memory import store
 
 router = APIRouter(prefix="/api/channels", tags=["channels"])
@@ -64,25 +66,58 @@ async def status() -> dict:
     }
 
 
+SIGNATURE_WINDOW_S = 300      # SMSGate docs: reject timestamps more than ±5 min off
+STALE_SMS_S = 15 * 60         # a retried SMS older than this gets no answer
+
+
+def _received_age_s(received_at: str | None) -> float | None:
+    if not received_at:
+        return None
+    try:
+        when = datetime.fromisoformat(received_at.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if when.tzinfo is None:
+        return None
+    return (datetime.now(timezone.utc) - when).total_seconds()
+
+
 @router.post("/sms/smsgate")
 async def smsgate_webhook(request: Request, background: BackgroundTasks) -> dict:
+    """SMSGate webhook (docs.sms-gate.app/features/webhooks). It retries a failed
+    delivery for ~2 days, so every event id is handled once and a stale SMS is
+    recorded but not answered (a reply two days late is worse than none)."""
     raw = await request.body()
     key = os.environ.get("SMSGATE_SIGNING_KEY", "")
-    if key and not sms.verify_smsgate_signature(
-        raw, request.headers.get("X-Timestamp", ""), request.headers.get("X-Signature", ""), key
-    ):
-        raise HTTPException(401, "bad signature")
+    if key:
+        ts = request.headers.get("X-Timestamp", "")
+        if not sms.verify_smsgate_signature(raw, ts, request.headers.get("X-Signature", ""), key):
+            raise HTTPException(401, "bad signature")
+        if not ts.isdigit() or abs(time.time() - int(ts)) > SIGNATURE_WINDOW_S:
+            raise HTTPException(401, "stale signature")
     try:
         body = json.loads(raw or b"{}")
     except ValueError:
         raise HTTPException(400, "not JSON")
     event = body.get("event")
     payload = body.get("payload") or {}
+    if body.get("id") and not store.mark_webhook_seen(f"smsgate:{body['id']}"):
+        return {"ok": True, "duplicate": True}
     if event == "sms:received":
         sender, text = payload.get("sender") or payload.get("phoneNumber"), payload.get("message", "")
-        if sender:
-            background.add_task(_answer_sms, sender, text, "smsgate", payload.get("messageId"))
-    elif event in ("sms:sent", "sms:delivered", "sms:failed"):
+        if not sender:
+            return {"ok": True}
+        age = _received_age_s(payload.get("receivedAt"))
+        if age is not None and age > STALE_SMS_S:
+            log.warning("SMS from %s is %.0f min old (webhook retry); recorded, not answered",
+                        mask(sender), age / 60)
+            try:
+                sms.record_inbound(farm_id_for(sender), text, "smsgate", payload.get("messageId"))
+            except InvalidMsisdnError:
+                pass
+            return {"ok": True, "stale": True}
+        background.add_task(_answer_sms, sender, text, "smsgate", payload.get("messageId"))
+    elif event in ("sms:sent", "sms:delivered", "sms:failed", "sms:cancelled"):
         ref = payload.get("messageId") or body.get("id")
         if ref:
             store.update_sms_status(ref, event.split(":", 1)[1])

@@ -90,7 +90,8 @@ def test_smsgate_request_shape(monkeypatch):
     monkeypatch.setattr(sms.httpx, "post", fake_post)
     res = sms.SmsGateProvider("http://10.0.0.5:8080/", "u", "p").send(PHONE, "হ্যালো")
     assert captured["url"] == "http://10.0.0.5:8080/message"
-    assert captured["json"] == {"textMessage": {"text": "হ্যালো"}, "phoneNumbers": ["+8801812345678"]}
+    assert captured["json"] == {"textMessage": {"text": "হ্যালো"}, "phoneNumbers": ["+8801812345678"],
+                                "withDeliveryReport": True, "ttl": 3600}
     assert captured["auth"] == ("u", "p")
     assert res.status == "queued" and res.provider_ref == "abc"
 
@@ -119,8 +120,9 @@ def client(monkeypatch):
     return c
 
 
-def _webhook(event, payload):
-    return json.dumps({"event": event, "id": "e1", "deviceId": "d", "webhookId": "w", "payload": payload}).encode()
+def _webhook(event, payload, event_id="e1"):
+    return json.dumps({"event": event, "id": event_id, "deviceId": "d", "webhookId": "w",
+                       "payload": payload}).encode()
 
 
 def test_smsgate_webhook_answers_in_background(client):
@@ -136,6 +138,54 @@ def test_smsgate_webhook_rejects_a_bad_signature(client, monkeypatch):
     r = client.post("/api/channels/sms/smsgate", content=raw,
                     headers={"X-Timestamp": "1", "X-Signature": "bad"})
     assert r.status_code == 401 and client.calls == []
+
+
+def test_smsgate_retry_of_the_same_event_is_answered_once(client):
+    raw = _webhook("sms:received", {"messageId": "m1", "message": "ধান?", "sender": PHONE}, "ev-7")
+    client.post("/api/channels/sms/smsgate", content=raw)
+    r = client.post("/api/channels/sms/smsgate", content=raw)
+    assert r.json().get("duplicate") is True
+    assert len(client.calls) == 1
+
+
+def test_smsgate_stale_sms_is_recorded_not_answered(client):
+    fid = _register()
+    raw = _webhook("sms:received", {"messageId": "m2", "message": "পুরনো", "sender": PHONE,
+                                    "receivedAt": "2026-01-01T08:00:00.000+06:00"}, "ev-8")
+    r = client.post("/api/channels/sms/smsgate", content=raw)
+    assert r.json().get("stale") is True and client.calls == []
+    assert store.list_sms(fid)[0]["body"] == "পুরনো"
+
+
+def test_smsgate_signed_webhook_needs_a_fresh_timestamp(client, monkeypatch):
+    import time as _time
+    monkeypatch.setenv("SMSGATE_SIGNING_KEY", "k")
+    raw = _webhook("sms:received", {"messageId": "m3", "message": "x", "sender": PHONE}, "ev-9")
+
+    def sign(ts):
+        return {"X-Timestamp": ts, "X-Signature": hmac.new(b"k", raw + ts.encode(), hashlib.sha256).hexdigest()}
+
+    old = client.post("/api/channels/sms/smsgate", content=raw, headers=sign(str(int(_time.time()) - 3600)))
+    assert old.status_code == 401 and client.calls == []
+    fresh = client.post("/api/channels/sms/smsgate", content=raw, headers=sign(str(int(_time.time()))))
+    assert fresh.status_code == 200 and len(client.calls) == 1
+
+
+def test_delivery_status_never_moves_backwards(client):
+    fid = _register()
+    store.log_sms(fid, "out", "x", 2, "smsgate", "queued", "m10")
+    client.post("/api/channels/sms/smsgate", content=_webhook("sms:delivered", {"messageId": "m10"}, "d1"))
+    client.post("/api/channels/sms/smsgate", content=_webhook("sms:sent", {"messageId": "m10"}, "d2"))
+    assert store.list_sms(fid)[0]["status"] == "delivered"
+
+
+def test_phone_up_registers_every_event_on_loopback():
+    from backend.channels.bridge.phone_up import EVENTS, webhook_registrations
+    regs = webhook_registrations(8000)
+    assert [r["event"] for r in regs] == list(EVENTS)
+    assert len({r["id"] for r in regs}) == len(regs)
+    # SMSGate accepts plain HTTP only for 127.0.0.1 (reached through adb reverse).
+    assert all(r["url"] == "http://127.0.0.1:8000/api/channels/sms/smsgate" for r in regs)
 
 
 def test_delivery_events_update_status(client):

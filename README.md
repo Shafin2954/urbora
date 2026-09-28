@@ -409,17 +409,27 @@ Then open `http://localhost:5173/#/phone` (button-phone emulator), `#/monitor`
 (live phone conversations) and `#/market`. With the default `SMS_PROVIDER=simulator`
 nothing leaves the machine and the emulator's inbox shows every SMS.
 
-**Real SMS through an Android phone** (pilot):
+**Real SMS through an Android phone** (pilot, USB only — no Wi-Fi needed):
 
-1. Install **SMS Gateway for Android** (SMSGate) on the phone, enable *Local Server*,
-   note the address, username and password it shows.
-2. In `.env`: `SMS_PROVIDER=smsgate`, `SMSGATE_URL=http://<phone-ip>:8080`,
-   `SMSGATE_USER`, `SMSGATE_PASSWORD`, and a long random `CHANNEL_ID_SALT`.
-3. Register a webhook on the phone for `sms:received` (and `sms:delivered`) pointing at
-   `http://<backend>/api/channels/sms/smsgate`; set the app's signing key as
-   `SMSGATE_SIGNING_KEY` so unsigned calls are refused.
-4. Missed calls: plug the phone in with USB debugging on, set `BRIDGE_TOKEN` on both
-   sides, and run `python -m backend.channels.bridge.adb --backend http://<backend>`.
+1. Install **SMS Gateway for Android** (SMSGate, `me.capcom.smsgateway`) from its
+   [GitHub releases](https://github.com/capcom6/android-sms-gateway/releases). In the app:
+   turn on *Local Server*, tap *Offline* so it shows *Online*, and note the username and
+   password. Samsung: set the app's battery use to *Unrestricted*.
+2. In `.env.local`: `SMS_PROVIDER=smsgate`, `SMSGATE_USER`, `SMSGATE_PASSWORD`, and the
+   app's Settings → Webhooks → Signing Key as `SMSGATE_SIGNING_KEY`. `SMSGATE_URL`
+   defaults to `http://127.0.0.1:8080`. Optional `SMSGATE_SIM=1|2` on a dual-SIM phone.
+3. Start the backend, plug the phone in with USB debugging on, then run
+   `python -m backend.channels.bridge.phone_up --watch`. It exempts the app from battery
+   optimisation, opens `adb forward tcp:8080` (laptop → phone API) and `adb reverse
+   tcp:8000` (phone → backend), and registers the `sms:received/sent/delivered/failed`
+   webhooks at `http://127.0.0.1:8000/api/channels/sms/smsgate` — the only plain-HTTP
+   webhook address SMSGate accepts. `--watch` re-applies the tunnels after a reconnect.
+4. Missed calls: set `BRIDGE_TOKEN` on both sides and run
+   `python -m backend.channels.bridge.adb --backend http://127.0.0.1:8000`.
+
+The webhook is idempotent: SMSGate retries a failed delivery for ~2 days, so each event
+id is handled once, signatures older than 5 minutes are refused, and an SMS older than
+15 minutes is recorded but not answered.
 
 **Real voice calls through Windows Phone Link** (pilot, no root, no modem):
 
@@ -428,9 +438,15 @@ nothing leaves the machine and the emulator's inbox shows every SMS.
    the bridge also finds the Android SDK copy on its own).
 2. Phone: install **Link to Windows**; PC: **Phone Link** → Calls → pair over Bluetooth.
    Make a test call from the PC to confirm call audio plays on the laptop.
-3. Windows Settings → Sound → Volume mixer → Phone Link: **output** = "Voicemeeter Input",
-   **input** = "Voicemeeter Out B2". In Voicemeeter: the VAIO strip → **B1** only, the AUX
-   strip → **B2** only (both → A1 too if you want to listen in).
+3. Audio route (verified on a real call with **Voicemeeter Standard**, LOG4 [16:40]):
+   caller → Phone Link → **Speakers** → **Stereo Mix** (enable it under Sound → Recording)
+   → bridge; bridge → **Voicemeeter Input** (VAIO strip → **B1** only) → **Voicemeeter
+   Out B1**, set as the Windows default microphone → Phone Link. Set Voicemeeter's A1 to
+   the speakers so its engine runs. Run the bridge with
+   `--capture "Stereo Mix" --playback "Voicemeeter Input"`. (With Voicemeeter Potato the
+   AUX → B2 route in the bridge's defaults works instead.)
+   **The laptop must not take its internet from the phone that answers calls** — Android
+   drops mobile data during a non-VoLTE call, and STT/agent/TTS need the network.
 4. `BRIDGE_TOKEN` in `.env.local` (same value the backend reads), backend running, then:
    `python -m backend.channels.voice.phonelink --test-playback` (you hear the Bangla
    greeting when a call is up), `--test-capture` (speak on a call; the meter moves), and
