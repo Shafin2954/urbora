@@ -253,3 +253,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** First live proof of a button-phone flow end to end.
 **Rejected:** none.
 **Impacts:** Still unverified live: voice call (needs a second phone), keypad tones, bdapps USSD.
+
+## [01:20] Plan: farmer profiles and return-visit personalization (proposal, not built)
+**Did:** Wrote `PROFILE_PLAN.md` from the team's brief: profile per phone in three layers (who / land / season) with source + date on every fact and freshness rules; episode memory with follow-ups; a deterministic return briefing (days since last contact, stage computed from the sowing date, due tasks, open follow-ups, stale facts); gap buckets decided in code (same day / 1–7 d / 8–45 d / harvest / new season / >12 months) that set what the agent leads with; outcome capture (yield, price) as the impact metric; consent, "তথ্য মুছুন", shared-phone handling. Build order ≈1.5 days in three steps.
+**Decision:** Build on the existing farm id, `farms` table and fresh-session injection; the briefing replaces the raw profile dump. Dates and stages are computed in code, never by the model.
+**Why:** The team wants a farmer to never repeat himself, and the next question to depend on how long he has been away.
+**Rejected:** Letting the model infer "how long since" or the crop stage from history (rule 1); storing free-text LLM summaries with figures (rule 15).
+**Impacts:** Next session is the Round 1 docs (team's call); this plan is ready for the docs' "solution" section and for a later build.

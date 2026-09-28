@@ -37,6 +37,8 @@ Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
 - `backend/channels/sms_menu.py` — "মেনু" → USSD menu over SMS (checked first in `flows.handle_inbound_sms`).
 - `backend/channels/voice/audio.py` `DtmfDetector` + `voice/ivr.py` (keys → spoken USSD menu); routes `/api/channels/{emulator,bridge}/voice/keys`; `phonelink --test-dtmf`.
 - `.claude/launch.json` — dev servers: backend :8000 (reload), frontend :5000.
+- `PROFILE_PLAN.md` — plan (not built) for farmer profiles + return-visit personalization.
+- `FUTUREMAKERS_BRIEF.md` — competition Round 1 requirements, judging criteria, IP terms.
 - `backend/market/` — `db.py` (market tables in the same SQLite file), `catalog.py`
   (generic inputs), `ranking.py` (price/distance/stock/trust), `inputs.py`
   (`find_inputs` tool, orders + state machine, dealers, SMS), `produce.py`
