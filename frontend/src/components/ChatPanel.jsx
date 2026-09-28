@@ -178,9 +178,15 @@ export default function ChatPanel({
         )}
 
         {error && (
-          <p className="error" role="alert">
-            {error}
-          </p>
+          // The farmer gets a plain Bangla apology; the raw error (English,
+          // developer-facing) stays one tap away for whoever is debugging.
+          <div className="error" role="alert">
+            <p>{t('chat.failed')}</p>
+            <details className="error-detail">
+              <summary>{t('chat.failedDetail')}</summary>
+              <code>{error}</code>
+            </details>
+          </div>
         )}
 
         <div ref={endRef} />

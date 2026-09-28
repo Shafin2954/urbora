@@ -3,6 +3,47 @@
 Map of the tree. Update after any unit of work so nothing has to be re-explored.
 "?" = not yet known / not yet built.
 
+## FutureMakers round (September 2026) — read this first
+Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
+- `backend/branding.py`, `frontend/src/branding.js` — the product name: **Agrosfeer**.
+- `backend/env.py` — loads `.env.local` > `backend/.env` > `.env` (both configs use it).
+- `backend/agent/intake_guard.py` — refuses planning tools on district/soil/water/season the farmer never stated.
+- `backend/channels/voice/audio.py` (pure audio helpers + VAD segmenter + ADB call-state parser) and
+  `voice/phonelink.py` (real calls via Windows Phone Link + Voicemeeter; optional deps in
+  `backend/requirements-voice-bridge.txt`); routes `/api/channels/bridge/voice/*`.
+- `backend/tests/conftest.py` — clears provider env vars so tests stay hermetic.
+- `backend/channels/` — phone channels. `identity.py` (phone → `ph-<hmac>` farm id;
+  sessions per phone per day, voice per call), `adapter.py` (`run_channel_turn`:
+  drains `run_turn` into text + numbered `Menu` + plan/finance + redacted events;
+  digit replies map back to option labels), `sms_text.py` (GSM-7/UCS-2 segment
+  math, `fit`, template `plan_summary_sms`), `sms.py` (providers smsgate / bdapps /
+  simulator; `send_sms(farm_id, text)`), `flows.py` (inbound SMS, missed call,
+  summary), `ussd.py` (pure `step()` state machine + `ussd_request` runtime; agent
+  work runs as background actions → SMS), `alerts_job.py` (rain-conflict SMS once
+  per alert), `voice/speech.py` (Sarvam/OpenAI/Azure STT+TTS over httpx),
+  `voice/turn.py` (`voice_turn`, `hang_up` → SMS summary), `bridge/adb.py`
+  (missed-call watcher over ADB).
+- `backend/agent/loop.py` — `run_turn(..., channel=)` + `CHANNEL_NOTES`.
+- `backend/market/` — `db.py` (market tables in the same SQLite file), `catalog.py`
+  (generic inputs), `ranking.py` (price/distance/stock/trust), `inputs.py`
+  (`find_inputs` tool, orders + state machine, dealers, SMS), `produce.py`
+  (listings + price guide, offers, accept/contacts), `sms_commands.py` (বিক্রি /
+  গ্রহণ / dealer হ্যাঁ…), `ussd_menus.py` (menus 4 and 5), `seed_demo.py`.
+- `backend/finance/market.py` — order totals, commission (dealer pays), packs,
+  produce deal fee (buyer pays). Decimal.
+- `backend/api/channels.py` (`/api/channels/*`: SMSGate/bdapps webhooks, emulator
+  SMS/USSD/voice/missed-call/inbox — only in simulator mode —, monitor sessions,
+  bridge, alert scan) and `backend/api/market.py` (`/api/market/*`).
+- `backend/memory/store.py` — new tables `contacts` (the only raw phone numbers),
+  `channel_turns`, `sms_log`, `ussd_sessions`, `alert_sms`.
+- Frontend hash routes (`frontend/src/Root.jsx`): `#/phone` (`pages/PhonePage.jsx`,
+  `VoiceCall.jsx`), `#/monitor` (`components/ChannelMonitor.jsx` → `GraphPanel`),
+  `#/market` (`pages/MarketPage.jsx`), `#/dealer`, `#/buyer`
+  (`pages/PartnerPages.jsx`). API clients `src/api/channels.js`, `src/api/market.js`.
+- Tests: `backend/tests/test_channels_{core,sms,ussd,voice}.py`,
+  `backend/tests/test_market.py`, `tests/test_market_finance.py`. Suite 562 green.
+- Gone: `data/agristats.db` (0-byte decoy), `NodeInspector.jsx`, `TracePanel.jsx`.
+
 ## Ownership
 **Single operator since H10.5** (LOG3 [10:30]) — the whole tree. The A/B labels below
 are historical: they say who originally wrote a thing, not who may touch it. Current

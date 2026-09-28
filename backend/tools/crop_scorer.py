@@ -45,6 +45,7 @@ from .cropdb import (
     yield_track_record,
 )
 from .districts import lookup_district
+from backend.branding import BRAND_NAME
 from .districts import DISTRICTS
 from backend.units import to_hectares
 
@@ -78,7 +79,7 @@ class CropFacts:
     rain_opt_mm: tuple[float, float] # (lo, hi) optimal total rain over growing months
     growing_months: frozenset[int]   # 1-12
     source_id: str = "crop_facts"
-    source_title: str = "AgriSense crop agronomy facts"
+    source_title: str = f"{BRAND_NAME} crop agronomy facts"
     locator: str | None = None
 
 
@@ -153,7 +154,7 @@ def _unavailable_component(name: str, max_points: float, reason: str, now: str) 
             "unavailable",
             source_type="computed",
             source_id="crop_scorer",
-            source_title="AgriSense crop scorer",
+            source_title=f"{BRAND_NAME} crop scorer",
             confidence="low",
             formula=reason,
             retrieved_at=now,
@@ -367,7 +368,7 @@ def _district_track_record(crop: str, district: str, now: str) -> tuple[ScoreCom
             points,
             source_type="computed",
             source_id="crop_scorer",
-            source_title="AgriSense crop scorer",
+            source_title=f"{BRAND_NAME} crop scorer",
             formula=(
                 f"percentile {pct} -> 0-18 scale + Holt trend '{trend}' "
                 f"adjustment {trend_adj:+.0f}"

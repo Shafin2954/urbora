@@ -1,12 +1,21 @@
-# AgriSense AI
+# Agrosfeer (অ্যাগ্রোস্ফিয়ার)
 
-A Bangla-first web app where a smallholder farmer talks to an autonomous agent that
-produces a costed, weather-grounded season plan for their specific farm — and
-every number in that plan carries provenance you can inspect.
+A Bangla-first farm advisor that a smallholder farmer can reach from **any phone**:
+a voice call, a USSD code, an SMS, or the web app. One autonomous agent produces a
+costed, weather-grounded season plan for their specific farm — every number in it
+carries provenance you can inspect — and then helps them act on it: buy the right
+inputs from a nearby dealer, and sell the harvest directly to buyers.
 
-The demo is live at [https://team-fixeth-agri-sense--Shafin54.replit.app](https://team-fixeth-agri-sense--Shafin54.replit.app).
+The web demo is live at [https://team-fixeth-agri-sense--Shafin54.replit.app](https://team-fixeth-agri-sense--Shafin54.replit.app).
 
-Built for the IUT 12th ICT Fest Bdapps Agentic AI Hackathon, 24–25 July 2026.
+- **July 2026:** built for the IUT 12th ICT Fest Bdapps Agentic AI Hackathon
+  (the web advisor; tag `tier0-stable`).
+- **September 2026:** entered in **Grameenphone FutureMakers 2026**, track
+  *Digital Inclusion & Education*. This round added the button-phone channels and the
+  two marketplaces — see [New in the FutureMakers round](#new-in-the-futuremakers-round)
+  and `LOG4.md`. The product was renamed from its hackathon working name, AgriSense,
+  to **Agrosfeer**; the name is one constant (`backend/branding.py`,
+  `frontend/src/branding.js`, or `BRAND_NAME` in `.env`).
 
 ---
 
@@ -29,6 +38,56 @@ Where data is missing, the app says so — in Bangla, to the farmer, and in the
 trace, to you. That honesty is the product, not a limitation of it.
 
 ---
+
+## New in the FutureMakers round
+
+Only about 1 in 4 rural mobile users in Bangladesh owns a smartphone (GSMA, 2024),
+so the advisor now has four doors onto the same agent, the same farm memory and the
+same tools:
+
+| Door | Phone | Status | Where |
+|---|---|---|---|
+| Web app | smartphone | **Working** (the July build) | `frontend/`, `POST /api/chat` |
+| SMS | any | **Working in the simulator; real SMS via an Android phone is built but not yet run on a device** | `backend/channels/sms.py`, `flows.py`; `POST /api/channels/sms/smsgate` |
+| Missed call → SMS | any | **Working in the simulator; ADB bridge built, not yet run on a device** | `backend/channels/bridge/adb.py` |
+| USSD `*code#` | any | **Working in the simulator** (a real short code needs operator provisioning); bdapps request/response shape implemented | `backend/channels/ussd.py`; `POST /api/channels/ussd/bdapps` |
+| Voice call | any | **Push-to-talk in the browser emulator; real calls through Windows Phone Link built** (bridge + Voicemeeter, no root, no modem) — **the first real call on a paired phone is still to be run.** Sarvam speech verified live (below) | `backend/channels/voice/`, `phonelink.py` |
+| Proactive alerts by SMS | any | **Working** (opt-in loop) | `backend/channels/alerts_job.py` |
+
+And two marketplaces that turn advice into action:
+
+| Marketplace | Status | Where |
+|---|---|---|
+| **Input marketplace** — the agent's `find_inputs` tool ranks nearby dealers (price 40, distance 30, stock 15, trust 15; no paid placement); order on the web, USSD menu 4 or SMS; the dealer confirms by SMS; commission paid by the dealer | **Working, with demo dealers** (labelled ডেমো everywhere) | `backend/market/inputs.py`, `ranking.py`; `#/market`, `#/dealer` |
+| **Produce marketplace** — the farmer lists the harvest (`বিক্রি আলু 500 কেজি 22 টাকা`), sees a cited price guide, buyers offer, the farmer accepts with one SMS reply; the platform fee is paid by the buyer | **Working, with demo buyers** | `backend/market/produce.py`; `#/market`, `#/buyer` |
+
+Try it: `#/phone` is a button-phone emulator (dial `*3700#`, SMS, missed call, call),
+`#/monitor` replays every phone conversation into the provenance graph, `#/market` is
+the farmer's marketplace. Everything simulated is labelled **সিমুলেটর** or **ডেমো**.
+
+### What never changed
+
+Every channel runs the same agent under the same rules: numbers come only from tool
+results (the LLM never does arithmetic or ranks — crops *or* dealers), every price
+carries provenance, and a missing source is said out loud. SMS and USSD numbers are
+inserted by templates from tool payloads (`backend/channels/sms_text.py`: the ranking
+and the plan/cost summary), never written by the model — the agent's SMS prose is told
+to carry no figures. And the agent may not plan on farm facts the farmer never gave:
+`backend/agent/intake_guard.py` refuses `crop_scorer` / `finance_projection` /
+`season_plan` / `simulate_budget` when the district, soil, water or season in their
+parameters is not in the farmer's messages or saved profile (found live: a garbled SMS
+had produced a ranking for an invented district). Phone numbers are stored in one table (`contacts`); everything
+else keys on a salted hash, and traces show the last 3 digits only.
+
+### Tool choices (researched September 2026)
+
+| Need | Choice | Why |
+|---|---|---|
+| Bangla speech-to-text | **Sarvam** (`saaras:v3`), OpenAI `gpt-4o-transcribe` as fallback | A Sep-2026 Bangla benchmark over 1,001 clips ([riverbornai](https://github.com/riverbornai/bangla-speech-to-text-benchmark/releases/tag/v1.0.0)) measured Sarvam at 6.9% CER vs 28.7% for `gpt-4o-transcribe`. **Verified here 2026-09-28:** Sarvam TTS → Sarvam STT on the July district-name sentence ("আমার দিনাজপুরে এক বিঘা জমি আছে…") came back exact, also after squeezing the audio to 8 kHz telephone band (TTS 2.2 s, STT 1.2 s). That is synthetic speech; real farmers' voices are the next test |
+| Bangla text-to-speech | Sarvam Bulbul, Azure `bn-BD` (Dhaka accent) or OpenAI — a config switch | To be chosen by a listening test |
+| SMS gateway (pilot) | [SMSGate](https://github.com/capcom6/android-sms-gateway) on an Android phone (Apache-2.0, local-server REST + signed webhooks) | Free, real SMS |
+| Real phone calls (pilot) | **Windows Phone Link + Voicemeeter** (both free); a Quectel EC2x USB modem is the later, laptop-free option | An Android phone cannot hand call audio to an app without root, but Phone Link makes the laptop the phone's Bluetooth hands-free, and Voicemeeter turns its speaker/mic into cables the bridge can use |
+| USSD emulator, marketplace | Own code | Existing USSD simulators speak other operators' formats; a separate commerce stack (e.g. Medusa) would duplicate our Decimal finance engine |
 
 ## Agent System Architecture
 
@@ -68,7 +127,7 @@ through the live agent and UI, not just that the code exists.
 
 | Capability | Status | Notes |
 |---|---|---|
-| Marketplace / supplier comparison | **Not implemented** | Out of scope. Note that the checkout basket below is built from the agent's own cited input costs, not from a supplier catalog — there is no supplier catalog, mock or real |
+| Marketplace / supplier comparison | **Done (FutureMakers round), with demo dealers** | `find_inputs` ranks dealers by price, distance, stock and trust, deterministically; see "New in the FutureMakers round" |
 | Market price intelligence (sell-now/wait) | **Done** | `market_price` tool (`backend/tools/market_price.py`) over `agristats.db :: fact_prices` — 83,097 BBS Yearbook monthly wholesale rows, 2007-08 to 2025. Returns the 12-month historical price curve in Tk/kg plus a deterministic sell-now / consider-storing reading. Three constraints are structural, not disclaimers: it is labelled `basis: historical_pattern` and `not_a_forecast` (the same discipline `weather.py` applies to climatology); it is labelled `is_farm_gate: false`, because these are wholesale prices and revenue may only come from the cited farm-gate table in `data/prices.md`; and `storage_cost_bdt` is null because no source in this project prices storage or spoilage, so a "store" reading is an upside **before** costs. See "Why retail prices cannot become revenue" below |
 | Plant disease detection from images | **Done, with a stated limitation** | `POST /api/diagnose/image` runs `linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification` (MobileNetV2 fine-tuned on PlantVillage, 38 classes) locally on CPU — no image leaves the machine. Camera button in the composer. **Two limitations ship inside every response, not as a footnote:** (1) of our five crops, PlantVillage's label set covers **potato only** — rice, mustard and lentil are absent from it entirely, and a closed-set classifier will still return a confident label for them, so every result reports `is_supported_crop` and an out-of-scope warning in Bangla when the predicted crop is not one we advise on; (2) PlantVillage is **laboratory imagery** (single detached leaves, uniform background), so accuracy on a real field photo is materially lower than the headline benchmark — the result says so and tells the farmer to treat it as a second opinion. Dependencies are **optional** (`backend/requirements-vision.txt`, ~200 MB of CPU torch): without them the backend still starts, `GET /api/diagnose/status` reports `available: false`, and the UI hides the camera button rather than offering an upload that will fail |
 | bdapps Payment Gateway Integration | **Done, simulator mode.** The payments module (`backend/payments/`: `client.py`, `msisdn.py`, `service.py`, `simulator.py`) is now wired end to end: a `কেনাকাটা` tab appears when a basket exists, and runs quote -> confirmation -> charge -> Bangla SMS receipt through `POST /api/checkout/quote` and `POST /api/checkout`. The confirmation gate is enforced **server-side** — a charge without a registered, unexpired quote is refused with 409, so it is a guarantee rather than a UI convention. The mode badge reads whatever `GET /api/checkout/mode` reports off the client object actually in use, and says `unknown` if the server did not answer, because guessing "simulator" in the wrong direction is exactly the failure CLAUDE.md rule 13 exists to prevent. **No real money moves.** The basket is derived from the agent's own cited input-cost lines, and only from purchasable ones — BBS's boro/aman/potato cost rows are a single aggregate figure in `ha`, so those crops get no checkout rather than a fabricated product list. |
@@ -98,12 +157,16 @@ competitive submission — Tier 1 above it is where this build differentiates.
 | Checkout basket contents | Derived from `finance_projection`'s cited input-cost lines | **Real, cited.** Not a product catalog — there is no supplier catalog in this project |
 | Historic monthly wholesale prices (sell/store timing) | `agristats.db :: fact_prices`, BBS Yearbook, 83,097 rows, 2007-08 to 2025 | **Real, cited.** Used only for the seasonal *pattern*; flagged `not_a_forecast` and `is_farm_gate: false` so it can never become revenue |
 | Pest and disease risk rules | Stage windows from the same cited sources as `season_plan`; treatment text from the 14 cited pest/disease KB passages; triggers from live Open-Meteo forecast + humidity | **Real, cited.** The risk *level* is computed, not retrieved — the formula is returned with every risk |
-| **Pesticide / fungicide prices** | — | **MISSING, and reported as missing.** No citable Tk price for any spray exists in any source we hold, so `pest_risk` returns `treatment_cost_bdt: null` with a Bangla note telling the farmer to ask a local dealer. Tier 1 asks for an estimated treatment cost; we do not have one and did not invent one |
+| **Pesticide / fungicide prices** | — | **MISSING from public sources, and reported as missing.** `pest_risk` still returns `treatment_cost_bdt: null`. The only spray price the agent may quote is a dealer's dated marketplace listing (`find_inputs`, provenance `source_type: listing`). The seeded demo listings' spray prices are **invented demo values**, labelled `[DEMO]` and "ডেমো দোকান" |
 | **Seed prices** | — | **MOCK / ABSENT.** No centralised Bangladeshi seed price source was found. Seed cost is therefore **not included** in any projection: `agristats.db`'s `fact_seed` carries national supply/demand tonnage only (no price column), and the mustard/lentil cost rows are explicitly fertiliser-only. Every affected figure is labelled a minimum bound rather than silently completed with a guessed seed price |
 | Leaf-photo disease classification | `linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification` (PlantVillage, 38 classes), CPU, local | **Real model, narrow scope.** Covers potato among our five crops; rice/mustard/lentil are not in its label set and are reported as out-of-scope rather than diagnosed. Lab-trained, so field-photo accuracy is lower — stated in every response |
 | Bangla speech-to-text | OpenAI `gpt-4o-transcribe`, live | **Real.** The farmer's recording is sent to OpenAI — the same provider already receiving every typed message, so no new boundary is crossed, but it is stated here rather than buried |
 | Crop profit figures | `data/prices.md` via `backend/finance/` | **Real for boro/aman/potato** (complete BBS cost). **Mustard and lentil are an UPPER BOUND, not a profit** — their cost rows are fertiliser-only, so revenue minus a subset of costs. `crop_scorer` returns `profit_basis` marking them non-comparable and the agent is required to print "সর্বোচ্চ সম্ভাব্য লাভ — সব খরচ ধরা হয়নি" on the same line as the number |
-| **Marketplace / supplier catalog** | — | **MOCK / ABSENT.** There is no supplier list, no ranking by price/delivery/distance/rating, and no seeded catalog. The checkout basket is the agent's own cited input costs, not products from a vendor |
+| **Marketplace dealers and buyers** | `python -m backend.market.seed_demo` | **DEMO.** 5 dealers and 3 buyers, every row `is_demo`, named ডেমো, labelled in the UI, SMS and agent narration. Their phone numbers are made up and a live SMS gateway never texts them. Demo fertiliser listings use the cited government-notified price (Urea/TSP ৳27/kg, MoP ৳20/kg; 2023-04-11 notice in `data/prices.md`); spray prices are invented. Real dealers and buyers self-register at `#/dealer` / `#/buyer` and show as "যাচাই হয়নি" until verified |
+| Produce price guide | `data/prices.md` farm-gate row + `market_price` (BBS wholesale pattern) | **Real, cited.** Labelled a historical pattern, not a forecast, and wholesale, not farm-gate |
+| Commission and platform-fee rates | `MARKET_COMMISSION_PCT` (5), `PRODUCE_FEE_PCT` (2) | **Pilot parameters, not data.** The dealer pays the commission; the buyer pays the fee |
+| SMS, USSD and voice in the emulator | `#/phone` | **SIMULATED transport, real flows.** The emulator calls the same backend flows a gateway would; `SMS_PROVIDER=simulator` sends nothing |
+| Bangla speech on the voice line | Sarvam / OpenAI / Azure | **Real APIs, quality not yet verified** for this line |
 
 ### Voice disclosure — why dictation is not browser-native
 
@@ -204,9 +267,9 @@ params/result inspector, and that a chronological raw log sits nested
 underneath the graph. **That was true of an earlier build and is not what
 ships.** `App.jsx` renders exactly one trace surface, `GraphPanel.jsx`; two
 components that used to provide node-level and raw-JSON drilldown
-(`NodeInspector.jsx`, `TracePanel.jsx`) still exist as files but are not
-imported anywhere and are not reachable from the UI (removed deliberately —
-see `LOG2.md`, "the previous graph was too dense and English-heavy for the
+(`NodeInspector.jsx`, `TracePanel.jsx`) were deleted in LOG4 (they had been
+unreachable from the UI since
+`LOG2.md`, "the previous graph was too dense and English-heavy for the
 requested product surface").
 
 What the shipped graph panel actually does: every tool call still fires
@@ -313,7 +376,9 @@ default in `backend/api/config.py`) or the proxy has nothing to forward to.
 backend/.venv/Scripts/python.exe -m pytest tests backend/tests -q
 ```
 
-**402 passed** — verified by running it directly against this checkout.
+**583 passed** — verified on 2026-09-28 against this checkout (LOG4). Tests are hermetic:
+an autouse fixture clears provider keys, so a developer's `.env.local` never sends test
+audio to Sarvam or turns on a live gateway.
 Coverage spans the finance engine, `units.py`, the trace redactor, crop
 scoring, retrieval, season-plan generation and persistence, plan-conflict
 checking, the care scheduler, scenario simulation, and agri-input lookups —
@@ -334,11 +399,56 @@ Supabase-issued JWT verified by Supabase itself, those two features do not have 
 show in guest mode; the chat/agent path itself (the thing being judged) needs no
 Supabase session and works normally.
 
+### Phone channels and marketplaces
+
+```bash
+python -m backend.market.seed_demo      # demo dealers + buyers (once; --reset removes them)
+```
+
+Then open `http://localhost:5173/#/phone` (button-phone emulator), `#/monitor`
+(live phone conversations) and `#/market`. With the default `SMS_PROVIDER=simulator`
+nothing leaves the machine and the emulator's inbox shows every SMS.
+
+**Real SMS through an Android phone** (pilot):
+
+1. Install **SMS Gateway for Android** (SMSGate) on the phone, enable *Local Server*,
+   note the address, username and password it shows.
+2. In `.env`: `SMS_PROVIDER=smsgate`, `SMSGATE_URL=http://<phone-ip>:8080`,
+   `SMSGATE_USER`, `SMSGATE_PASSWORD`, and a long random `CHANNEL_ID_SALT`.
+3. Register a webhook on the phone for `sms:received` (and `sms:delivered`) pointing at
+   `http://<backend>/api/channels/sms/smsgate`; set the app's signing key as
+   `SMSGATE_SIGNING_KEY` so unsigned calls are refused.
+4. Missed calls: plug the phone in with USB debugging on, set `BRIDGE_TOKEN` on both
+   sides, and run `python -m backend.channels.bridge.adb --backend http://<backend>`.
+
+**Real voice calls through Windows Phone Link** (pilot, no root, no modem):
+
+1. `python -m pip install -r backend/requirements-voice-bridge.txt`; install
+   [Voicemeeter](https://vb-audio.com/Voicemeeter/) (free) and adb (Android platform-tools;
+   the bridge also finds the Android SDK copy on its own).
+2. Phone: install **Link to Windows**; PC: **Phone Link** → Calls → pair over Bluetooth.
+   Make a test call from the PC to confirm call audio plays on the laptop.
+3. Windows Settings → Sound → Volume mixer → Phone Link: **output** = "Voicemeeter Input",
+   **input** = "Voicemeeter Out B2". In Voicemeeter: the VAIO strip → **B1** only, the AUX
+   strip → **B2** only (both → A1 too if you want to listen in).
+4. `BRIDGE_TOKEN` in `.env.local` (same value the backend reads), backend running, then:
+   `python -m backend.channels.voice.phonelink --test-playback` (you hear the Bangla
+   greeting when a call is up), `--test-capture` (speak on a call; the meter moves), and
+   finally `python -m backend.channels.voice.phonelink --auto-answer`.
+5. The caller's number comes from ADB when Android reveals it; if yours hides it, pass
+   `--caller <number>` for testing. One call at a time.
+
+A personal SIM is for a pilot only; production runs on the operator's IVR, USSD short
+code and bulk-SMS channels. `ALERT_SMS_ENABLED=true` turns on the proactive rain-alert
+texts.
+
 ### Payments
 
-Not part of this submission — see the Tier 2 table above. `backend/payments/` exists
-in the tree from earlier in the event but is not called by the agent or reachable from
-the UI; no checkout flow ships.
+Ships in **simulator mode** — see the Tier 2 table above. The `কেনাকাটা` tab appears when
+the finance projection has purchasable input lines, and runs quote → confirmation → charge
+→ Bangla SMS receipt through `POST /api/checkout/quote` and `POST /api/checkout`. The
+confirmation gate is enforced server-side (409 without a matching, unexpired quote).
+No real money moves; the mode badge reads `GET /api/checkout/mode`.
 
 ---
 
@@ -353,7 +463,11 @@ backend/
   kb/         holt.py (Holt yield projections) · retrieval.py (rag_query's 52-passage
               corpus) · crop_facts.py (curated agronomic facts the scorer reads directly)
   finance/    engine.py (Decimal, the only place money math happens) + catalog.py
-  payments/   bdapps client + simulator twin + confirmation gate (built, not shipped — see above)
+  payments/   bdapps client + simulator twin + server-enforced confirmation gate (simulator mode)
+  channels/   phone identity, adapter over run_turn, SMS providers + text rules, USSD menus,
+              voice line, ADB missed-call bridge, proactive alert SMS
+  market/     input + produce marketplaces: catalog, ranking, orders, listings/offers,
+              SMS commands, USSD sub-menus, demo seed
   memory/     SQLite WAL: conversation history and farm profiles
   api/        FastAPI routes, SSE transport, redacting trace emitter, Supabase-proxying crop index
   units.py    bigha/katha/maund conversions
@@ -363,7 +477,8 @@ data/         crop.db (generated in-event) · prices.md (cited price tables) ·
 ```
 
 **Agent tools** (registered in `backend/agent/tools_spec.py`, dispatched by name; every
-call emits a traced `tool_call`/`tool_result` pair — 14 tools total):
+call emits a traced `tool_call`/`tool_result` pair — 17 tools total; the table
+lists the original core, plus `pest_risk`, `market_price` and `find_inputs`):
 
 | Tool | Does |
 |---|---|
@@ -381,6 +496,9 @@ call emits a traced `tool_call`/`tool_result` pair — 14 tools total):
 | `care_schedule` | Fertilizer/irrigation tasks due from a saved plan, with forecast context |
 | `simulate_budget` | Re-runs ranking + finance under a changed budget |
 | `remember_farm` | Persists the confirmed farm profile for future turns/sessions |
+| `pest_risk` | Deterministic crop × growth-stage × forecast pest/disease risk, cited treatments |
+| `market_price` | Historical wholesale price pattern + sell-now / consider-storing reading |
+| `find_inputs` | Ranked nearby dealer offers for one input, with dated listing provenance |
 
 The agent streams Server-Sent Events; every tool call emits `tool_call` and
 `tool_result` into a live trace, rendered as a Bangla-labeled provenance graph

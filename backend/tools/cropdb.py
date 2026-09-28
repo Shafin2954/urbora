@@ -20,6 +20,7 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
+from backend.branding import BRAND_NAME
 from .districts import lookup_district
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -148,7 +149,7 @@ def holt_projection(crop: str, district: str) -> dict:
         "method": r["method"],
         "source_type": "computed",
         "source_id": "crop.db/holt_projections",
-        "source_title": "AgriSense damped-Holt projection (in-event)",
+        "source_title": f"{BRAND_NAME} damped-Holt projection (in-event)",
         "formula": f"{r['method']} over {canon_dist} {crop}, n={r['n_points']} years; "
                    f"base ± band (residual sd). Projection, not a guarantee.",
         "confidence": conf,

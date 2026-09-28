@@ -1,0 +1,10 @@
+# Optional: real phone calls through Windows Phone Link (LOG4).
+#
+# Only the laptop running `python -m backend.channels.voice.phonelink` needs
+# these; the API, the tests and every other channel run without them.
+# Install:  python -m pip install -r backend/requirements-voice-bridge.txt
+# Also needs (not pip): Voicemeeter (vb-audio.com, free), Windows Phone Link
+# with Calls enabled, and adb (Android platform-tools) for call state.
+sounddevice==0.5.6        # PortAudio capture/playback on the Voicemeeter buses
+webrtcvad-wheels==2.0.14  # voice-activity detection (prebuilt Windows wheels of webrtcvad)
+numpy==2.5.3

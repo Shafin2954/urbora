@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// AgriSense frontend config.
+// Agrosfeer frontend config.
 //
 // Two things here are load-bearing and should not be "tidied up" later:
 //
@@ -16,6 +16,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 //    stale SW cache is a stale-JS ghost hunt nobody has time for. So the PWA
 //    plugin here generates a manifest and NOTHING ELSE. See the comments on
 //    injectRegister/devOptions below before changing either.
+// Product name, read from the same root .env the app uses (src/branding.js).
+const brandName = loadEnv(process.env.NODE_ENV ?? 'development', '..', 'VITE_').VITE_BRAND_NAME || 'Agrosfeer'
+
 export default defineConfig({
   // The API and browser share one ignored root `.env`. Vite otherwise looks
   // beside this config (`frontend/.env`) and silently leaves VITE_* values
@@ -38,8 +41,8 @@ export default defineConfig({
       // origin. Cost: a ~1KB stub instead of the whole workbox runtime.
       selfDestroying: true,
       manifest: {
-        name: 'AgriSense — কৃষি পরামর্শ',
-        short_name: 'AgriSense',
+        name: `${brandName} — কৃষি পরামর্শ`,
+        short_name: brandName,
         description:
           'Bangla-first farm planning: costed, weather-grounded season plans with sources for every number.',
         lang: 'bn',

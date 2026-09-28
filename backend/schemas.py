@@ -1,5 +1,5 @@
 """
-AgriSense shared schemas — THE CONTRACT (PLAN.md §2).
+Agrosfeer shared schemas — THE CONTRACT (PLAN.md §2).
 
 Owner: Instance A. Imported by Instance B (api / finance / payments / frontend
 serialization). FROZEN at H1. After the freeze, any change requires a LOG1.md
@@ -28,7 +28,7 @@ from pydantic import BaseModel, Field
 # Provenance — the spine of the whole system (PRD §7, PLAN §2)
 # ─────────────────────────────────────────────────────────────────────────────
 
-SourceType = Literal["kb", "api", "dataset", "static_table", "computed"]
+SourceType = Literal["kb", "api", "dataset", "static_table", "computed", "listing"]
 Confidence = Literal["high", "medium", "low"]
 
 
@@ -42,6 +42,8 @@ class Provenance(BaseModel):
       static_table — hand-curated table (prices.md, FAO-56 Kc, AEZ soil)
       computed     — derived by a pure function (finance engine, holt.py, scorer);
                      `formula` names the method + inputs.
+      listing      — a dealer's dated marketplace listing (LOG4); `source_title`
+                     names the dealer and says [DEMO] for seeded demo rows.
     """
 
     value: Union[int, float, str]

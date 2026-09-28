@@ -53,6 +53,7 @@ from ..tools.ask import DISTRICT_BN
 from ..tools.districts import ALIASES, DISTRICTS
 from .config import AgentConfig
 from .llm_client import ChatBackend, LLMClient
+from . import intake_guard
 from .prompts import SYSTEM_PROMPT
 from .tools_spec import TOOL_DEFS, dispatch
 
@@ -327,6 +328,16 @@ def run_turn_sync(
                 break  # natural end of turn
 
             for tc in res.tool_calls:
+                # Rule 2, structurally: a plan may only rest on farm facts the
+                # farmer actually gave (intake_guard.py; found live, LOG4).
+                unstated = intake_guard.unstated_fields(tc.name, tc.args, messages)
+                if unstated:
+                    yield ToolCallEvent(id=tc.id, name=tc.name, params=tc.args, ts=_now())
+                    refused = intake_guard.refusal(unstated)
+                    yield ToolResultEvent(id=tc.id, name=tc.name, result_raw=refused, ts=_now())
+                    messages.append(client.tool_result_message(
+                        tc.id, json.dumps(refused, ensure_ascii=False), True))
+                    continue
                 # Retrieval is a required evidence step, not a best-effort model
                 # habit. The model receives the cited passages before it sees
                 # the deterministic recommendation/calendar result, and both
@@ -408,12 +419,53 @@ async def _sync_iter_to_async(sync_gen: Iterator[Any]) -> AsyncIterator[Any]:
         yield item
 
 
+# How to write for each phone channel. The web app renders markdown, tables and
+# a provenance graph; a button phone shows ~70 Bangla characters per SMS
+# segment and a caller hears every word. The rules that do not change: tools
+# still run, numbers still come only from tool results, Western numerals.
+_PHONE_COMMON = (
+    "Numbers still come ONLY from tool results, in Western numerals. Never use "
+    "markdown, tables, bullet symbols, emoji or links. Do not emit the "
+    "[[CHAT_TITLE: ...]] marker on this channel. Ask at most one question per "
+    "reply. If you call ask_farmer, keep prompt_bn under 60 characters and give "
+    "at most 6 short options."
+)
+_SMS_NO_FIGURES = (
+    "Write NO figures in this reply: no money, kg, yields, scores, percentages or "
+    "ROI. A separate SMS built from the tool results carries every figure (the "
+    "ranking or the plan and costs). Say in words what you recommend and why, and "
+    "tell the farmer the numbers follow in the next SMS. "
+)
+CHANNEL_NOTES: dict[str, str] = {
+    "sms": (
+        "The farmer is on a basic phone, talking to you by SMS. Reply in at most "
+        "2 short sentences (under 130 Bangla characters in total). Give the single "
+        "most useful answer. " + _SMS_NO_FIGURES + _PHONE_COMMON
+    ),
+    "ussd": (
+        "The farmer reached you from a USSD menu on a basic phone; your reply "
+        "is delivered by SMS. Reply in at most 2 short sentences (under 130 Bangla "
+        "characters in total). " + _SMS_NO_FIGURES + _PHONE_COMMON
+    ),
+    "voice": (
+        "The farmer is on a PHONE CALL; every word you write is spoken aloud by "
+        "text-to-speech. Speak in short, plain Bangla sentences, at most 4 "
+        "sentences per reply. Say 'টাকা' instead of the ৳ sign and say units in "
+        "words. Never read out source names, ids or URLs; say 'সরকারি তথ্য "
+        "অনুযায়ী' if a source must be mentioned. Before the first plan, confirm "
+        "the district and land size you heard. A summary SMS is sent after the "
+        "call. " + _PHONE_COMMON
+    ),
+}
+
+
 async def run_turn(
     session_id: str,
     farm_id: str | None,
     message: str,
     client: ChatBackend | None = None,
     language: str = "bn",
+    channel: str = "web",
 ) -> AsyncIterator[dict]:
     """The real agent entrypoint — this is what backend/api/chat.py imports.
 
@@ -496,6 +548,12 @@ async def run_turn(
                 "them back to Bangla — an explicit message beats this setting."
             ),
         })
+
+    # Phone channels (LOG4): same agent, same tools, different screen. Injected
+    # every turn for the same reason as the language note.
+    channel_note = CHANNEL_NOTES.get(channel)
+    if channel_note:
+        messages.append({"role": "system", "content": channel_note})
 
     messages.append({"role": "user", "content": message})
 

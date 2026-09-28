@@ -39,6 +39,8 @@ const bn = {
 
   'chat.placeholder': 'এখানে লিখুন…',
   'chat.send': 'পাঠান',
+  'chat.failed': 'দুঃখিত, এখন উত্তর দিতে পারছি না। একটু পরে আবার চেষ্টা করুন।',
+  'chat.failedDetail': 'কারিগরি তথ্য',
   'chat.mic': 'কথা বলে লিখুন',
   'chat.micStop': 'থামুন',
   'chat.listening': 'শুনছি… (থামাতে আবার চাপুন)',
@@ -96,6 +98,8 @@ const en = {
 
   'chat.placeholder': 'Type here…',
   'chat.send': 'Send',
+  'chat.failed': 'Sorry, I cannot answer right now. Please try again in a little while.',
+  'chat.failedDetail': 'Technical detail',
   'chat.mic': 'Speak instead of typing',
   'chat.micStop': 'Stop',
   'chat.listening': 'Listening… (tap again to stop)',

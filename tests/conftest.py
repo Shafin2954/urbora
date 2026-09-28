@@ -60,3 +60,11 @@ def priced_catalog(priced_md):
     from backend.finance.catalog import PriceCatalog
 
     return PriceCatalog(priced_md)
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_providers(monkeypatch):
+    """A developer's real keys in .env.local must not switch providers in tests."""
+    from backend.tests.conftest import PROVIDER_VARS
+    for var in PROVIDER_VARS:
+        monkeypatch.delenv(var, raising=False)

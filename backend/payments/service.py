@@ -28,6 +28,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
 from backend.api.redact import redact
+from backend.branding import BRAND_NAME
 from backend.schemas import CheckoutItem, CheckoutResult
 
 from .client import BdappsClient, BdappsTransportError
@@ -86,7 +87,7 @@ def receipt_bn(amount: float, items: list[CheckoutItem], trx_id: str | None) -> 
     Bangla words, Western numerals — NOTES.md #17: computed values stay in
     Western numerals so they can be checked against the screen.
     """
-    lines = [f"AgriSense: ৳{amount:.2f} কাটা হয়েছে।"]
+    lines = [f"{BRAND_NAME}: ৳{amount:.2f} কাটা হয়েছে।"]
     for item in items:
         lines.append(f"- {item.name} {item.qty:g} {item.unit}")
     if trx_id:

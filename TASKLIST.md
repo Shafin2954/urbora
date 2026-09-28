@@ -1,37 +1,25 @@
-# Remaining task list
+# Task list — GP FutureMakers round
 
-This list reflects the completed work recorded in `LOG1.md`, `LOG2.md`, and
-`LOG3.md`. Keep Tier 0 stable before starting optional or gated work.
+Done items and the reasoning live in `LOG4.md`. This list is what is still open.
 
-## Tier 0 completion
+## Needs the team (cannot be done from code)
 
-- [x] Curate the `crop_facts` knowledge-base data from the staged source PDFs:
-  crop seasons, allowed soil and water classes, and climate ranges for the five
-  supported crops. Cite each source.
-- [x] Feed those cited facts into `crop_scorer` so season/soil/water exclusions,
-  Agronomic Fit, and Climate Fit become available; retain honest degradation for
-  any missing evidence.
-- [x] Build the sourced season-plan calendar only after the crop facts are
-  curated; do not invent dates or pest checkpoints.
-- [x] Run an end-to-end chat turn through the API after the current
-  unit-contract fix, including trace, provenance, and the budget replan path.
-- [x] Audit every rendered number for provenance, then run the required finance,
-  units, scorer, and trace-redactor tests before the next merge.
+- [ ] **First real call through Phone Link:** pair the phone (Link to Windows ↔ Phone
+  Link, Calls on), set Phone Link's output/input to Voicemeeter (README → "Real voice
+  calls"), plug the phone in with USB debugging for call state, then run
+  `python -m backend.channels.voice.phonelink --test-playback`, `--test-capture`,
+  `--auto-answer`.
+- [ ] **First real SMS through the Android phone:** SMSGate from its official GitHub
+  releases (package `me.capcom.smsgateway`), Local Server on, then set `SMS_PROVIDER`,
+  `SMSGATE_*` and the `sms:received` webhook (README → "Real SMS").
+- [ ] Voice quality with real farmers' voices (Sarvam verified only on synthetic speech,
+  incl. 8 kHz); pick the TTS voice by ear (Sarvam default today; Azure `bn-BD` needs a key).
+- [ ] Answer the concept-note comment: buyer pays the produce fee (assumed) vs split.
 
-## Demo hardening
+## Build next
 
-- [x] Rehearse the seeded Rajshahi Rabi farm flow twice, including geocode
-  confirmation, a live bigha-area change, the reduced-budget recovery, and the
-  simulator insufficient-balance path.
-- [x] Confirm the README and demo use the actual five-crop universe
-  (boro rice, aman rice, potato, mustard, lentil), not the superseded six-crop
-  plan.
-- [ ] Tag `tier0-stable` only when the end-to-end flow is green.
-
-## Deferred / requires an explicit scope decision
-
-- [ ] Consider reintroducing wheat only if its crop.db data, facts, costs, and
-  tests are curated together. Maize remains excluded because its available data
-  is corrupt.
-- [ ] Start any gated Tier 1 work only after `tier0-stable` exists and main is
-  green.
+- [ ] Quectel USB-modem transport (only if a laptop-free setup is wanted; Phone Link
+  covers the pilot).
+- [ ] Dealer/buyer auth: phone OTP instead of registration tokens.
+- [ ] Encrypt the `contacts` table at rest before real farmers' numbers are stored.
+- [ ] Voice barge-in (the Phone Link line is half-duplex today).

@@ -1,3 +1,37 @@
+# PRD v4 addendum — GP FutureMakers 2026 (September 2026)
+
+**This addendum governs the FutureMakers round. Sections 1–15 below are the July
+hackathon PRD (v3.1), kept as history; where they conflict, this addendum wins.**
+
+**Track:** Digital Inclusion & Education. **Round 1 deliverable:** idea/pitch (concept
+note, LOG4 [00:40]); the build backs the pitch with working flows.
+
+**Users, widened.** Primary: a Bangladeshi smallholder on **any phone** — including the
+~3 in 4 rural mobile users without a smartphone (GSMA 2024). Also: input dealers and
+produce buyers (marketplace partners).
+
+**In scope (reverses §8 "Non-goals"):**
+1. Channels: SMS (two-way), missed-call opt-in, USSD menus, a voice line, proactive
+   alert SMS — one agent, one farm memory across all of them.
+2. Input marketplace (dealer-paid commission) and produce marketplace (buyer-paid fee).
+3. Rename (working name AgriSense; one constant).
+
+**Still out of scope:** escrow and payments held on behalf of others, logistics,
+quality disputes, a real USSD short code or IVR number (operator provisioning), model
+training.
+
+**Rules that carry over unchanged:** the LLM never computes or ranks (now including
+dealers); every number has provenance or does not render; missing data is said out
+loud; simulated things are labelled. New: CLAUDE.md rules 15 (channels) and 16
+(marketplace honesty).
+
+**Success for this round:** a button phone can go from a missed call to a costed plan by
+SMS, order an input, and sell a harvest, with every number traceable in `#/monitor`;
+all of it runs in the emulator today and on a real SIM once the gateway phone and keys
+are in place.
+
+---
+
 # PRD v3.1 — AgriSense AI (TeamFixeth_AgriSense)
 
 IUT 12th ICT Fest — Bdapps Agentic AI Hackathon, Final Round. 24h: 24 Jul 09:00 → 25 Jul 09:00, demo 25 Jul 10:00. **This document replaces all earlier PRD versions.** PLAN.md stays authoritative for execution — the §13 amendments of PRD v3 have been folded into PLAN.md directly; do not re-apply. NOTES.md and CLAUDE.md unchanged and binding.

@@ -1,4 +1,4 @@
-"""AgriSense API — FastAPI skeleton.
+"""Agrosfeer API — FastAPI skeleton.
 
 H0-H1 scope (PLAN.md §3): the app, CORS, and a hello-world SSE endpoint that
 proves browser -> stream plumbing works. Real routes (/api/chat, /api/farms,
@@ -10,6 +10,8 @@ Run from the repo root:
 """
 
 import asyncio
+import os
+from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from pathlib import Path
 
@@ -18,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from ..branding import BRAND_NAME
 from . import config, sse
 from .chat import router as chat_router
 from .checkout import router as checkout_router
@@ -27,9 +30,25 @@ from .alerts import router as alerts_router
 from .crops import router as crops_router
 from .diagnose import router as diagnose_router
 from .transcribe import router as transcribe_router
+from .channels import router as channels_router
+from .market import router as market_router
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    """Proactive weather-alert SMS (backend/channels/alerts_job.py), opt-in via
+    ALERT_SMS_ENABLED so tests and plain dev runs never text anyone."""
+    task = None
+    if os.environ.get("ALERT_SMS_ENABLED", "").strip().lower() in ("1", "true", "yes"):
+        from backend.channels import alerts_job
+        task = asyncio.create_task(alerts_job.run_forever())
+    yield
+    if task:
+        task.cancel()
+
 
 app = FastAPI(
-    title="AgriSense API",
+    lifespan=lifespan,
+    title=f"{BRAND_NAME} API",
     version="0.1.0",
     description="Bangla-first farm planning agent. B-owned: api/finance/payments.",
 )
@@ -53,6 +72,8 @@ app.include_router(alerts_router)
 app.include_router(crops_router)
 app.include_router(diagnose_router)
 app.include_router(transcribe_router)
+app.include_router(channels_router)
+app.include_router(market_router)
 
 
 @app.get("/api/health")

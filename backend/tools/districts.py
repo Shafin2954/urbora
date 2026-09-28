@@ -115,7 +115,11 @@ def _norm(name: str) -> str:
 def lookup_district(name: str) -> tuple[str, str, float, float] | None:
     """Resolve a (possibly misspelled/aliased) district name to
     (canonical_district, division, lat, lon), or None if no match."""
-    key = _norm(name)
+    key = _norm(name or "")
+    if not key:
+        # An empty name is "unknown", not "the first district": the loose
+        # contains-match below would otherwise match "" inside every name.
+        return None
     # exact (case-insensitive) match on canonical names
     for district, (division, lat, lon) in DISTRICTS.items():
         if _norm(district) == key:

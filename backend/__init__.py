@@ -1,1 +1,1 @@
-"""AgriSense backend package (TeamFixeth_AgriSense)."""
+"""Agrosfeer backend package (TeamFixeth_Agrosfeer)."""

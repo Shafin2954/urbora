@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 
 import httpx
 
+from backend.branding import BRAND_NAME
 from .districts import DISTRICTS, lookup_district
 
 _GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search"
@@ -47,7 +48,7 @@ def _fallback(name: str) -> dict:
         "candidates": candidates,
         "source_type": "static_table",
         "source_id": "districts_64",
-        "source_title": "AgriSense hardcoded 64-district table",
+        "source_title": f"{BRAND_NAME} hardcoded 64-district table",
         "locator": "backend/tools/districts.py",
         "retrieved_at": _now(),
         "cached": True,
