@@ -24,6 +24,7 @@ from . import sms, ussd
 
 TRIGGERS = {"মেনু", "মেন্যু", "menu", "m", "ম"}
 IDLE_LIMIT = timedelta(minutes=15)
+INSTANT_ACTIONS = ("problem", "sms")   # answered by template at once
 FIRST_HINT = "উত্তরে শুধু নম্বর লিখে পাঠান।"
 _REPLY = re.compile(r"^[\d০-৯]{1,7}$|^\*$")
 
@@ -76,7 +77,10 @@ async def try_handle(local_msisdn: str, farm_id: str, text: str) -> bool:
     if resume is not None and new_state.get("at") == "resume":
         store.close_other_ussd_states(farm_id, keep=_key(farm_id))
     body = f"{screen.text}\n{FIRST_HINT}" if starting else screen.text
-    sms.send_sms(farm_id, body)
+    # "উত্তর কয়েক মিনিটে SMS-এ আসবে" is noise when the answer is a template sent
+    # this same second (crop problem, alert); keep it for agent answers, which take a while.
+    if not (screen.end and action and action.get("kind") in INSTANT_ACTIONS):
+        sms.send_sms(farm_id, body)
     if action:
         await ussd.run_action(local_msisdn, farm_id, action)
     return True

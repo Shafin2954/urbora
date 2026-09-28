@@ -48,13 +48,13 @@ same tools:
 | Door | Phone | Status | Where |
 |---|---|---|---|
 | Web app | smartphone | **Working** (the July build) | `frontend/`, `POST /api/chat` |
-| SMS | any | **Working in the simulator; real SMS via an Android phone is built but not yet run on a device** | `backend/channels/sms.py`, `flows.py`; `POST /api/channels/sms/smsgate` |
+| SMS | any | **Verified on real SIMs** (2026-09-29): SMS in and out through an Android phone over USB, incl. the full SMS menu → crop-problem diagnosis; loop-guarded | `backend/channels/sms.py`, `flows.py`; `POST /api/channels/sms/smsgate` |
 | Missed call → SMS | any | **Working in the simulator; ADB bridge built, not yet run on a device** | `backend/channels/bridge/adb.py` |
 | USSD `*code#` | any | **Working in the simulator** (a real short code needs operator provisioning); bdapps request/response shape implemented. Every screen fits one Bangla USSD page (80 UCS-2 units, tested over all reachable screens); 9 = more, 0 = back everywhere; a dropped session is offered back on redial | `backend/channels/ussd.py`; `POST /api/channels/ussd/bdapps` |
 | Crop-problem menu (USSD 2) | any | **Working in the simulator.** Crop → stage → where → what it looks like → how much, by digits; a deterministic KB-bounded table names the likely causes, the SMS answer is a template (doses only as the source states them, scaled to the farmer's bigha by `units.py`); no KB coverage → referral to SAAO / 16123. Reports aggregate by district as a pest signal | `backend/kb/triage.py`, `backend/channels/triage_menu.py`; `CHANNELS_RESEARCH.md` §4 |
 | Voice call | any | **Push-to-talk in the browser emulator; real calls through Windows Phone Link built** (bridge + Voicemeeter, no root, no modem) — **the first real call on a paired phone is still to be run.** Sarvam speech verified live (below) | `backend/channels/voice/`, `phonelink.py` |
 | Proactive alerts by SMS | any | **Working** (opt-in loop) | `backend/channels/alerts_job.py` |
-| SMS menu mode (text মেনু) | any | **Working in the simulator** — the USSD menu over plain SMS, so button-phone menus work today without a short code | `backend/channels/sms_menu.py` |
+| SMS menu mode (text মেনু) | any | **Verified on real SIMs** — the USSD menu over plain SMS, so button-phone menus work today without a short code | `backend/channels/sms_menu.py` |
 | Keypad on the hotline | any | **Working in the browser emulator; DTMF detection tested on synthetic tones (noise, 8 kHz), not yet on a real call** | `backend/channels/voice/audio.py` (`DtmfDetector`), `voice/ivr.py` |
 
 And two marketplaces that turn advice into action:

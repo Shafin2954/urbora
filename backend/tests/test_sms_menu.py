@@ -49,6 +49,8 @@ def test_a_whole_crop_problem_walk_by_sms_ends_with_the_answer(_db):
         text_in(k)
     last = text_in("2")                            # half the field
     assert "ফল ছিদ্রকারী পোকা" in last and "16123" in last
+    outs = [m["body"] for m in store.list_sms(farm_id_for(PHONE)) if m["direction"] == "out"]
+    assert not any("কয়েক মিনিটে" in b for b in outs)  # no "coming soon" before an instant answer
     assert _db == []                               # no agent call for any of it
     assert not sms_menu.is_open(farm_id_for(PHONE))
 

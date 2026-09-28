@@ -246,3 +246,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** An auto-responder that can hear itself will eventually talk to itself — dual-SIM testing just made it happen first.
 **Rejected:** Relying on the own-number list alone (a test SIM in the same phone, or an operator echo, still loops).
 **Impacts:** For demos, a second phone as the farmer avoids dual-SIM confusion. ~50 min.
+
+## [01:05] Real SMS menu walk verified on real SIMs
+**Did:** From the test SIM: মেনু → 2 → 5 → 3 → 4 → 2 → 2 — each menu screen and the lentil pod-borer diagnosis arrived by real SMS within seconds (triage report `covered`, `pod_borer`). The loop guard held in real traffic: five of our own replies that landed back on the phone were logged `ignored: own number`. Cleanup: SMS menu mode no longer sends "উত্তর কয়েক মিনিটে SMS-এ আসবে" before an instant template answer (crop problem, alert) — it cost an SMS and preceded the answer by 0 s; kept for agent answers. Suite 636.
+**Decision:** SMS channel status in the README moves from "simulator" to "verified on real SIMs".
+**Why:** First live proof of a button-phone flow end to end.
+**Rejected:** none.
+**Impacts:** Still unverified live: voice call (needs a second phone), keypad tones, bdapps USSD.
