@@ -7,6 +7,11 @@ Map of the tree. Update after any unit of work so nothing has to be re-explored.
 Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
 - `backend/branding.py`, `frontend/src/branding.js` — the product name: **Agrosfeer**.
 - `backend/env.py` — loads `.env.local` > `backend/.env` > `.env` (both configs use it).
+- Replit (committed by the Repl itself to `master`): `.replit` (dev = `start.sh`; deployment = autoscale,
+  build `cd frontend && npm install && npm run build`, run uvicorn on :5000), `start.sh`, `pyproject.toml` +
+  `uv.lock` (**the Repl's own dependency list — separate from `backend/requirements.txt`**), `replit.md`,
+  stub `main.py`, `package.json`. `backend/api/main.py` serves `frontend/dist` + an SPA fallback when dist exists.
+  Vite dev port is **5000** since the merge (was 5173).
 - `backend/agent/intake_guard.py` — refuses planning tools on district/soil/water/season the farmer never stated.
 - `backend/channels/voice/audio.py` (pure audio helpers + VAD segmenter + ADB call-state parser) and
   `voice/phonelink.py` (real calls via Windows Phone Link + Voicemeeter; optional deps in
