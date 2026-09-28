@@ -53,6 +53,7 @@ DEFAULT_CAPTURE = "Voicemeeter Out B1"
 DEFAULT_PLAYBACK = "Voicemeeter AUX Input"
 GREETING = "আসসালামু আলাইকুম। {brand} কৃষি পরামর্শে স্বাগতম। আপনার জেলা, জমির পরিমাণ আর প্রশ্ন বলুন।"
 FILLER = "একটু অপেক্ষা করুন, দেখছি।"
+SORRY = "দুঃখিত, এখন উত্তর দিতে পারছি না। আবার বলুন।"
 _HOSTAPI_PREFERENCE = ("Windows DirectSound", "MME", "Windows WASAPI")
 
 
@@ -81,8 +82,11 @@ class Adb:
         self.base = [adb] + (["-s", serial] if serial else [])
 
     def _run(self, *args: str) -> str:
-        out = subprocess.run(self.base + list(args), capture_output=True, text=True, timeout=10)
-        return out.stdout
+        # Explicit UTF-8: Windows' default cp1252 cannot decode some dumpsys bytes,
+        # which killed the reader thread and crashed the bridge mid-ring (LOG4).
+        out = subprocess.run(self.base + list(args), capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=10)
+        return out.stdout or ""
 
     def call_state(self) -> tuple[int, str | None]:
         state, number = parse_call_state(self._run("shell", "dumpsys", "telephony.registry"))
@@ -93,8 +97,11 @@ class Adb:
             number = m.group(1) if m else None
         return state, number
 
-    def answer(self) -> None:
-        self._run("shell", "input", "keyevent", "KEYCODE_CALL")
+    ANSWER_KEYS = ("KEYCODE_HEADSETHOOK", "KEYCODE_CALL")
+
+    def answer(self, attempt: int = 0) -> None:
+        # Samsung ignores KEYCODE_CALL on a ringing call; the headset button answers.
+        self._run("shell", "input", "keyevent", self.ANSWER_KEYS[attempt % len(self.ANSWER_KEYS)])
 
 
 class Bridge:
@@ -115,11 +122,14 @@ class Bridge:
         self.say_cache: dict[str, tuple[np.ndarray, int]] = {}
         self.call_id: str | None = None
         self.number: str | None = None
+        self.peak = 0  # loudest captured sample since the last level report
 
     # --- audio --------------------------------------------------------------------
 
     def _on_audio(self, indata, _frames, _time, status) -> None:
-        self.q.put(indata[:, 0].copy())
+        chunk = indata[:, 0].copy()
+        self.peak = max(self.peak, int(np.abs(chunk).max()) if chunk.size else 0)
+        self.q.put(chunk)
 
     def _drain(self) -> None:
         while not self.q.empty():
@@ -130,12 +140,29 @@ class Bridge:
     def play(self, pcm: np.ndarray, rate: int) -> None:
         self.sd.play(pcm, rate, device=self.playback, blocking=True)
 
-    def say(self, text: str) -> None:
-        if text not in self.say_cache:
+    def fetch(self, text: str) -> bool:
+        """Synthesize `text` into the cache; False (logged) if the backend or TTS failed."""
+        if text in self.say_cache:
+            return True
+        try:
             r = self.http.post("/api/channels/bridge/voice/say", json={"text": text})
             r.raise_for_status()
             self.say_cache[text] = from_wav(base64.b64decode(r.json()["audio_b64"]))
-        self.play(*self.say_cache[text])
+            return True
+        except (httpx.HTTPError, ValueError, KeyError) as exc:
+            print(f"could not synthesize speech: {exc}", file=sys.stderr)
+            return False
+
+    def warm_up(self) -> None:
+        """Cache the fixed phrases before any call, so answering never waits on the network."""
+        from backend.branding import BRAND_NAME_BN
+        for text in (GREETING.format(brand=BRAND_NAME_BN), FILLER, SORRY):
+            self.fetch(text)
+
+    def say(self, text: str) -> None:
+        # A failed clip is skipped, never fatal: the bridge must outlive a network blip.
+        if self.fetch(text):
+            self.play(*self.say_cache[text])
 
     # --- call lifecycle -----------------------------------------------------------------
 
@@ -178,7 +205,7 @@ class Bridge:
                 body = r.json()
             except (httpx.HTTPError, ValueError) as exc:
                 print(f"turn failed: {exc}", file=sys.stderr)
-                self.say("দুঃখিত, এখন উত্তর দিতে পারছি না। আবার বলুন।")
+                self.say(SORRY)
                 return
         print(f"  heard: {body.get('transcript')!r}\n  said:  {body.get('reply_text')!r}")
         if body.get("audio_b64"):
@@ -206,21 +233,28 @@ class Bridge:
                                  dtype="int16", blocksize=int(self.in_rate * 0.03), callback=self._on_audio):
             if always_on:
                 self.start_call(self.caller)
-            last_poll, answered = 0.0, False
+            last_poll, attempts, last_try, rang_from, last_level = 0.0, 0, 0.0, None, 0.0
             while True:
                 if self.adb and time.monotonic() - last_poll > 0.5:
                     last_poll = time.monotonic()
                     state, number = self.adb.call_state()
-                    if state == RINGING and self.auto_answer and not answered:
-                        print(f"ringing from {_mask(number)}; answering")
-                        self.adb.answer()
-                        answered = True
+                    if state == RINGING and number:
+                        rang_from = number  # Android blanks the number once the call is answered
+                    # Retry while it still rings: one key press is not always taken.
+                    if state == RINGING and self.auto_answer and time.monotonic() - last_try > 3:
+                        print(f"ringing from {_mask(number)}; answering (attempt {attempts + 1})")
+                        self.adb.answer(attempts)
+                        attempts, last_try = attempts + 1, time.monotonic()
                     elif state == OFFHOOK and not self.call_id:
-                        self.start_call(number)
+                        self.start_call(number or rang_from)
                     elif state == IDLE:
-                        answered = False
+                        attempts, last_try, rang_from = 0, 0.0, None
                         if self.call_id:
                             self.end_call()
+                if self.call_id and time.monotonic() - last_level > 5:
+                    # Shows whether the caller's audio reaches the bridge at all.
+                    print(f"  capture level: {self.peak * 100 // 32768}%")
+                    self.peak, last_level = 0, time.monotonic()
                 utterance = self.feed()
                 if utterance and self.call_id:
                     self.turn(utterance)
@@ -283,6 +317,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     print(f"bridge: capture='{sd.query_devices(capture)['name']}', playback='{sd.query_devices(playback)['name']}', "
           f"backend={args.backend}. Ctrl+C to stop.")
+    bridge.warm_up()
     try:
         bridge.run(args.always_on)
     except KeyboardInterrupt:
