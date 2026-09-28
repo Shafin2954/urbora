@@ -1,5 +1,5 @@
 """
-Agrosfera shared schemas — THE CONTRACT (PLAN.md §2).
+Agrosfeer shared schemas — THE CONTRACT (PLAN.md §2).
 
 Owner: Instance A. Imported by Instance B (api / finance / payments / frontend
 serialization). FROZEN at H1. After the freeze, any change requires a LOG1.md

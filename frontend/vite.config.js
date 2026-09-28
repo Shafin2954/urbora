@@ -2,7 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// Agrosfera frontend config.
+// Agrosfeer frontend config.
 //
 // Two things here are load-bearing and should not be "tidied up" later:
 //
@@ -17,7 +17,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 //    plugin here generates a manifest and NOTHING ELSE. See the comments on
 //    injectRegister/devOptions below before changing either.
 // Product name, read from the same root .env the app uses (src/branding.js).
-const brandName = loadEnv(process.env.NODE_ENV ?? 'development', '..', 'VITE_').VITE_BRAND_NAME || 'Agrosfera'
+const brandName = loadEnv(process.env.NODE_ENV ?? 'development', '..', 'VITE_').VITE_BRAND_NAME || 'Agrosfeer'
 
 export default defineConfig({
   // The API and browser share one ignored root `.env`. Vite otherwise looks

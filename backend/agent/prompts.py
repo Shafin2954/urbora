@@ -1,4 +1,4 @@
-"""System prompt for the Agrosfera agent.
+"""System prompt for the Agrosfeer agent.
 
 Kept as a single static string so it caches cleanly (llm_client.cached_system).
 NEVER interpolate timestamps / session ids into it — that silently breaks the

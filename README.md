@@ -1,4 +1,4 @@
-# Agrosfera (অ্যাগ্রোস্ফেরা)
+# Agrosfeer (অ্যাগ্রোস্ফিয়ার)
 
 A Bangla-first farm advisor that a smallholder farmer can reach from **any phone**:
 a voice call, a USSD code, an SMS, or the web app. One autonomous agent produces a
@@ -14,7 +14,7 @@ The web demo is live at [https://team-fixeth-agri-sense--Shafin54.replit.app](ht
   *Digital Inclusion & Education*. This round added the button-phone channels and the
   two marketplaces — see [New in the FutureMakers round](#new-in-the-futuremakers-round)
   and `LOG4.md`. The product was renamed from its hackathon working name, AgriSense,
-  to **Agrosfera**; the name is one constant (`backend/branding.py`,
+  to **Agrosfeer**; the name is one constant (`backend/branding.py`,
   `frontend/src/branding.js`, or `BRAND_NAME` in `.env`).
 
 ---

@@ -1,6 +1,6 @@
 """Product name, in one place.
 
-The product is Agrosfera (renamed from the hackathon's working name AgriSense
+The product is Agrosfeer (renamed from the hackathon's working name AgriSense
 for GP FutureMakers 2026, LOG4). Every farmer-facing string reads it from here,
 so a future rename is a one-line change or an env override.
 
@@ -13,5 +13,5 @@ from __future__ import annotations
 
 import os
 
-BRAND_NAME: str = os.environ.get("BRAND_NAME", "Agrosfera")
-BRAND_NAME_BN: str = os.environ.get("BRAND_NAME_BN", "অ্যাগ্রোস্ফেরা")
+BRAND_NAME: str = os.environ.get("BRAND_NAME", "Agrosfeer")
+BRAND_NAME_BN: str = os.environ.get("BRAND_NAME_BN", "অ্যাগ্রোস্ফিয়ার")

@@ -15,8 +15,6 @@ Done items and the reasoning live in `LOG4.md`. This list is what is still open.
 - [ ] Voice quality with real farmers' voices (Sarvam verified only on synthetic speech,
   incl. 8 kHz); pick the TTS voice by ear (Sarvam default today; Azure `bn-BD` needs a key).
 - [ ] Answer the concept-note comment: buyer pays the produce fee (assumed) vs split.
-- [ ] Name check: "Agrosfera" is also a Ukrainian agrochemical company with a Play Store
-  app (`ua.agrosfera.app`) — decide whether that matters for the pitch.
 
 ## Build next
 

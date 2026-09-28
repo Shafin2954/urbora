@@ -1,4 +1,4 @@
-"""Agrosfera API — FastAPI skeleton.
+"""Agrosfeer API — FastAPI skeleton.
 
 H0-H1 scope (PLAN.md §3): the app, CORS, and a hello-world SSE endpoint that
 proves browser -> stream plumbing works. Real routes (/api/chat, /api/farms,

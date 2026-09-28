@@ -1,1 +1,1 @@
-"""Agrosfera backend package (TeamFixeth_Agrosfera)."""
+"""Agrosfeer backend package (TeamFixeth_Agrosfeer)."""

@@ -1,4 +1,4 @@
-# Agrosfera backend dependencies — pin EXACT versions on first add (CLAUDE.md rule 7).
+# Agrosfeer backend dependencies — pin EXACT versions on first add (CLAUDE.md rule 7).
 # Python 3.12. Create venv: `python -m venv backend/.venv`
 # Install:    `backend/.venv/Scripts/python -m pip install -r backend/requirements.txt`
 

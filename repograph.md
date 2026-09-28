@@ -5,7 +5,7 @@ Map of the tree. Update after any unit of work so nothing has to be re-explored.
 
 ## FutureMakers round (September 2026) — read this first
 Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
-- `backend/branding.py`, `frontend/src/branding.js` — the product name: **Agrosfera**.
+- `backend/branding.py`, `frontend/src/branding.js` — the product name: **Agrosfeer**.
 - `backend/env.py` — loads `.env.local` > `backend/.env` > `.env` (both configs use it).
 - `backend/agent/intake_guard.py` — refuses planning tools on district/soil/water/season the farmer never stated.
 - `backend/channels/voice/audio.py` (pure audio helpers + VAD segmenter + ADB call-state parser) and

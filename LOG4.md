@@ -146,3 +146,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The team chose Phone Link (free, no root, no card, works for any caller on a normal local call).
 **Rejected:** Twilio trial (5 verified numbers, `<Stream>` blocked on trial), Vapi (US numbers only), Tasker/MacroDroid for audio (same Android restriction; fine as triggers).
 **Impacts:** Needs a person at the laptop with the phone paired for the first real call; README → "Real voice calls" has the steps.
+
+## [15:22] Name is now Agrosfeer
+**Did:** Renamed Agrosfera → **Agrosfeer** (Bangla অ্যাগ্রোস্ফিয়ার): `backend/branding.py`, `frontend/src/branding.js`, `vite.config.js` fallback, `.env.example`, README title/intro, docstrings/comments (`backend/__init__.py`, `api/__init__.py`, `api/main.py`, `agent/prompts.py`, `agent/llm_client.py`, `schemas.py` header only — no contract change, `index.html`, `index.css`), `requirements.txt` header, repograph, the ranking-SMS prefix assertion in `test_channels_core.py`. TASKLIST: dropped the "Agrosfera = Ukrainian agrochemical app" name-check item (no longer applies). Suite 583 passed; frontend lint clean, build OK.
+**Decision:** Agrosfeer, the team's choice.
+**Why:** "Agrosfera" collided with an existing agrochemical company and its ordering app. Name search for Agrosfeer: near neighbours AgroSfer, AgriSfeer; no exact match found.
+**Rejected:** none.
+**Impacts:** The concept note doc is updated in the next step. Anyone with `BRAND_NAME`/`VITE_BRAND_NAME` set in their own `.env`/`.env.local` or Replit secrets must change it there too, or the old name wins.
