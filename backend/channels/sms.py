@@ -145,12 +145,14 @@ def max_parts() -> int:
         return 3
 
 
-def send_sms(farm_id: str, text: str, *, p: SmsProvider | None = None) -> SendResult:
-    """Send `text` to the farm's registered number. Trims, sends, logs."""
+def send_sms(farm_id: str, text: str, *, p: SmsProvider | None = None,
+             parts: int | None = None) -> SendResult:
+    """Send `text` to the farm's registered number. Trims (to `parts`, default
+    SMS_MAX_PARTS), sends, logs."""
     contact = store.get_contact(farm_id)
     if not contact:
         return SendResult("none", "failed", detail="no contact for this farm")
-    body = sms_text.fit(text, max_parts())
+    body = sms_text.fit(text, parts or max_parts())
     if not body:
         return SendResult("none", "failed", detail="empty message")
     prov = p or provider()

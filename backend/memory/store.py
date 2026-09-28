@@ -113,6 +113,25 @@ def _connect() -> sqlite3.Connection:
             updated_at TEXT NOT NULL
         )"""
     )
+    # Crop-problem reports from the keypad menu: follow-up context for the
+    # agent, and (aggregated by district/week, no numbers) a pest-surveillance signal.
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS triage_reports (
+            report_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            farm_id TEXT NOT NULL,
+            district TEXT,
+            crop TEXT NOT NULL,
+            stage TEXT NOT NULL,
+            organ TEXT NOT NULL,
+            symptom TEXT NOT NULL,
+            extent TEXT NOT NULL,
+            coverage TEXT NOT NULL,
+            top_candidate TEXT,
+            detail_json TEXT NOT NULL,
+            sms TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )"""
+    )
     # Webhook deliveries already handled: SMSGate retries a webhook for ~2 days,
     # and a retried sms:received must not earn the farmer a second answer.
     conn.execute(
@@ -405,6 +424,73 @@ def save_ussd_state(ussd_session_id: str, farm_id: str, state: dict) -> None:
             (ussd_session_id, farm_id, json.dumps(state, ensure_ascii=False), _now()),
         )
         conn.commit()
+    finally:
+        conn.close()
+
+
+def latest_ussd_state(farm_id: str, exclude: str | None = None) -> tuple[dict, str] | None:
+    """The farm's most recently touched USSD walk (state, updated_at), other than `exclude`."""
+    conn = _connect()
+    try:
+        row = conn.execute(
+            "SELECT state_json, updated_at FROM ussd_sessions WHERE farm_id=? AND ussd_session_id<>? "
+            "ORDER BY updated_at DESC LIMIT 1",
+            (farm_id, exclude or ""),
+        ).fetchone()
+        return (json.loads(row[0]), row[1]) if row else None
+    finally:
+        conn.close()
+
+
+def close_other_ussd_states(farm_id: str, keep: str) -> None:
+    """Mark every other walk of this farm finished, so none is offered for resume again."""
+    conn = _connect()
+    try:
+        conn.execute("UPDATE ussd_sessions SET state_json=? WHERE farm_id=? AND ussd_session_id<>?",
+                     (json.dumps({"at": "done"}), farm_id, keep))
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def save_triage_report(farm_id: str, district: str | None, detail: dict, sms: str) -> int:
+    cands = detail.get("candidates") or []
+    conn = _connect()
+    try:
+        cur = conn.execute(
+            "INSERT INTO triage_reports (farm_id, district, crop, stage, organ, symptom, extent, coverage, "
+            "top_candidate, detail_json, sms, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            (farm_id, district, detail["crop"], detail["stage"], detail["organ"], detail["symptom"],
+             detail["extent"], detail["coverage"], cands[0]["key"] if cands else None,
+             json.dumps(detail, ensure_ascii=False), sms, _now()),
+        )
+        conn.commit()
+        return int(cur.lastrowid)
+    finally:
+        conn.close()
+
+
+def latest_triage_report(farm_id: str) -> dict | None:
+    conn = _connect()
+    try:
+        row = conn.execute(
+            "SELECT detail_json, sms, created_at FROM triage_reports WHERE farm_id=? "
+            "ORDER BY report_id DESC LIMIT 1", (farm_id,)).fetchone()
+        return {"detail": json.loads(row[0]), "sms": row[1], "created_at": row[2]} if row else None
+    finally:
+        conn.close()
+
+
+def triage_summary(since_iso: str) -> list[dict]:
+    """Report counts per district × crop × top candidate since a time — no farm ids."""
+    conn = _connect()
+    try:
+        rows = conn.execute(
+            "SELECT district, crop, COALESCE(top_candidate, 'no_kb'), COUNT(*), MAX(created_at) "
+            "FROM triage_reports WHERE created_at >= ? GROUP BY 1, 2, 3 ORDER BY 4 DESC",
+            (since_iso,)).fetchall()
+        return [{"district": r[0], "crop": r[1], "candidate": r[2], "reports": r[3], "latest": r[4]}
+                for r in rows]
     finally:
         conn.close()
 

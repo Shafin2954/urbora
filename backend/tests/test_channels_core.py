@@ -155,7 +155,8 @@ def test_menu_round_trips_through_dict():
 def _fake_run_turn(script):
     seen = {}
 
-    async def fake(session_id, farm_id, message, client=None, language="bn", channel="web"):
+    async def fake(session_id, farm_id, message, client=None, language="bn", channel="web",
+                   context_note=None):
         seen.update(session_id=session_id, farm_id=farm_id, message=message, channel=channel)
         for ev in script:
             yield ev
@@ -253,7 +254,8 @@ def test_adapter_keeps_the_ranking_and_flows_text_it(monkeypatch):
     sms.set_provider(rec)
     params = {"district": "Rajshahi", "season": "rabi"}
 
-    async def fake(session_id, farm_id, message, client=None, language="bn", channel="web"):
+    async def fake(session_id, farm_id, message, client=None, language="bn", channel="web",
+                   context_note=None):
         yield sse.tool_call("c1", "crop_scorer", params)
         yield sse.tool_result("c1", "crop_scorer", _scorer())
         yield sse.token("বোরো ধান সবচেয়ে উপযুক্ত। হিসাব পরের SMS-এ।")

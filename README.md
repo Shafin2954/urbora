@@ -50,7 +50,8 @@ same tools:
 | Web app | smartphone | **Working** (the July build) | `frontend/`, `POST /api/chat` |
 | SMS | any | **Working in the simulator; real SMS via an Android phone is built but not yet run on a device** | `backend/channels/sms.py`, `flows.py`; `POST /api/channels/sms/smsgate` |
 | Missed call → SMS | any | **Working in the simulator; ADB bridge built, not yet run on a device** | `backend/channels/bridge/adb.py` |
-| USSD `*code#` | any | **Working in the simulator** (a real short code needs operator provisioning); bdapps request/response shape implemented | `backend/channels/ussd.py`; `POST /api/channels/ussd/bdapps` |
+| USSD `*code#` | any | **Working in the simulator** (a real short code needs operator provisioning); bdapps request/response shape implemented. Every screen fits one Bangla USSD page (80 UCS-2 units, tested over all reachable screens); 9 = more, 0 = back everywhere; a dropped session is offered back on redial | `backend/channels/ussd.py`; `POST /api/channels/ussd/bdapps` |
+| Crop-problem menu (USSD 2) | any | **Working in the simulator.** Crop → stage → where → what it looks like → how much, by digits; a deterministic KB-bounded table names the likely causes, the SMS answer is a template (doses only as the source states them, scaled to the farmer's bigha by `units.py`); no KB coverage → referral to SAAO / 16123. Reports aggregate by district as a pest signal | `backend/kb/triage.py`, `backend/channels/triage_menu.py`; `CHANNELS_RESEARCH.md` §4 |
 | Voice call | any | **Push-to-talk in the browser emulator; real calls through Windows Phone Link built** (bridge + Voicemeeter, no root, no modem) — **the first real call on a paired phone is still to be run.** Sarvam speech verified live (below) | `backend/channels/voice/`, `phonelink.py` |
 | Proactive alerts by SMS | any | **Working** (opt-in loop) | `backend/channels/alerts_job.py` |
 
@@ -58,7 +59,7 @@ And two marketplaces that turn advice into action:
 
 | Marketplace | Status | Where |
 |---|---|---|
-| **Input marketplace** — the agent's `find_inputs` tool ranks nearby dealers (price 40, distance 30, stock 15, trust 15; no paid placement); order on the web, USSD menu 4 or SMS; the dealer confirms by SMS; commission paid by the dealer | **Working, with demo dealers** (labelled ডেমো everywhere) | `backend/market/inputs.py`, `ranking.py`; `#/market`, `#/dealer` |
+| **Input marketplace** — the agent's `find_inputs` tool ranks nearby dealers (price 40, distance 30, stock 15, trust 15; no paid placement); order on the web, USSD menu 5 or SMS; the dealer confirms by SMS; commission paid by the dealer | **Working, with demo dealers** (labelled ডেমো everywhere) | `backend/market/inputs.py`, `ranking.py`; `#/market`, `#/dealer` |
 | **Produce marketplace** — the farmer lists the harvest (`বিক্রি আলু 500 কেজি 22 টাকা`), sees a cited price guide, buyers offer, the farmer accepts with one SMS reply; the platform fee is paid by the buyer | **Working, with demo buyers** | `backend/market/produce.py`; `#/market`, `#/buyer` |
 
 Try it: `#/phone` is a button-phone emulator (dial `*3700#`, SMS, missed call, call),

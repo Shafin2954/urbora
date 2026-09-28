@@ -133,7 +133,8 @@ def test_voice_turn_then_hang_up_texts_the_plan(monkeypatch):
                         lambda text, provider=None, wav=False: (speech.Audio(b"wav", "audio/wav"), "sarvam"))
     seen = {}
 
-    async def fake_run_turn(session_id, farm_id, message, client=None, language="bn", channel="web"):
+    async def fake_run_turn(session_id, farm_id, message, client=None, language="bn", channel="web",
+                   context_note=None):
         seen.update(session_id=session_id, message=message, channel=channel)
         yield sse.token("আলুর জন্য পরিকল্পনা তৈরি হয়েছে।")
         yield {"type": "plan_update", "plan": _plan()}
@@ -174,7 +175,8 @@ def test_tts_failure_still_returns_the_text(monkeypatch):
 
     monkeypatch.setattr(speech, "synthesize", broken)
 
-    async def fake(session_id, farm_id, message, client=None, language="bn", channel="web"):
+    async def fake(session_id, farm_id, message, client=None, language="bn", channel="web",
+                   context_note=None):
         yield sse.token("নমস্কার")
 
     monkeypatch.setattr(loop, "run_turn", fake)

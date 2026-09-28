@@ -29,6 +29,11 @@ Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
   `voice/turn.py` (`voice_turn`, `hang_up` → SMS summary), `bridge/adb.py`
   (missed-call watcher over ADB).
 - `backend/agent/loop.py` — `run_turn(..., channel=)` + `CHANNEL_NOTES`.
+- `CHANNELS_RESEARCH.md` — verified telecom/SMSGate/16123 facts + the KB-bounded crop-problem tree. Read before touching channels.
+- `backend/channels/bridge/phone_up.py` — one command: phone as SMS gateway over USB (adb forward 8080 / reverse 8000, webhooks).
+- `backend/channels/ussd.py` — screen budget (`fits`, 80 UCS-2 / 182 GSM-7), pager (`paginate`/`paged`/`pick_paged`), 9 = more / 0 = back, resume of dropped walks.
+- `backend/kb/triage.py` (deterministic crop-problem table, SMS template) + `backend/channels/triage_menu.py` (USSD menu 2, `run_problem_action`); store table `triage_reports`, `triage_summary()`.
+- `run_turn(..., context_note=)` — server note a channel attaches (recent triage for SMS follow-ups).
 - `backend/market/` — `db.py` (market tables in the same SQLite file), `catalog.py`
   (generic inputs), `ranking.py` (price/distance/stock/trust), `inputs.py`
   (`find_inputs` tool, orders + state machine, dealers, SMS), `produce.py`
@@ -46,7 +51,7 @@ Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
   `#/market` (`pages/MarketPage.jsx`), `#/dealer`, `#/buyer`
   (`pages/PartnerPages.jsx`). API clients `src/api/channels.js`, `src/api/market.js`.
 - Tests: `backend/tests/test_channels_{core,sms,ussd,voice}.py`,
-  `backend/tests/test_market.py`, `tests/test_market_finance.py`. Suite 562 green.
+  `backend/tests/test_market.py`, `tests/test_market_finance.py`. Suite 615 green (2026-09-28).
 - Gone: `data/agristats.db` (0-byte decoy), `NodeInspector.jsx`, `TracePanel.jsx`.
 
 ## Ownership

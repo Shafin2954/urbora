@@ -192,7 +192,7 @@ def _ctx():
 def test_ussd_buy_urea(rec):
     c = _ctx()
     screen, state, _ = step(None, None, c)
-    for t in ["4", "1", "1", "2"]:
+    for t in ["5", "1", "1", "2"]:
         screen, state, action = step(state, t, c)
     assert "মোট ৳2,700" in screen.text
     screen, state, action = step(state, "1", c)
@@ -205,11 +205,11 @@ def test_ussd_buy_urea(rec):
 def test_ussd_sell_potato_shows_the_price_guide(rec):
     c = _ctx()
     screen, state, _ = step(None, None, c)
-    for t in ["5", "3", "500"]:
+    for t in ["6", "3", "500"]:
         screen, state, action = step(state, t, c)
-    assert "খামার-দাম ৳7/কেজি" in screen.text
+    assert "খামারে ৳7" in screen.text
     screen, state, _ = step(state, "*", c)
-    assert "দাম ক্রেতা বলবেন" in screen.text
+    assert "দাম ক্রেতা বলবে" in screen.text
     screen, state, action = step(state, "1", c)
     assert action["op"] == "list" and action["price"] is None
 
@@ -218,7 +218,7 @@ def test_ussd_market_without_a_district_sends_the_farmer_to_intake(rec):
     from backend.market.ussd_menus import SUBMENUS
     c = UssdContext(brand="B", farm_id="x", profile=None, submenus=SUBMENUS)
     _, state, _ = step(None, None, c)
-    screen, _, _ = step(state, "4", c)
+    screen, _, _ = step(state, "5", c)
     assert screen.end and "জেলা" in screen.text
 
 

@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from backend.memory import store
@@ -160,7 +161,8 @@ async def run_channel_turn(
     chunks: list[str] = []
     try:
         async for event in run_turn(session_id, farm_id, message, client=client,
-                                    language=language, channel=channel):
+                                    language=language, channel=channel,
+                                    context_note=_triage_context(farm_id, channel)):
             kind = event.get("type")
             if kind == "token":
                 chunks.append(event.get("text", ""))
@@ -202,6 +204,27 @@ async def run_channel_turn(
     store.save_channel_turn(session_id, farm_id, channel, masked, message,
                             reply.display_text(), reply.events)
     return reply
+
+
+TRIAGE_CONTEXT_WINDOW = timedelta(hours=48)
+
+
+def _triage_context(farm_id: str, channel: str) -> str | None:
+    """A crop-problem report the farmer made in the last 48 h, so an SMS follow-up
+    ("কোন দোকানে পাব?", "কতবার দেব?") is read against it."""
+    if channel not in ("sms", "ussd"):
+        return None
+    report = store.latest_triage_report(farm_id)
+    if not report:
+        return None
+    try:
+        when = datetime.fromisoformat(report["created_at"])
+    except ValueError:
+        return None
+    if datetime.now(timezone.utc) - when > TRIAGE_CONTEXT_WINDOW:
+        return None
+    from backend.kb.triage import agent_note
+    return agent_note(report["detail"])
 
 
 def cost_is_complete(crop: str | None) -> bool:
