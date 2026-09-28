@@ -93,9 +93,16 @@ async def smsgate_webhook(request: Request, background: BackgroundTasks) -> dict
     key = os.environ.get("SMSGATE_SIGNING_KEY", "")
     if key:
         ts = request.headers.get("X-Timestamp", "")
-        if not sms.verify_smsgate_signature(raw, ts, request.headers.get("X-Signature", ""), key):
+        sig = request.headers.get("X-Signature", "")
+        if not sms.verify_smsgate_signature(raw, ts, sig, key):
+            # Say why (never the key): the usual cause is SMSGATE_SIGNING_KEY not matching
+            # the app's Settings -> Webhooks -> Signing key.
+            log.warning("SMSGate webhook refused: bad signature (timestamp %s, signature %s, key length %d)",
+                        "present" if ts else "MISSING", f"{len(sig)} chars" if sig else "MISSING", len(key))
             raise HTTPException(401, "bad signature")
         if not ts.isdigit() or abs(time.time() - int(ts)) > SIGNATURE_WINDOW_S:
+            log.warning("SMSGate webhook refused: timestamp off by %s s (phone/laptop clock?)",
+                        int(time.time() - int(ts)) if ts.isdigit() else "?")
             raise HTTPException(401, "stale signature")
     try:
         body = json.loads(raw or b"{}")

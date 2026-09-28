@@ -7,8 +7,11 @@ browser phone emulator, the ADB missed-call bridge, or a test.
 from __future__ import annotations
 
 import logging
+import os
+from datetime import datetime, timedelta, timezone
 
 from backend.branding import BRAND_NAME
+from backend.memory import store
 
 from . import sms, sms_text
 from .adapter import ChannelReply, cost_is_complete, run_channel_turn
@@ -21,6 +24,40 @@ WELCOME_SMS = (
     "প্রশ্ন লিখে SMS করুন, যেমন: রাজশাহীতে 2 বিঘা, রবি মৌসুমে কী চাষ করব?\n"
     "মেনু পেতে লিখুন: মেনু। অথবা কল করুন।"
 )
+
+
+ECHO_WINDOW = timedelta(minutes=15)
+RATE_WINDOW = timedelta(minutes=5)
+RATE_LIMIT = 8        # handled messages per phone per window; a person does not text faster
+
+
+def _norm(text: str) -> str:
+    return " ".join((text or "").split())
+
+
+def loop_reason(local: str, farm_id: str, text: str) -> str | None:
+    """Why an inbound SMS must NOT be answered, or None.
+
+    An auto-responder on a SIM can talk to itself: if an answer lands back on the
+    gateway phone (the service's own number, or a test SIM in the same phone),
+    it arrives as a new "farmer" message and gets answered again (LOG4
+    2026-09-29 — it happened, three rounds). Three independent guards:
+    the sender is one of our own numbers; the text is something we sent;
+    the phone is texting faster than a person can.
+    """
+    own = {normalise(n) for n in os.environ.get("CHANNEL_OWN_NUMBERS", "").split(",") if n.strip()}
+    if local in own:
+        return "own number"
+    now = datetime.now(timezone.utc)
+    body = _norm(text)
+    if len(body) >= 8:
+        for sent in store.recent_outbound_bodies((now - ECHO_WINDOW).isoformat(timespec="seconds")):
+            sent = _norm(sent)
+            if body == sent or sent.startswith(body[:60]) or body.startswith(sent[:60]):
+                return "echo of our own SMS"
+    if store.count_inbound(farm_id, (now - RATE_WINDOW).isoformat(timespec="seconds")) >= RATE_LIMIT:
+        return "rate limit"
+    return None
 
 
 def send_summary(reply: ChannelReply) -> sms.SendResult | None:
@@ -49,9 +86,13 @@ async def handle_inbound_sms(msisdn: str, text: str, provider_name: str,
     farm_id = farm_id_for(local)
     text = (text or "").strip()
 
-    from backend.memory import store
-
     from . import sms_menu
+
+    reason = loop_reason(local, farm_id, text)
+    if reason:
+        log.warning("inbound SMS from %s not answered: %s", mask(local), reason)
+        store.log_sms(farm_id, "in", text, sms_text.segments(text), provider_name, f"ignored: {reason}", ref)
+        return None
     store.upsert_contact(farm_id, local, mask(local), "sms")
 
     # "মেনু" starts the USSD menu over SMS; digit replies continue an open walk.

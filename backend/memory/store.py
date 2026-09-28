@@ -389,6 +389,25 @@ def mark_webhook_seen(event_id: str) -> bool:
         conn.close()
 
 
+def recent_outbound_bodies(since_iso: str) -> list[str]:
+    """Every SMS body we sent (to anyone) since a time — the SMS loop guard."""
+    conn = _connect()
+    try:
+        return [r[0] for r in conn.execute(
+            "SELECT body FROM sms_log WHERE direction='out' AND created_at >= ?", (since_iso,))]
+    finally:
+        conn.close()
+
+
+def count_inbound(farm_id: str, since_iso: str) -> int:
+    conn = _connect()
+    try:
+        return conn.execute("SELECT COUNT(*) FROM sms_log WHERE farm_id=? AND direction='in' AND created_at >= ?",
+                            (farm_id, since_iso)).fetchone()[0]
+    finally:
+        conn.close()
+
+
 def list_sms(farm_id: str, limit: int = 50) -> list[dict]:
     conn = _connect()
     try:

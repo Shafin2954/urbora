@@ -230,3 +230,19 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** A farmer who cannot read or type gets the same menu by ear; one engine means one set of tests and one screen budget.
 **Rejected:** A separate IVR menu tree (would drift from USSD); sending bdapps screens from Replit (no static IP).
 **Impacts:** Needs the team: real-call `--test-dtmf`, real SMS via `phone_up`, bdapps account, a real button phone for Bangla rendering.
+
+# 2026-09-29
+
+## [00:55] First real SMS through the phone; an SMS loop found and closed
+**Did:**
+- Phone (SM-A556E, dual SIM: test "farmer" SIM …766, service SIM …884) on USB; `phone_up` all green after three setup fixes: (1) Android's restricted-settings block on the sideloaded app — the team allowed restricted settings + SMS permission; (2) `SMSGATE_SIGNING_KEY` in `.env.local` held a 49-char value that was not the app's (8-char) webhook key → every webhook 401; replaced with the app's key; (3) the app's **Cloud server** switch was on — turned off so farmers' SMS never leave the phone. Turning the SMS permission off/on left **SEND_SMS** ungranted (gateway error `uid … does not have android.permission.SEND_SMS`), then left the app's SMS receiver detached; a force-stop + START SERVICE fixed receiving.
+- Verified on real SIMs: "Hello" and "মেনু" received by webhook over `adb reverse`; the menu SMS **Delivered** (gateway state); "2" → the crop menu sent.
+- **Bug — SMS loop:** the service SIM (…884, the phone's default sender) texted the test SIM in the same phone; after the app restart, the bot's own menu came back as an incoming "farmer" message from …884 and the bot answered itself three times (#40–45) before the backend was stopped. **Fix:** `flows.loop_reason` — never answer (a) `CHANNEL_OWN_NUMBERS`, (b) text matching an SMS we sent in the last 15 min, (c) >8 messages per phone per 5 min. Ignored messages are logged with the reason. `CHANNEL_OWN_NUMBERS=…884` set locally; `.env.example` documents it.
+- **Bug — internal text leaked to a farmer:** fed its own menu, the model copied the `ask_farmer` tool note ("The question is now on the farmer's screen with a widget. End your turn…") into an SMS. `ask.ASK_NOTE` constant; `adapter.scrub_internal` drops any sentence carrying a tool-note fragment from every phone reply.
+- Diagnostics kept: a refused webhook logs why (missing header / mismatch / clock skew, never the key); a failed send logs the gateway's reason.
+- Tests: 4 new in `test_sms_menu.py`. **Suite 636 passed.**
+- `FUTUREMAKERS_BRIEF.md` (new): the competition's Round 1 requirements, 7 judging criteria, IP terms, from the site's FAQ.
+**Decision:** Loop protection lives in the flow, not in the provider, so every SMS transport gets it.
+**Why:** An auto-responder that can hear itself will eventually talk to itself — dual-SIM testing just made it happen first.
+**Rejected:** Relying on the own-number list alone (a test SIM in the same phone, or an operator echo, still loops).
+**Impacts:** For demos, a second phone as the farmer avoids dual-SIM confusion. ~50 min.

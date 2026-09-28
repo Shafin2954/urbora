@@ -30,11 +30,14 @@ from dataclasses import dataclass
 from typing import Protocol
 
 import httpx
+import logging
 
 from backend.memory import store
 
 from . import sms_text
 from .identity import normalise
+
+log = logging.getLogger("channels.sms")
 
 
 @dataclass
@@ -157,6 +160,8 @@ def send_sms(farm_id: str, text: str, *, p: SmsProvider | None = None,
         return SendResult("none", "failed", detail="empty message")
     prov = p or provider()
     result = prov.send(normalise(contact["msisdn"]), body)
+    if result.status == "failed":
+        log.warning("SMS to %s via %s failed: %s", contact.get("masked", "***"), result.provider, result.detail)
     store.log_sms(farm_id, "out", body, sms_text.segments(body), result.provider,
                   result.status, result.provider_ref)
     return result

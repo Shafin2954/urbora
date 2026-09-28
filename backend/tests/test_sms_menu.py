@@ -94,3 +94,33 @@ def test_question_screen_takes_free_text_as_the_question(monkeypatch):
     text_in("8")
     text_in("আমার আলুর পাতা কুঁকড়ে যাচ্ছে")
     assert seen == [{"kind": "ask", "message": "আমার আলুর পাতা কুঁকড়ে যাচ্ছে"}]
+
+
+# --- the SMS loop guard (LOG4 2026-09-29: the bot answered itself three times) --------
+
+
+def test_our_own_sms_coming_back_is_not_answered(_db):
+    body = text_in("মেনু")                          # we sent the menu...
+    asyncio.run(flows.handle_inbound_sms(PHONE, body, "smsgate"))   # ...and it came back in
+    assert _db == []
+    assert store.list_sms(farm_id_for(PHONE))[0]["status"] == "ignored: echo of our own SMS"
+
+
+def test_messages_from_the_service_numbers_are_not_answered(_db, monkeypatch):
+    monkeypatch.setenv("CHANNEL_OWN_NUMBERS", "01999999884, 01812345678")
+    asyncio.run(flows.handle_inbound_sms(PHONE, "ধানে পোকা", "smsgate"))
+    assert _db == []
+
+
+def test_a_phone_texting_faster_than_a_person_is_throttled(_db):
+    for i in range(flows.RATE_LIMIT + 3):
+        asyncio.run(flows.handle_inbound_sms(PHONE, f"প্রশ্ন নম্বর {i} আলুর দাম কত", "smsgate"))
+    assert len(_db) == flows.RATE_LIMIT
+
+
+def test_internal_tool_notes_never_reach_a_farmer():
+    from backend.channels.adapter import scrub_internal
+    from backend.tools.ask import ASK_NOTE
+    assert scrub_internal(f"আপনার জেলা কোনটি? {ASK_NOTE}") == "আপনার জেলা কোনটি?"
+    assert scrub_internal(ASK_NOTE) == ""
+    assert scrub_internal("রাজশাহীতে আলু ভালো হয়। সেচ দিন।") == "রাজশাহীতে আলু ভালো হয়। সেচ দিন।"

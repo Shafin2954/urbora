@@ -195,7 +195,7 @@ async def run_channel_turn(
         if name == "finance_projection" and isinstance(params, dict):
             reply.finance_crop = params.get("crop")
 
-    reply.text = _TITLE_MARKER.sub(" ", "".join(chunks)).strip()
+    reply.text = scrub_internal(_TITLE_MARKER.sub(" ", "".join(chunks)).strip())
     if reply.error and not reply.text:
         reply.text = "দুঃখিত, এখন উত্তর দিতে পারছি না। একটু পরে আবার চেষ্টা করুন।"
     if reply.menu:
@@ -204,6 +204,21 @@ async def run_channel_turn(
     store.save_channel_turn(session_id, farm_id, channel, masked, message,
                             reply.display_text(), reply.events)
     return reply
+
+
+# Tool notes are instructions to the model. A model fed garbage (an SMS loop,
+# LOG4 2026-09-29) copied one into a farmer's SMS; any sentence carrying one of
+# these fragments is dropped from phone replies, whatever the model writes.
+_INTERNAL_FRAGMENTS = ("farmer's screen", "widget", "End your turn", "End your \nturn",
+                       "do not assume an answer", "next user message", "Authoritative farm_id",
+                       "Deterministic extraction")
+_SENTENCE = re.compile(r"[^।.!?\n]+[।.!?]?\n?")
+
+
+def scrub_internal(text: str) -> str:
+    kept = [s for s in _SENTENCE.findall(text)
+            if not any(f.lower() in s.lower() for f in _INTERNAL_FRAGMENTS)]
+    return "".join(kept).strip()
 
 
 TRIAGE_CONTEXT_WINDOW = timedelta(hours=48)
