@@ -1,0 +1,6 @@
+out/
+seg/
+stills/
+clips
+assets/kf*.png
+package-lock.json

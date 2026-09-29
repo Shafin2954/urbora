@@ -28,3 +28,10 @@ dropped in. Waiting on the user's version pick and line picks.
 **Why:** Stills cost 0.25 each, so fixing a bad frame before animating saves the 8.75 a bad clip would waste.
 **Rejected:** Seedance 2.5 1080p (60 credits per clip); uploading the character sheets (the cloud container cannot reach upload.higgsfield.ai).
 **Impacts:** The cloud container cannot reach d8j0ntlcm91z4.cloudfront.net / d2ol7oe51mr4n9.cloudfront.net (Higgsfield results), upload.higgsfield.ai, api.open-meteo.com, api.openai.com or api.sarvam.ai. Without them it cannot download clips to edit or fetch a real rain forecast. Potato and mustard are covered crops (S15 is fine).
+
+## [02:30] Footage and line-art scenes built (no app screens yet)
+**Did:** 16 Kling 3.0 pro clips from the approved keyframes (~192 credits; the potato-field keyframe was redone without bangles, with a sari anchal and a small ring instead). Motion prompts written as DP/editor briefs in `video/storyboard/motion_prompts.md`. Line-art scenes S06, S07, S08, S14, S17 built in `video/build/mg.html` (brag-slim method: each frame is `render(scene, t)`, captured by Playwright and encoded with ffmpeg via `render.js`), using the brand seal, palette v2 and the paddy engraving from `brand/scripts/paddy-engraving.mjs`. Rough-cut edit list in `video/build/assemble.py`. Job IDs in `video/build/jobs.json`.
+**Decision:** Clip 01 is used for its first 3.5 s only (later frames grow dark spots that read as a different disease); clip 12 is used for its first 2.3 s (the sari folds oddly after). App screens (S10 left half, S11, the SMS on S12/S13) wait until the website session finishes.
+**Why:** The team asked for everything except the app/website shots first, and for economy with credits.
+**Rejected:** Re-generating clip 01 now (a trim fixes it for free).
+**Impacts:** Rebuild: `cd video/build && npm i && python3 -m http.server 8765 & node render.js S06 S07 S08 S14 S17 && python3 assemble.py`. The Higgsfield clips live in the team's Higgsfield project "Urbora Round 1 video" and are not in git.
