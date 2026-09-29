@@ -1,4 +1,4 @@
-"""Urbora Round 1 video, v3: base plates -> frame compositor -> final MP4 (audio muxed by audio.py).
+"""Urbora Round 1 video, v4: base plates -> frame compositor -> final MP4 (audio muxed by audio.py).
 
 Run from video/build:
   python3 final.py base      # cut every plate to 1920x1080@30 and join them into out/base.mp4
@@ -14,6 +14,7 @@ from functools import lru_cache
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import imageio_ffmpeg
+import timeline as T
 
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 W, H, FPS = 1920, 1080, 30
@@ -37,21 +38,8 @@ C = dict(shyamol=(13, 59, 46), sun=(242, 162, 49), kraft=(235, 217, 180), sepia=
          straw=(250, 245, 234), ink=(17, 32, 26), paddy=(168, 214, 92), lcd_ink=(28, 40, 30), terra=(184, 71, 42))
 
 # ---------------------------------------------------------------- plates (base track)
-# (start, duration, source, source_in, speed). 'phone'/'web' plates are drawn by the compositor.
-EDL = [
-    (0.00, 1.25, 'N1', 0.0, 1), (1.25, 1.25, 'N5', 0.1, 1), (2.50, 1.25, 'N4', 0.6, 1), (3.75, 1.25, 'N6', 3.0, 1),
-    (5.00, 3.80, 'N2', 0.0, 1), (8.80, 2.50, 'c00', 2.0, 1), (11.30, 3.70, 'N1', 1.2, 1),
-    (15.00, 3.80, 'freeze:N1@4.9', 0, 1),
-    (18.80, 4.20, 'c02', 0.2, 1), (23.00, 2.10, 'c03', 1.0, 1), (25.10, 0.90, 'c04', 1.0, 1), (26.00, 2.30, 'c05', 1.0, 1),
-    (28.30, 1.70, 'c06', 1.0, 1),
-    (30.00, 4.50, 'mg:S06', 0, 8 / 4.5), (34.50, 3.00, 'mg:S07', 0, 1), (37.50, 5.00, 'mg:S08', 0, 1),
-    (42.50, 3.00, 'web', 0, 1), (45.50, 21.00, 'phone', 0, 1),
-    (66.50, 3.00, 'c09', 0.3, 1), (69.50, 3.00, 'c10', 0.5, 1), (72.50, 3.00, 'N6', 0.5, 1), (75.50, 6.00, 'c11', 0.5, 1),
-    (81.50, 12.00, 'mg:S14', 0, 1),
-    (93.50, 1.40, 'c12', 0.2, 1), (94.90, 1.20, 'c13', 1.0, 1), (96.10, 1.20, 'c14', 1.0, 1), (97.30, 2.40, 'N7', 0.5, 1),
-    (99.70, 7.00, 'c15', 1.5, 1), (106.70, 3.00, 'N3', 0.0, 1), (109.70, 9.80, 'mg:S17', 0, 7.8 / 9.8),
-]
-TOTAL = 119.5
+# (start, duration, source, source_in, speed) lives in timeline.py, shared with audio.py.
+EDL, TOTAL = T.EDL, T.TOTAL
 CONFORM = 'scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=30,setsar=1'
 ENC = ['-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '16', '-preset', 'medium', '-an']
 
@@ -70,6 +58,12 @@ def build_base():
         elif src.startswith('mg:'):
             vf = CONFORM + (f',setpts=PTS/{speed},fps=30' if speed != 1 else '')
             run(['-i', f'out/{src[3:]}.mp4', '-vf', vf, '-frames:v', str(n), *ENC, out])
+        elif src.startswith('xf:'):
+            (ca, ia), (cb, ib) = [x.split('@') for x in src[3:].split('>')]
+            la = T.XF_AT + T.XF_LEN; lb = dur - T.XF_AT
+            run(['-ss', ia, '-t', str(la + 0.2), '-i', f'{CLIPS}/{ca}.mp4', '-ss', ib, '-t', str(lb + 0.2), '-i', f'{CLIPS}/{cb}.mp4',
+                 '-filter_complex', f'[0:v]{CONFORM}[a];[1:v]{CONFORM}[b];[a][b]xfade=transition=fade:duration={T.XF_LEN}:offset={T.XF_AT}',
+                 '-frames:v', str(n), *ENC, out])
         elif src.startswith('freeze:'):
             clip, at = src[7:].split('@')
             run(['-ss', at, '-i', f'{CLIPS}/{clip}.mp4', '-frames:v', '1', 'seg3/freeze.png'])
@@ -267,16 +261,11 @@ def camera(img, cx, cy, zoom):
     return img.crop((int(x0), int(y0), int(x0 + sw), int(y0 + sh))).resize((W, H), Image.LANCZOS)
 
 
-# phone demo timeline (absolute seconds)
-D0 = 45.5
-DIAL = [('*', 46.10), ('3', 46.30), ('7', 46.50), ('0', 46.70), ('0', 46.90), ('#', 47.10)]
-GREEN = 47.35
-PRESSES = [('menu', '2', 1, 48.90), ('crop', '2', 2, 50.40), ('stage', '2', 2, 51.90), ('organ', '2', 2, 53.40),
-           ('symptom', '1', 1, 54.90), ('extent', '1', 1, 56.40)]
+# phone demo timeline (absolute seconds, from timeline.py)
+D0, DIAL, GREEN, PRESSES = T.D0, T.DIAL, T.GREEN, T.PRESSES
 ANSWERS = [('কোন ফসল?', 'বোরো ধান'), ('গাছের অবস্থা?', 'কুশি'), ('কোথায় সমস্যা?', 'কাণ্ড/খোল'),
            ('কেমন দেখায়?', 'ডগা শুকানো'), ('কত জমিতে?', 'অল্প')]
-NOTIFY, SMS_ON, SMS_END = 57.60, 58.30, 62.30
-CALLOUT = 62.40
+NOTIFY, SMS_ON, SMS_END, CALLOUT = T.NOTIFY, T.SMS_ON, T.SMS_END, T.CALLOUT
 
 
 def phone_state(t):
@@ -323,8 +312,8 @@ def phone_scene(t):
     paste(ov, sprite('সিমুলেটর · আসল সিস্টেম', 'sansb', 32, C['terra']), 1690, 68, alpha=a)
     # right column: the questions it asked, filling in as the farmer answers
     xr = 1180
-    if t >= 47.8 and t < CALLOUT + 0.2:
-        fa = prog(t, 47.8, 48.3) * (1 - prog(t, CALLOUT - 0.4, CALLOUT))
+    if t >= T.ASK_HEAD and t < CALLOUT + 0.2:
+        fa = prog(t, T.ASK_HEAD, T.ASK_HEAD + 0.5) * (1 - prog(t, CALLOUT - 0.4, CALLOUT))
         paste(ov, sprite('উর্বরা নিজেই জিজ্ঞেস করে', 'serif', 58, C['shyamol']), xr, 200, 'lm', alpha=fa)
         for i, (q, ans) in enumerate(ANSWERS):
             ta = PRESSES[i + 1][3] + 0.35
@@ -350,7 +339,7 @@ def phone_scene(t):
 
 
 def web_scene(t):
-    k = prog(t, 42.5, 45.5)
+    k = prog(t, T.WEB0, D0)
     img = Image.open('assets/home2.png').convert('RGB') if not hasattr(web_scene, 'img') else web_scene.img
     web_scene.img = img
     z = 1.0 + 0.10 * eo(k)
@@ -361,10 +350,11 @@ def web_scene(t):
 
 def alert_phone(frame, t):
     """The rain alert arrives: the same phone rises from the bottom right with the real alert text."""
-    k = eo(prog(t, 76.3, 76.9)) * (1 - prog(t, 81.2, 81.5))
+    a0, a1 = T.ALERT_IN, T.ALERT_OUT
+    k = eo(prog(t, a0, a0 + 0.6)) * (1 - prog(t, a1 - 0.3, a1))
     if k <= 0: return
-    s = min(1.0, (t - 76.3) / 4.6) if t > 76.9 else 0.0
-    st = ('sms', 'alert', -1, round(s * 10) / 10, None) if t > 76.9 else ('notify', '', -1, 0.0, None)
+    s = min(1.0, (t - a0 - 0.6) / 2.6) if t > a0 + 0.6 else 0.0
+    st = ('sms', 'alert', -1, round(s * 10) / 10, None) if t > a0 + 0.6 else ('notify', '', -1, 0.0, None)
     img = phone_with(st).crop((1560, 60, 2540, 1300))
     sc = 0.86; img = img.resize((int(img.width * sc), int(img.height * sc)), Image.LANCZOS)
     y = int(H - img.height * k + 10)
@@ -393,6 +383,49 @@ def chip(ov, t, t0, t1, text, x, y, size=46, bg=None, fg=None, anchor='lm'):
     paste(ov, spr, x, y, anchor, alpha=k, scale=0.9 + 0.1 * back(prog(t, t0, t0 + 0.3)))
 
 
+KSTYLE = {'foot': dict(fill=C['straw'], emph=C['sun'], stroke=4, line=C['sun']),
+          'paper': dict(fill=C['shyamol'], emph=C['terra'], stroke=0, line=C['terra'])}
+
+
+def kinetic(ov, t):
+    """Bangla captions on the emphasis lines (PLAN_v4 §7): words arrive with the voice, the key word lands bigger in
+    colour and gets an underline drawn under it. One phrase at a time."""
+    for v in VO:
+        if v['id'] not in T.KIN or not (v['start'] - 0.05 <= t <= v['end'] + 0.5): continue
+        text, x, y, style, size = T.KIN[v['id']]; st = KSTYLE[style]
+        marks = text.split(); words = v['words']
+        cur = max([w[2] for w in words if w[1] <= t] or [0])
+        idx = [i for i, w in enumerate(words) if w[2] == cur]
+        out = prog(t, v['end'] + 0.2, v['end'] + 0.5)
+        items = []
+        for i in idx:
+            em = marks[i].startswith('*'); wd = marks[i].strip('*')
+            spr = sprite(wd, 'sansb', size, st['emph'] if em else st['fill'], stroke=st['stroke'], stroke_fill=(20, 20, 16))
+            items.append((i, em, spr, spr.width * (1.15 if em else 1.0)))
+        gap = size * 0.12; maxw = 900 if x > 1200 else 1720
+        lines, cur_line, wsum = [], [], 0
+        for it in items:
+            if cur_line and wsum + it[3] > maxw: lines.append(cur_line); cur_line, wsum = [], 0
+            cur_line.append(it); wsum += it[3] + gap
+        if cur_line: lines.append(cur_line)
+        for li, line in enumerate(lines):
+            lw = sum(it[3] for it in line) + gap * (len(line) - 1); cx = x - lw / 2
+            ly = y + (li - (len(lines) - 1)) * size * 1.25
+            for i, em, spr, w in line:
+                wt = words[i][1]; k = prog(t, wt - 0.04, wt + 0.14)
+                if k > 0:
+                    sc = (1.0 + 0.15 * back(prog(t, wt, wt + 0.3))) if em else 1.0
+                    dy = 14 * (1 - eo(prog(t, wt - 0.04, wt + 0.2)))
+                    paste(ov, spr, cx + w / 2, ly + dy, 'mm', alpha=k * (1 - out), scale=sc)
+                    if em:
+                        u = eo(prog(t, wt + 0.12, wt + 0.4)); uw = (w - 24) * u
+                        if uw > 2:
+                            d = ImageDraw.Draw(ov); yy = ly + size * 0.62
+                            if style == 'foot': d.line([(cx + 12, yy + 2), (cx + 12 + uw, yy + 2)], fill=(20, 20, 16, int(160 * (1 - out))), width=9)
+                            d.line([(cx + 12, yy), (cx + 12 + uw, yy)], fill=st['line'] + (int(255 * (1 - out)),), width=7)
+                cx += w + gap
+
+
 def overlays(frame, t):
     ov = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     # hook: the farmer's own figures
@@ -400,25 +433,14 @@ def overlays(frame, t):
     if 1.28 <= t <= 2.45:
         slam(ov, t, 1.28, 2.45, '→', 960, 470, 150, fname='sym')
         slam(ov, t, 1.28, 2.45, '30 মণ', 1360, 470, 190, fill=C['sun'])
-    if 0.3 <= t <= 4.9:
-        a = prog(t, 0.4, 0.8) * (1 - prog(t, 4.6, 4.9))
+    if 0.3 <= t <= 4.6:
+        a = prog(t, 0.4, 0.8) * (1 - prog(t, 4.3, 4.6))
         paste(ov, sprite('সংখ্যাগুলো দিনাজপুরের এক কৃষকের নিজের কথা', 'sans', 32, C['straw'], shadow=True), 60, 70, 'lm', alpha=a)
-    slam(ov, t, 12.3, 14.9, 'আগের মতো ধান হয় না', 960, 860, 96)
-    slam(ov, t, 16.2, 18.7, 'কী যে হইছে?', 960, 860, 110)
-    for t0, t1, who, q in [(19.0, 22.9, 'দোকানি', '"এইটা নিয়া যান"'), (23.1, 25.0, 'প্রতিবেশী', '"পটাশ দিছিলাম"'),
-                           (25.15, 25.95, 'ভিডিও', '"এইটা দিলেই হয়!"'), (26.05, 28.25, 'আব্বার কথা', '"আব্বা এইটাই দিত"')]:
+    for t0, t1, who, q in [(17.25, 20.45, 'দোকানি', '"এইটা নিয়া যান"'), (20.55, 22.8, 'প্রতিবেশী', '"পটাশ দিছিলাম"'),
+                           (22.95, 23.85, 'ভিডিও', '"এইটা দিলেই হয়!"'), (23.95, 26.45, 'আব্বার কথা', '"আব্বা এইটাই দিত"')]:
         chip(ov, t, t0, t1, who, 70, 90, 34, bg=C['shyamol'], fg=C['sun'])
         slam(ov, t, t0 + 0.08, t1, q, 70, 185, 72, anchor='lm')
-    slam(ov, t, 28.9, 30.0, 'কার কথা শুনমু?', 960, 540, 150)
-    if 30.9 <= t <= 34.4:
-        k = prog(t, 30.9, 31.2) * (1 - prog(t, 34.1, 34.4))
-        paste(ov, sprite('যাইতেই পুরা দিন', 'serif', 92, C['shyamol']), 330, 250, 'lm', alpha=k, scale=1.1 - 0.1 * eo(prog(t, 30.9, 31.2)))
-    # the rain alert in words, over the storm
-    slam(ov, t, 72.8, 75.4, 'বৃষ্টির আগেই খবর', 960, 860, 100)
-    # reach: every phone, any hour
-    for t0, t1, txt in [(93.6, 94.85, 'স্মার্টফোন'), (94.95, 96.05, 'বাটন ফোন'), (96.15, 97.25, 'দিন'), (97.35, 99.6, 'রাত')]:
-        slam(ov, t, t0, t1, txt, 960, 860, 120)
-    slam(ov, t, 100.0, 101.9, 'এইবার বুঝলাম', 960, 860, 100)
+    kinetic(ov, t)
     # English subtitles from the placed voice lines
     for v in VO:
         if v['start'] <= t <= v['end'] + 0.15 and v.get('en'):
@@ -434,7 +456,7 @@ def overlays(frame, t):
 
 def punch(img, t):
     """A small zoom punch on the first frames of each hook cut."""
-    for t0 in (0.0, 1.25, 2.5, 3.75, 18.8, 23.0, 25.1, 26.0, 93.5, 94.9, 96.1, 97.3):
+    for t0 in T.CUTS_PUNCH:
         if t0 <= t < t0 + 0.25:
             z = 1.0 + 0.06 * (1 - eo(prog(t, t0, t0 + 0.25)))
             sw, sh = W / z, H / z
@@ -443,13 +465,13 @@ def punch(img, t):
 
 
 def compose(base_rgb, t):
-    if 42.5 <= t < 45.5:
+    if T.WEB0 <= t < D0:
         fr = web_scene(t)
-    elif 45.5 <= t < 66.5:
+    elif D0 <= t < D0 + 17.5:
         fr = phone_scene(t)
     else:
         fr = punch(Image.fromarray(base_rgb), t).convert('RGBA')
-    if 75.5 <= t < 81.5:
+    if T.ALERT_IN <= t < T.ALERT_OUT:
         alert_phone(fr, t)
     return overlays(fr, t).convert('RGB')
 

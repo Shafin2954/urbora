@@ -56,3 +56,6 @@ dropped in. Waiting on the user's version pick and line picks.
 **Why:** v0 was slow and silent; the team asked for hooks, pace, sound and a realistic phone.
 **Rejected:** OpenAI "ash" narrator (speech-to-text heard a line as Urdu), Jawat's voice clone (team found it unnatural), the old c01 macro (spotted leaves read as a different disease), Playwright video capture (ignores device scale; screenshots per state instead).
 **Impacts:** Rebuild: `python3 audio.py <vo_dir> <music_dir>`, `python3 final.py base`, `python3 final.py frames`, then mux. Music credit (Kevin MacLeod, CC BY 4.0) is on the end card and must stay. Higgsfield credits left ≈300.
+
+## 2026-09-30 v4 cut
+See LOG4 [05:30] and PLAN_v4.md. Timing lives in build/timeline.py; the in-mix intelligibility check is build/qa_mix.py.

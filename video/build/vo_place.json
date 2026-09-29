@@ -1,128 +1,961 @@
 [
  {
   "id": "L01",
-  "start": 0.35,
-  "end": 2.729,
-  "en": "Last season I got fifty maunds of rice. This season, thirty."
+  "start": 0.3,
+  "end": 2.807,
+  "en": "Last season I got fifty maunds of paddy. This season, thirty.",
+  "words": [
+   [
+    "গতবার",
+    0.343,
+    0
+   ],
+   [
+    "পঞ্চাশ",
+    0.629,
+    0
+   ],
+   [
+    "মণ",
+    0.962,
+    0
+   ],
+   [
+    "ধান",
+    1.105,
+    0
+   ],
+   [
+    "পাইছিলাম।",
+    1.296,
+    0
+   ],
+   [
+    "এইবার",
+    2.044,
+    1
+   ],
+   [
+    "তিরিশ।",
+    2.354,
+    1
+   ]
+  ]
  },
  {
-  "id": "L02",
-  "start": 5.3,
-  "end": 7.796,
-  "en": "This land was my father's and grandfather's. This soil has fed us."
+  "id": "N01",
+  "start": 5.55,
+  "end": 9.524,
+  "en": "This country's soil is fertile. This soil is our greatest gift.",
+  "words": [
+   [
+    "এ",
+    5.593,
+    0
+   ],
+   [
+    "দেশের",
+    5.721,
+    0
+   ],
+   [
+    "মাটি",
+    6.105,
+    0
+   ],
+   [
+    "উর্বর।",
+    6.425,
+    0
+   ],
+   [
+    "এই",
+    7.299,
+    1
+   ],
+   [
+    "মাটিই",
+    7.479,
+    1
+   ],
+   [
+    "আমাদের",
+    7.84,
+    1
+   ],
+   [
+    "সবচেয়ে",
+    8.26,
+    1
+   ],
+   [
+    "বড়",
+    8.74,
+    1
+   ],
+   [
+    "উপহার।",
+    8.98,
+    1
+   ]
+  ]
  },
  {
-  "id": "L03",
-  "start": 11.5,
-  "end": 14.615,
-  "en": "But the same land doesn't give rice like it used to."
+  "id": "N02",
+  "start": 10.85,
+  "end": 14.605,
+  "en": "But the same land doesn't give paddy like it used to.",
+  "words": [
+   [
+    "কিন্তু",
+    10.893,
+    0
+   ],
+   [
+    "একই",
+    11.443,
+    0
+   ],
+   [
+    "জমিতে",
+    11.757,
+    0
+   ],
+   [
+    "এখন",
+    12.228,
+    0
+   ],
+   [
+    "আর",
+    12.543,
+    0
+   ],
+   [
+    "আগের",
+    12.779,
+    0
+   ],
+   [
+    "মতো",
+    13.171,
+    0
+   ],
+   [
+    "ধান",
+    13.486,
+    0
+   ],
+   [
+    "হয়",
+    13.8,
+    0
+   ],
+   [
+    "না।",
+    14.114,
+    0
+   ]
+  ]
  },
  {
-  "id": "L04",
-  "start": 15.0,
-  "end": 18.787,
-  "en": "The shoots are drying up. I can't even explain what's wrong."
+  "id": "N03",
+  "start": 14.75,
+  "end": 16.29,
+  "en": "One question. Many answers.",
+  "words": [
+   [
+    "প্রশ্ন",
+    14.793,
+    0
+   ],
+   [
+    "একটাই।",
+    15.155,
+    0
+   ],
+   [
+    "উত্তর",
+    15.689,
+    1
+   ],
+   [
+    "অনেক।",
+    15.937,
+    1
+   ]
+  ]
  },
  {
   "id": "L05",
-  "start": 18.95,
-  "end": 22.886,
-  "en": "Brother, take this one. Everyone's taking it this year."
+  "start": 17.2,
+  "end": 20.389,
+  "en": "Brother, take this one. Everyone's taking it this year.",
+  "words": [
+   [
+    "ভাই,",
+    17.205,
+    0
+   ],
+   [
+    "এইটা",
+    17.797,
+    1
+   ],
+   [
+    "নিয়া",
+    18.032,
+    1
+   ],
+   [
+    "যান।",
+    18.314,
+    1
+   ],
+   [
+    "এইবার",
+    18.757,
+    2
+   ],
+   [
+    "সবাই",
+    19.137,
+    2
+   ],
+   [
+    "এইটাই",
+    19.454,
+    2
+   ],
+   [
+    "নিতেছে।",
+    19.834,
+    2
+   ]
+  ]
  },
  {
   "id": "L06",
-  "start": 23.006,
-  "end": 25.033,
-  "en": "I used potash. It worked for me."
+  "start": 20.509,
+  "end": 22.867,
+  "en": "I used potash. It worked for me.",
+  "words": [
+   [
+    "আমি",
+    20.552,
+    0
+   ],
+   [
+    "তো",
+    20.764,
+    0
+   ],
+   [
+    "পটাশ",
+    20.924,
+    0
+   ],
+   [
+    "দিছিলাম,",
+    21.189,
+    0
+   ],
+   [
+    "কাজ",
+    22.12,
+    1
+   ],
+   [
+    "হইছে।",
+    22.353,
+    1
+   ]
+  ]
  },
  {
   "id": "L07",
-  "start": 25.153,
-  "end": 25.857,
-  "en": "Just use this!"
+  "start": 22.987,
+  "end": 23.92,
+  "en": "Just use this!",
+  "words": [
+   [
+    "এইটা",
+    23.03,
+    0
+   ],
+   [
+    "দিলেই",
+    23.263,
+    0
+   ],
+   [
+    "হয়!",
+    23.543,
+    0
+   ]
+  ]
  },
  {
   "id": "L08",
-  "start": 25.977,
-  "end": 28.206,
-  "en": "Father always used this."
+  "start": 24.04,
+  "end": 26.643,
+  "en": "Father always used this.",
+  "words": [
+   [
+    "আব্বা",
+    24.082,
+    0
+   ],
+   [
+    "সবসময়",
+    24.693,
+    0
+   ],
+   [
+    "এইটাই",
+    25.406,
+    0
+   ],
+   [
+    "দিত।",
+    26.016,
+    0
+   ]
+  ]
  },
  {
   "id": "L09",
-  "start": 28.35,
-  "end": 30.366,
-  "en": "Everyone says something different. Whose word do I take?"
+  "start": 26.9,
+  "end": 28.914,
+  "en": "Everyone says something different. Whose word do I take?",
+  "words": [
+   [
+    "একেকজন",
+    26.937,
+    0
+   ],
+   [
+    "একেক",
+    27.286,
+    0
+   ],
+   [
+    "কথা",
+    27.535,
+    0
+   ],
+   [
+    "কয়।",
+    27.734,
+    0
+   ],
+   [
+    "কার",
+    28.148,
+    1
+   ],
+   [
+    "কথা",
+    28.323,
+    1
+   ],
+   [
+    "শুনমু?",
+    28.498,
+    1
+   ]
+  ]
  },
  {
   "id": "L10",
-  "start": 30.6,
-  "end": 32.499,
-  "en": "The upazila agriculture office? Getting there takes all day."
+  "start": 29.9,
+  "end": 32.159,
+  "en": "Just getting to the upazila agriculture office takes a whole day.",
+  "words": [
+   [
+    "উপজেলা",
+    29.943,
+    0
+   ],
+   [
+    "কৃষি",
+    30.308,
+    0
+   ],
+   [
+    "অফিসে",
+    30.568,
+    0
+   ],
+   [
+    "যাইতেই",
+    30.881,
+    0
+   ],
+   [
+    "পুরা",
+    31.246,
+    0
+   ],
+   [
+    "দিন",
+    31.507,
+    0
+   ],
+   [
+    "লাগে।",
+    31.715,
+    0
+   ]
+  ]
  },
  {
   "id": "L11",
-  "start": 34.7,
-  "end": 37.004,
-  "en": "You don't have to go to a bank to send money any more..."
+  "start": 33.2,
+  "end": 36.19,
+  "en": "You don't have to go to a bank to send money any more.",
+  "words": [
+   [
+    "টাকা",
+    33.243,
+    0
+   ],
+   [
+    "পাঠাইতে",
+    33.551,
+    0
+   ],
+   [
+    "তো",
+    34.045,
+    0
+   ],
+   [
+    "এখন",
+    34.231,
+    0
+   ],
+   [
+    "আর",
+    34.478,
+    0
+   ],
+   [
+    "ব্যাংকে",
+    34.663,
+    0
+   ],
+   [
+    "যাইতে",
+    35.157,
+    0
+   ],
+   [
+    "হয়",
+    35.527,
+    0
+   ],
+   [
+    "না।",
+    35.774,
+    0
+   ]
+  ]
  },
  {
   "id": "L12",
-  "start": 37.6,
-  "end": 40.491,
-  "en": "Farming advice is the same now: on the phone in your hand."
+  "start": 36.9,
+  "end": 39.407,
+  "en": "Farming advice is the same now: on the phone in your hand.",
+  "words": [
+   [
+    "কৃষি",
+    36.943,
+    0
+   ],
+   [
+    "পরামর্শও",
+    37.241,
+    0
+   ],
+   [
+    "এখন",
+    37.779,
+    0
+   ],
+   [
+    "তেমনি,",
+    38.018,
+    0
+   ],
+   [
+    "হাতের",
+    38.644,
+    1
+   ],
+   [
+    "ফোনে।",
+    38.948,
+    1
+   ]
+  ]
  },
  {
   "id": "L12b",
-  "start": 40.611,
-  "end": 41.112,
-  "en": "Urbora."
+  "start": 40.0,
+  "end": 40.662,
+  "en": "Urbora.",
+  "words": [
+   [
+    "উর্বরা।",
+    40.037,
+    0
+   ]
+  ]
  },
  {
   "id": "L13",
-  "start": 47.6,
-  "end": 50.619,
-  "en": "Press a few buttons. Urbora asks the questions itself."
+  "start": 46.6,
+  "end": 49.401,
+  "en": "Press a few buttons. Urbora asks the questions itself.",
+  "words": [
+   [
+    "কয়েকটা",
+    46.643,
+    0
+   ],
+   [
+    "বাটন",
+    47.027,
+    0
+   ],
+   [
+    "চাপেন।",
+    47.267,
+    0
+   ],
+   [
+    "উর্বরা",
+    47.875,
+    1
+   ],
+   [
+    "নিজেই",
+    48.178,
+    1
+   ],
+   [
+    "জিজ্ঞেস",
+    48.438,
+    1
+   ],
+   [
+    "করে",
+    48.785,
+    1
+   ],
+   [
+    "নেয়।",
+    48.959,
+    1
+   ]
+  ]
  },
  {
   "id": "L15",
-  "start": 58.4,
-  "end": 63.989,
-  "en": "Then the answer comes by SMS: what's wrong, which medicine, and exactly how much for your land."
+  "start": 55.65,
+  "end": 61.667,
+  "en": "Then the answer comes by SMS: what's wrong, which medicine, and exactly how much for your land.",
+  "words": [
+   [
+    "তারপর",
+    55.693,
+    0
+   ],
+   [
+    "উত্তর",
+    55.935,
+    0
+   ],
+   [
+    "আসে",
+    56.178,
+    0
+   ],
+   [
+    "এসএমএস-এ।",
+    56.339,
+    0
+   ],
+   [
+    "কী",
+    57.053,
+    1
+   ],
+   [
+    "রোগ,",
+    57.335,
+    1
+   ],
+   [
+    "কোন",
+    58.37,
+    2
+   ],
+   [
+    "ওষুধ,",
+    58.536,
+    2
+   ],
+   [
+    "আর",
+    59.17,
+    3
+   ],
+   [
+    "আপনার",
+    59.428,
+    3
+   ],
+   [
+    "জমিতে",
+    59.943,
+    3
+   ],
+   [
+    "ঠিক",
+    60.459,
+    3
+   ],
+   [
+    "কতটুকু।",
+    60.803,
+    3
+   ]
+  ]
  },
  {
   "id": "L16",
-  "start": 66.9,
-  "end": 70.228,
-  "en": "Oh, stem borer? Then take this. This much is all you need."
+  "start": 62.4,
+  "end": 66.549,
+  "en": "Oh, stem borer? Then take this. This much is all you need.",
+  "words": [
+   [
+    "ও,",
+    62.432,
+    0
+   ],
+   [
+    "মাজরা",
+    63.061,
+    1
+   ],
+   [
+    "পোকা?",
+    63.461,
+    1
+   ],
+   [
+    "তাইলে",
+    64.187,
+    2
+   ],
+   [
+    "এইটা",
+    64.565,
+    2
+   ],
+   [
+    "নেন।",
+    64.88,
+    2
+   ],
+   [
+    "এইটুকুই",
+    65.584,
+    3
+   ],
+   [
+    "লাগবে।",
+    66.011,
+    3
+   ]
+  ]
  },
  {
   "id": "L17",
-  "start": 77.8,
-  "end": 80.424,
-  "en": "The warning came before the rain. The urea was saved."
+  "start": 68.9,
+  "end": 71.621,
+  "en": "The warning came before the rain. The urea was saved.",
+  "words": [
+   [
+    "বৃষ্টির",
+    68.943,
+    0
+   ],
+   [
+    "আগেই",
+    69.397,
+    0
+   ],
+   [
+    "খবর",
+    69.681,
+    0
+   ],
+   [
+    "আইলো।",
+    69.908,
+    0
+   ],
+   [
+    "ইউরিয়াটা",
+    70.735,
+    1
+   ],
+   [
+    "বাঁচলো।",
+    71.144,
+    1
+   ]
+  ]
  },
  {
   "id": "L18",
-  "start": 82.0,
-  "end": 87.92,
-  "en": "It doesn't make things up. The numbers come from tested code. If it doesn't know, it says so."
+  "start": 72.4,
+  "end": 77.926,
+  "en": "It doesn't make things up. The numbers come from tested code. If it doesn't know, it says so.",
+  "words": [
+   [
+    "বানিয়ে",
+    72.443,
+    0
+   ],
+   [
+    "কিছু",
+    72.865,
+    0
+   ],
+   [
+    "বলে",
+    73.129,
+    0
+   ],
+   [
+    "না।",
+    73.341,
+    0
+   ],
+   [
+    "হিসাব",
+    73.979,
+    1
+   ],
+   [
+    "আসে",
+    74.301,
+    1
+   ],
+   [
+    "পরীক্ষিত",
+    74.516,
+    1
+   ],
+   [
+    "কোড",
+    74.999,
+    1
+   ],
+   [
+    "থেকে।",
+    75.214,
+    1
+   ],
+   [
+    "না",
+    76.027,
+    2
+   ],
+   [
+    "জানলে,",
+    76.207,
+    2
+   ],
+   [
+    "সোজা",
+    77.008,
+    3
+   ],
+   [
+    "বলে",
+    77.253,
+    3
+   ],
+   [
+    "দেয়।",
+    77.45,
+    3
+   ]
+  ]
  },
  {
   "id": "L19",
-  "start": 93.7,
-  "end": 97.753,
-  "en": "Smartphone or button phone. Day or night."
+  "start": 81.6,
+  "end": 85.334,
+  "en": "Smartphone or button phone. Day or night.",
+  "words": [
+   [
+    "স্মার্টফোন",
+    81.648,
+    0
+   ],
+   [
+    "হোক",
+    82.381,
+    0
+   ],
+   [
+    "বা",
+    82.648,
+    0
+   ],
+   [
+    "বাটন",
+    82.848,
+    0
+   ],
+   [
+    "ফোন।",
+    83.181,
+    0
+   ],
+   [
+    "দিন",
+    83.883,
+    1
+   ],
+   [
+    "হোক",
+    84.185,
+    1
+   ],
+   [
+    "বা",
+    84.488,
+    1
+   ],
+   [
+    "রাত।",
+    84.715,
+    1
+   ]
+  ]
  },
  {
   "id": "L20",
-  "start": 100.0,
-  "end": 101.248,
-  "en": "Well... now I understand."
+  "start": 89.1,
+  "end": 90.449,
+  "en": "Well... now I understand.",
+  "words": [
+   [
+    "যাক,",
+    89.116,
+    0
+   ],
+   [
+    "এইবার",
+    89.815,
+    1
+   ],
+   [
+    "বুঝলাম।",
+    90.039,
+    1
+   ]
+  ]
  },
  {
-  "id": "L21",
-  "start": 106.9,
-  "end": 112.767,
-  "en": "The soil is our gift. The knowledge to care for it is now in everyone's hands. Urbora. May your dreams bear fruit."
+  "id": "L21a",
+  "start": 92.3,
+  "end": 95.981,
+  "en": "The soil is our gift. The knowledge to care for it is now in everyone's hands.",
+  "words": [
+   [
+    "মাটি",
+    92.343,
+    0
+   ],
+   [
+    "আমাদের",
+    92.619,
+    0
+   ],
+   [
+    "উপহার।",
+    93.006,
+    0
+   ],
+   [
+    "তার",
+    93.777,
+    1
+   ],
+   [
+    "যত্নের",
+    93.986,
+    1
+   ],
+   [
+    "জ্ঞান,",
+    94.351,
+    1
+   ],
+   [
+    "এখন",
+    94.945,
+    2
+   ],
+   [
+    "সবার",
+    95.179,
+    2
+   ],
+   [
+    "হাতে।",
+    95.47,
+    2
+   ]
+  ]
+ },
+ {
+  "id": "L21b",
+  "start": 98.3,
+  "end": 99.058,
+  "en": "Urbora.",
+  "words": [
+   [
+    "উর্বরা।",
+    98.337,
+    0
+   ]
+  ]
+ },
+ {
+  "id": "L21c",
+  "start": 99.6,
+  "end": 100.699,
+  "en": "May your dreams bear fruit.",
+  "words": [
+   [
+    "স্বপ্ন",
+    99.659,
+    0
+   ],
+   [
+    "ফলুক।",
+    100.101,
+    0
+   ]
+  ]
  }
 ]
