@@ -4,6 +4,7 @@ Map of the tree. Update after any unit of work so nothing has to be re-explored.
 "?" = not yet known / not yet built.
 
 ## FutureMakers round (September 2026) — read this first
+- `video/` — the Round 1 pitch video. `storyboard/shots.js` is the single source (18 shots, prompts, replicas, cast); `storyboard/build_md.js` regenerates `FINAL_STORYBOARD.md` from it. No app code depends on it.
 Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
 - `backend/branding.py`, `frontend/src/branding.js` — the product name: **Agrosfeer**.
 - `backend/env.py` — loads `.env.local` > `backend/.env` > `.env` (both configs use it).

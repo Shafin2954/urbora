@@ -153,3 +153,12 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** "Agrosfera" collided with an existing agrochemical company and its ordering app. Name search for Agrosfeer: near neighbours AgroSfer, AgriSfeer; no exact match found.
 **Rejected:** none.
 **Impacts:** The concept note doc is updated in the next step. Anyone with `BRAND_NAME`/`VITE_BRAND_NAME` set in their own `.env`/`.env.local` or Replit secrets must change it there too, or the old name wins.
+
+# 2026-09-29
+
+## [23:10] Final 2:00 video storyboard (combines storyboards A, B and C)
+**Did:** New `video/storyboard/shots.js` (18 shots, 1:59: timecodes, hooks, picture, camera, lines, labels, Higgsfield prompts, motion-graphics notes, app-screen replicas R1–R6, the cast), `video/storyboard/build_md.js` and its output `video/FINAL_STORYBOARD.md`. The visual version with sketch panels is the "Urbora Final Cut" artifact.
+**Decision:** Five acts: the question (0:00) → the turn, road rolls up into a phone (0:29) → proof with real app screens (0:44) → trust and reach (1:27) → the daughter in gold paddy and the tagline (1:49). 13 hooks, longest gap 16 s. A gives the family and cast, B the pace and the three-phone proof, C the line art that the footage turns into and out of.
+**Why:** Each earlier storyboard ran about 2:00 alone and each was strong on one thing only; the team asked for one engaging cut that holds judges to the end.
+**Rejected:** Keeping one storyboard and trimming (loses either the warmth or the proof); 16123 framing (brand rule: no blaming the hotline).
+**Impacts:** Name in the video is উর্বরা (Urbora) pending team confirmation; the code still says Agrosfeer. Every on-screen number must come from one real run of Mahmud's case (2 bigha boro, dead centre shoots); blanks like "__ গ্রাম" stay blank until then. S16 crops (potato, mustard) must be checked against crop.db before generating.
