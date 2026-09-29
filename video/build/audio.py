@@ -193,9 +193,9 @@ def sfx_track():
     at(34.45, whoosh(0.9, 250, 3500), 0.8); at(37.9, whoosh(0.9, 250, 3500), 0.8)
     at(36.5, riser(3.6), 1.0); at(39.55, stamp(), 1.1)
     from final import DIAL, GREEN, PRESSES, NOTIFY, CALLOUT
-    for k, t in DIAL: at(t, dtmf(k))
+    for k, t in DIAL: at(t, dtmf(k), 0.8)
     at(GREEN, tick(1400, 0.08), 1.0)
-    for _, k, _, t in PRESSES: at(t, dtmf(k)); at(t + 0.35, tick(2600, 0.04), 0.6)
+    for _, k, _, t in PRESSES: at(t, dtmf(k), 0.35 if t < 51 else 0.8); at(t + 0.35, tick(2600, 0.04), 0.25 if t < 51 else 0.5)
     at(NOTIFY, buzz(0.9)); at(NOTIFY + 0.1, ding())
     at(CALLOUT + 0.5, boom(0.5, 110), 0.5); at(CALLOUT + 0.5, ding(), 0.6)
     at(72.5, rain(9.0), 1.0); at(72.7, boom(2.0, 38), 0.8)
@@ -224,8 +224,12 @@ def mix():
     out = vo + m + s * 0.8
     stereo = np.stack([out, out], 1)
     sf.write('out/mix_raw.wav', stereo, SR)
+    # two-pass master: measure integrated loudness, then gain to -14 LUFS with a -1 dBTP limiter
+    meas = subprocess.run([FF, '-hide_banner', '-i', 'out/mix_raw.wav', '-af', 'ebur128', '-f', 'null', '-'],
+                          capture_output=True, text=True).stderr
+    li = float(meas.rsplit('I:', 1)[1].split('LUFS')[0])
     subprocess.run([FF, '-y', '-loglevel', 'error', '-i', 'out/mix_raw.wav', '-af',
-                    'loudnorm=I=-14:TP=-1.0:LRA=11', '-ar', '48000', 'out/mix.wav'], check=True)
+                    f'volume={-14 - li:.2f}dB,alimiter=limit=0.89:attack=5:release=60', '-ar', '48000', 'out/mix.wav'], check=True)
     print(json.dumps(info), 'lines', len(placed))
 
 
