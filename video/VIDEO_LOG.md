@@ -42,3 +42,10 @@ dropped in. Waiting on the user's version pick and line picks.
 **Why:** Keeps the credits for retakes the team actually asks for.
 **Rejected:** none.
 **Impacts:** Credits left: 532.75 of 747.5 (~215 used: 17 keyframes, 16 clips). Still to do: app screens (S10 replica, S11, SMS on S12/S13, after the website is final), voice-over, music, subtitles, colour grade.
+
+## [03:35] v2 production: plan, voice audition, CC music, 8 new moving shots
+**Did:** `video/PLAN_v2.md` (attention design, beat-mapped structure, script, shot list, QA loop). Jawat's voice clone made and tested (ElevenLabs engine), then dropped at the team's request. 37 Sarvam Bulbul v3 voices auditioned and scored (speech-to-text accuracy, pace, pitch depth and movement); ratan scored best. 8 new keyframes (high quality) and clips: 3 Seedance 2.5 1080p (hook macro, sunrise FPV drone, golden drone), 5 Kling 3.0 pro (urea, sacks, storm, night lantern, farmer calling from behind). Job IDs in `video/build/jobs.json`.
+**Decision:** Music is Kevin MacLeod (incompetech, CC BY 4.0, credited): Vadodora (hook to many answers) → one-bar silence → Carpe Diem (from the reveal) → the Americana build-up for the ending. Vadodora and Carpe Diem are both 95.7 BPM.
+**Why:** Krea's ElevenLabs Music needs a higher plan and Higgsfield has no standalone music model; the team chose a free CC track.
+**Rejected:** Pixabay (blocks automated download); the voice clone (the team found it unnatural).
+**Impacts:** Waiting on the team's 1–2 reference voice files; the new VO must be faster (~2.8–3 words/s). Higgsfield credits left ≈306.
