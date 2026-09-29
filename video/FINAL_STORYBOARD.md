@@ -8,24 +8,23 @@ One film built from the three earlier storyboards: A (the family story) gives th
 
 | Time | Shot | Act | Texture | Hook |
 |---|---|---|---|---|
-| 0:00–0:03 | S01 The question | 1 | HF + HYP | yes |
-| 0:03–0:08 | S02 Fifty, then thirty | 1 | HF |  |
-| 0:08–0:17 | S03 Four faces, four answers | 1 | HF | yes |
-| 0:17–0:21 | S04 Buried in bubbles | 1 | HF + HYP |  |
-| 0:21–0:29 | S05 A whole day for one answer | 1 | HYP | yes |
-| 0:29–0:35 | S06 The road to the bank rolled up | 2 | HYP | yes |
-| 0:35–0:39 | S07 Money comes home | 2 | HF | yes |
-| 0:39–0:44 | S08 The field's road rolls up too | 2 | HYP | yes |
-| 0:44–0:47 | S09 He calls | 3 | HF |  |
-| 0:47–1:03 | S10 It asks him | 3 | REC + HF | yes |
-| 1:03–1:11 | S11 Three ways in, one answer | 3 | REC | yes |
-| 1:11–1:19 | S12 At the shop, with the SMS | 3 | HF + REC | yes |
-| 1:19–1:27 | S13 Before the rain | 3 | HF + REC | yes |
-| 1:27–1:37 | S14 Behind the answer | 4 | REC + HYP | yes |
-| 1:37–1:42 | S15 A fair market | 4 | REC |  |
-| 1:42–1:49 | S16 Other fields, other farmers | 4 | HF | yes |
-| 1:49–1:55 | S17 The dream | 5 | HF | yes |
-| 1:55–1:59 | S18 স্বপ্ন ফলুক | 5 | HYP |  |
+| 0:00–0:07 | S01 Dawn over the boro | 1 | HF | yes |
+| 0:07–0:14 | S02 Something is off | 1 | HF |  |
+| 0:14–0:16 | S03 The question | 1 | HYP + HF | yes |
+| 0:16–0:25 | S04 Four faces, four answers | 1 | HF | yes |
+| 0:25–0:29 | S05 Buried in bubbles | 1 | HF + HYP |  |
+| 0:29–0:37 | S06 A whole day for one answer | 2 | HYP | yes |
+| 0:37–0:40 | S07 Mobile banking, in passing | 2 | HYP | yes |
+| 0:40–0:45 | S08 The field's road rolls up too | 2 | HYP | yes |
+| 0:45–0:48 | S09 He calls | 3 | HF |  |
+| 0:48–1:04 | S10 It asks him | 3 | REC + HF | yes |
+| 1:04–1:12 | S11 Three ways in, one answer | 3 | REC | yes |
+| 1:12–1:20 | S12 At the shop, with the SMS | 3 | HF + REC | yes |
+| 1:20–1:28 | S13 Before the rain | 3 | HF + REC | yes |
+| 1:28–1:40 | S14 Why it can be trusted | 4 | HYP | yes |
+| 1:40–1:47 | S15 Other fields, other farmers | 4 | HF | yes |
+| 1:47–1:54 | S16 The dream | 5 | HF | yes |
+| 1:54–1:59 | S17 স্বপ্ন ফলুক | 5 | HYP |  |
 
 ## Cast (generate a character sheet for each before any shot; prompts refer to them as @NAME)
 
@@ -37,54 +36,64 @@ One film built from the three earlier storyboards: A (the family story) gives th
 
 **Style line, appended to every Higgsfield prompt:** Cinematic documentary realism, shot on 35mm, natural light, northern Bangladesh (Dinajpur), boro season. Shallow depth of field, soft film grain, warm but true colours. No text, no captions, no logos, no watermarks. Phone screens face away from camera or are dark (the screen is composited later).
 
-## Act 1: The question (0:00–0:29)
+## Act 1: The land (0:00–0:29)
 
-_Hook, then the problem in faces, not statistics_
+_The emotional opening, then the problem in faces, not statistics_
 
-### S01 · 0:00–0:03 (3 s) · The question
+### S01 · 0:00–0:07 (7 s) · Dawn over the boro
 
-From: B1 · Texture: Live action (Higgsfield), Line art (HTML motion graphics)
+From: A1 · Texture: Live action (Higgsfield)
 
-**Hook:** A question in the first second. A drum hit and a snap zoom, so nobody scrolls away.
+**Hook:** Beauty before the problem: a slow sunrise over green boro and a solo flute. The line tells the viewer this film is about the land.
 
-**Picture:** Extreme close-up: one dry, brown centre shoot among green rice. On the beat, the camera snap-zooms in and the question slams on screen in big Bangla type.
+**Picture:** Sunrise over a wide field of green boro. Mahmud walks the আইল (the earthen ridge) with a gamcha on his shoulder. Warm, real light; nobody is sad.
 
-**Camera:** Macro, snap zoom on the beat
-- SFX: One sharp dhol hit on the zoom; wind in the leaves
+**Camera:** Wide, slow push-in along the ridge
 
-**On screen:** ধানের হইলো কী?
+**Sound:**
+- Narrator: এ দেশের মাটি উর্বর। এই মাটিই আমাদের সবচেয়ে বড় উপহার। (This country's soil is fertile. This soil is our biggest gift.)
+- SFX: Birds; a soft solo flute comes in
 
 **Labels:** AI-generated footage
 
 **Higgsfield prompt (16:9):**
 
-> Extreme macro close-up of rice plants in a boro paddy field at early morning. In the centre one tiller has a dry, straw-brown dead centre shoot (deadheart from stem borer) while the leaves around it are bright green. Dew drops. Camera: fast push-in (snap zoom) onto the dead shoot. 5 seconds.
+> @MAHMUD walks slowly along a raised earthen ridge (ail) through a wide field of young green boro rice at sunrise, a gamcha over his shoulder, seen from behind and slightly to the side. Low golden sun on the horizon, thin mist over the paddy, birds crossing the sky, palm trees and a tin-roof village far away. Camera: wide shot, slow push-in along the ridge. 5 seconds.
 
-**Motion graphics:** Type slam: "ধানের হইলো কী?" in Noto Serif Bengali Bold, straw on a 70% shyamol band, scales 120%→100% in 6 frames on the drum hit.
-
-### S02 · 0:03–0:08 (5 s) · Fifty, then thirty
+### S02 · 0:07–0:14 (7 s) · Something is off
 
 From: A2 · Texture: Live action (Higgsfield)
 
-**Picture:** Mahmud crouches in his field and parts the plants with one hand. He looks at the dead shoot, then up and off camera, puzzled rather than sad.
+**Picture:** Close-up: his hand parts the plants. A few centre shoots are dry and brown (deadheart, from stem borer). He frowns, puzzled rather than upset.
 
-**Camera:** Medium close-up, slow push-in
+**Camera:** Macro, shallow focus; hand enters from the right
 
 **Sound:**
-- Mahmud: গতবার পঞ্চাশ মণ পাইছিলাম, এইবার তিরিশ। হইলো কী? (Fifty maunds last time, thirty this time. What happened?)
-- SFX: Birds, a distant shallow-engine pump
-
-**On screen:** caption, small: একজন কৃষকের কথা, দিনাজপুর
+- Narrator: কিন্তু একই জমিতে এখন আর আগের মতো ধান হয় না। (But the same land doesn't give like it used to.)
+- SFX: The flute thins out; wind in the leaves
 
 **Labels:** AI-generated footage; dramatization
 
 **Higgsfield prompt (16:9):**
 
-> @MAHMUD crouches between rows of green boro rice, parting the plants with his right hand to look at a dry brown centre shoot. He frowns, puzzled, then lifts his eyes and looks off camera left. Morning sidelight, mist low over the field. Camera: medium close-up, slow push-in. 5 seconds.
+> Macro close-up in a boro rice field: a farmer's weathered hand (@MAHMUD) enters from the right and parts the green rice plants, revealing a tiller whose centre shoot is dry and straw-brown (deadheart from stem borer) among bright green leaves. The hand pauses on it. Morning sidelight, dew. Shallow depth of field, slow push-in. 5 seconds.
 
-**Motion graphics:** Lower-third caption: "একজন কৃষকের কথা, দিনাজপুর" (the figures are one farmer's own words, never a statistic).
+### S03 · 0:14–0:16 (2 s) · The question
 
-### S03 · 0:08–0:17 (9 s) · Four faces, four answers
+From: B1 · Texture: Line art (HTML motion graphics), Live action (Higgsfield)
+
+**Hook:** The mood breaks on a drum hit: snap zoom onto the dead shoot and the question slams on screen. The pace changes here.
+
+**Picture:** The last frame of S02 snap-zooms onto the dry shoot on a drum hit, and the question slams on screen in big Bangla type.
+
+**Camera:** Snap zoom on the beat (digital push into the S02 footage, no new clip)
+- SFX: One sharp dhol hit; the dotara riff starts
+
+**On screen:** ধানের হইলো কী?
+
+**Motion graphics:** Digital snap zoom into the last frame of S02 (6 frames). Type slam: "ধানের হইলো কী?" in Noto Serif Bengali Bold, straw on a 70% shyamol band, scales 120%→100% in 6 frames on the drum hit.
+
+### S04 · 0:16–0:25 (9 s) · Four faces, four answers
 
 From: B2 + A3–A5 · Texture: Live action (Higgsfield)
 
@@ -121,7 +130,7 @@ From: B2 + A3–A5 · Texture: Live action (Higgsfield)
 
 **Motion graphics:** A thin 2×2 grid line appears for 6 frames between cuts (the four answers belong together).
 
-### S04 · 0:17–0:21 (4 s) · Buried in bubbles
+### S05 · 0:25–0:29 (4 s) · Buried in bubbles
 
 From: B3 · Texture: Live action (Higgsfield), Line art (HTML motion graphics)
 
@@ -141,86 +150,67 @@ From: B3 · Texture: Live action (Higgsfield), Line art (HTML motion graphics)
 
 > @MAHMUD stands at the edge of his rice field, facing the camera, and gives a slow, good-humoured shrug with both palms up, eyebrows raised. Overcast soft light. Static medium shot, locked off, plain background of paddy. 5 seconds.
 
-**Motion graphics:** Four cream speech bubbles (the S03 lines, 60% opacity) stack in over his head and shoulders, 4 frames each. The caption lands last.
+**Motion graphics:** Four cream speech bubbles (the S04 lines, 60% opacity) stack in over his head and shoulders, 4 frames each. The caption lands last.
 
-### S05 · 0:21–0:29 (8 s) · A whole day for one answer
+## Act 2: The turn (0:29–0:45)
+
+_The far office, a passing nod to mobile banking, then the name_
+
+### S06 · 0:29–0:37 (8 s) · A whole day for one answer
 
 From: C4 + A6 · Texture: Line art (HTML motion graphics)
 
-**Hook:** Style switch: the live frame freezes and redraws itself as engraved line art. A new texture resets attention at 0:21.
+**Hook:** Style switch: the live frame freezes and redraws itself as engraved line art. A new texture resets attention at 0:29.
 
 **Picture:** The shrug freezes, and pencil lines trace over it until it is line art on kraft paper. The camera pulls out: a long road winds from his field to the upazila agriculture office on the horizon. The sun crosses the sky while a tiny figure walks.
 
 **Camera:** Freeze → redraw (12 frames) → slow pull-out along the road
 
 **Sound:**
-- Narrator: ঠিক পরামর্শ আছে, কিন্তু উপজেলা অফিসে যাইতে গেলেই পুরা দিন শেষ। (The right advice exists, but a trip to the upazila office takes the whole day.)
+- Narrator: উপজেলা কৃষি অফিসে যাইতেই পুরা দিন লাগে। প্রতিবার কি আর যাওয়া যায়? (Just getting to the upazila agriculture office takes a whole day. Nobody can go every time.)
 - SFX: Pencil-scratch on the redraw; footsteps; a clock ticking softly under the sun's arc
 
-**Motion graphics:** Freeze the last frame of S04. Trace it with an animated SVG line (stroke-dashoffset) in sepia ink over kraft, then crossfade the photo out. Pull out to the road scene; the sun travels a dotted arc left to right in 5 s; a 12 px figure walks the road.
+**Motion graphics:** Freeze the last frame of S05. Trace it with an animated SVG line (stroke-dashoffset) in sepia ink over kraft, then crossfade the photo out. Pull out to the road scene; the sun travels a dotted arc left to right in 5 s; a 12 px figure walks the road.
 
-## Act 2: The turn (0:29–0:44)
-
-_The mobile-banking idea in one picture, then the name_
-
-### S06 · 0:29–0:35 (6 s) · The road to the bank rolled up
+### S07 · 0:37–0:40 (3 s) · Mobile banking, in passing
 
 From: C5 · Texture: Line art (HTML motion graphics)
 
-**Hook:** A visual idea the viewer has to work out: the road rolls up like a mat and becomes a phone.
+**Hook:** A quick visual rhyme, only 3 seconds: the road rolls up into a phone. It sets up the next shot rather than being a scene of its own.
 
-**Picture:** Still in line art. A second road leads to a bank building marked ৳, just as long. Then the road rolls up like a mat into a phone, and a ৳ note flies home.
+**Picture:** Still in line art, fast: a road leading to a bank rolls up like a mat into a phone showing ৳. A passing reference, not a scene.
 
-**Camera:** Line art; the road rolls up from the bank end
+**Camera:** Line art; one quick roll-up
 
 **Sound:**
-- Narrator: একসময় টাকা পাঠাইতেও দিন চলে যাইতো। এখন ব্যাংক হাতের মুঠায়। (Sending money used to cost a day too. Now the bank is in your hand.)
-- SFX: A paper-roll whoosh; a soft coin chime when ৳ lands
+- Narrator: মোবাইল ব্যাংকিং যেমন টাকা পাঠানো সহজ করছে, (Just as mobile banking made sending money easy,)
+- SFX: A short paper-roll whoosh
 
-**Motion graphics:** The road path animates from its full length to zero while a phone outline grows at the rolled end. The ৳ glyph arcs along a dotted path to a house.
+**Motion graphics:** One continuous 3 s move: the bank road animates from full length to zero while a phone outline with ৳ grows at the rolled end. No hold on the result; cut straight into S08 on the same whoosh.
 
-### S07 · 0:35–0:39 (4 s) · Money comes home
-
-From: A7 · Texture: Live action (Higgsfield)
-
-**Hook:** Match cut from the drawn phone to a real one. Line art to live action in one move.
-
-**Picture:** The drawn phone becomes Rahima's real phone in the courtyard. She reads a money-received message from their son in the city and smiles. Nobody went to a bank.
-
-**Camera:** Match cut on the phone shape, then a slow pull-back to reveal the courtyard
-- SFX: Phone notification tone; hens in the yard
-
-**Labels:** AI-generated footage
-
-**Higgsfield prompt (16:9):**
-
-> @RAHIMA stands in the sunlit courtyard of a village house with a tin roof and mud walls, hens nearby. She looks at her phone, reads a message and breaks into a warm smile. Camera: starts on a close-up of the phone in her hand (screen facing away), then slowly pulls back to a medium shot. 5 seconds.
-
-**Motion graphics:** Match cut: the S06 phone outline scales to the exact position of the real phone in frame 1 of the footage, then dissolves in 8 frames. Optional unbranded "৳ received" card composited on the screen.
-
-### S08 · 0:39–0:44 (5 s) · The field's road rolls up too
+### S08 · 0:40–0:45 (5 s) · The field's road rolls up too
 
 From: C6 · Texture: Line art (HTML motion graphics)
 
-**Hook:** The name lands at 0:40, a third of the way in. A reveal is a reason to keep watching.
+**Hook:** The name lands at 0:41, a third of the way in. A reveal is a reason to keep watching.
 
 **Picture:** Back to line art: the long road from Mahmud's field rolls up the same way, into his button phone. The seal lands on the screen and the promise appears.
 
 **Camera:** Line art; the road rolls up, the seal stamps onto the phone screen
 
 **Sound:**
-- Narrator: এখন কৃষি পরামর্শও তেমনি, হাতের ফোনে। (Now farming advice is too: on the phone in your hand.)
+- Narrator: তেমনি কৃষি পরামর্শও এখন হাতের ফোনে। (farming advice is now on the phone in your hand too.)
 - SFX: Same roll-up whoosh (the rhyme matters); a warm low chord on the seal
 
 **On screen:** উর্বরা · কৃষি পরামর্শ, এখন হাতের ফোনে
 
-**Motion graphics:** Repeat the S06 roll-up exactly (same timing, same sound) so the viewer sees the rhyme. The seal scales 0→100% with a slight overshoot; wordmark and line fade in under it.
+**Motion graphics:** Repeat the S07 roll-up motion exactly (same move, same sound) so the viewer sees the rhyme. The seal scales 0→100% with a slight overshoot; wordmark and line fade in under it.
 
-## Act 3: Proof (0:44–1:27)
+## Act 3: Proof (0:45–1:28)
 
 _The real product answering the real problem_
 
-### S09 · 0:44–0:47 (3 s) · He calls
+### S09 · 0:45–0:48 (3 s) · He calls
 
 From: A8 · Texture: Live action (Higgsfield)
 
@@ -239,7 +229,7 @@ From: A8 · Texture: Live action (Higgsfield)
 
 > Insert close-up: a farmer's weathered thumb presses the keys of a small black button phone (no brand, no readable screen). Shallow depth of field, green paddy blurred behind. 5 seconds.
 
-### S10 · 0:47–1:03 (16 s) · It asks him
+### S10 · 0:48–1:04 (16 s) · It asks him
 
 From: A8 + B5 + C7 · Texture: Real app (recording or HTML replica), Live action (Higgsfield)
 
@@ -266,7 +256,7 @@ From: A8 + B5 + C7 · Texture: Real app (recording or HTML replica), Live action
 
 **App screen:** R1 (see below)
 
-### S11 · 1:03–1:11 (8 s) · Three ways in, one answer
+### S11 · 1:04–1:12 (8 s) · Three ways in, one answer
 
 From: B6 · Texture: Real app (recording or HTML replica)
 
@@ -288,11 +278,11 @@ From: B6 · Texture: Real app (recording or HTML replica)
 
 **App screen:** R2 (see below)
 
-### S12 · 1:11–1:19 (8 s) · At the shop, with the SMS
+### S12 · 1:12–1:20 (8 s) · At the shop, with the SMS
 
 From: A9 + B7 · Texture: Live action (Higgsfield), Real app (recording or HTML replica)
 
-**Hook:** The payoff of S03: the same shopkeeper, now reading the answer and giving only what it says.
+**Hook:** The payoff of S04: the same shopkeeper, now reading the answer and giving only what it says.
 
 **Picture:** Next morning at the same shop. Rafi holds up the button phone and reads the SMS. The shopkeeper leans in, reads it, nods, and measures out just the amount it says. Mahmud smiles.
 
@@ -319,7 +309,7 @@ From: A9 + B7 · Texture: Live action (Higgsfield), Real app (recording or HTML 
 
 **App screen:** R3 (see below)
 
-### S13 · 1:19–1:27 (8 s) · Before the rain
+### S13 · 1:20–1:28 (8 s) · Before the rain
 
 From: A10 + C8 · Texture: Live action (Higgsfield), Real app (recording or HTML replica)
 
@@ -345,51 +335,30 @@ From: A10 + C8 · Texture: Live action (Higgsfield), Real app (recording or HTML
 
 **App screen:** R4 (see below)
 
-## Act 4: Trust and reach (1:27–1:49)
+## Act 4: Trust and reach (1:28–1:47)
 
 _Why the answer can be believed, and who else it reaches_
 
-### S14 · 1:27–1:37 (10 s) · Behind the answer
+### S14 · 1:28–1:40 (12 s) · Why it can be trusted
 
-From: B10 + C9 · Texture: Real app (recording or HTML replica), Line art (HTML motion graphics)
+From: C9 · Texture: Line art (HTML motion graphics)
 
-**Hook:** Show the machinery: the real tool graph lighting up. Judges score AI integration; this is where they see it.
+**Hook:** Back to line art for the explanation: three icons build left to right, so the idea lands without a single technical word.
 
-**Picture:** The real provenance graph from the web app lights up in order: the farmer's words, the triage table, the dose calculation in code, the SMS template. A second branch: an unknown symptom leads to "তথ্য যথেষ্ট নয়" and a hand-off to a human expert.
+**Picture:** An engraved diagram on kraft: an ear (it listens), a calculator (tested code does the numbers), a book (the source is shown). Under it, a row of channel icons: call, keypad, SMS. Paddy stalks frame the bottom corners.
 
-**Camera:** Screen recording, slow push-in; nodes highlight in sequence
+**Camera:** Animated line art; the three icons draw in one by one, then the channel row
 
 **Sound:**
-- Narrator: উর্বরা বানায়া কিছু বলে না। হিসাব আসে পরীক্ষিত কোড থেকে, আর না জানলে সোজা বলে দেয়। (Urbora doesn't make things up. The numbers come from tested code, and if it doesn't know, it says so.)
-- SFX: A soft tick per node
+- Narrator: উর্বরা বানায়া কিছু বলে না। না জানলে সোজা বলে দেয়। (Urbora doesn't make things up. If it doesn't know, it says so.)
+- Narrator: শহরের মানুষ যে পরামর্শ ফোনে পায়, এখন সেইটা মাঠেও। (The advice city people get on their phones now reaches the field.)
+- SFX: A soft pencil stroke per icon
 
 **On screen:** শোনে · হিসাব করে · উৎস দেখায়
 
-**Labels:** real system output
+**Motion graphics:** Kraft ground, sepia engraved line style (same as S06–S08). Ear → arrow → calculator → arrow → book draw in with stroke-dashoffset, 0.8 s each, timed to the three words of "শোনে · হিসাব করে · উৎস দেখায়" appearing in the shyamol band. Then the three channel phones (call waveform, keypad, SMS bubble) pop in on the REACH line.
 
-**Motion graphics:** Three-word strip "শোনে · হিসাব করে · উৎস দেখায়" in kraft line-art style along the bottom, one word per node group.
-
-**App screen:** R5 (see below)
-
-### S15 · 1:37–1:42 (5 s) · A fair market
-
-From: Mahmud storyboard B10 · Texture: Real app (recording or HTML replica)
-
-**Picture:** The real marketplace page: nearby dealers ranked by price, distance and stock, each price with its dealer and date. The demo label stays visible.
-
-**Camera:** Screen recording, one scroll and a tap on the first dealer
-
-**Sound:**
-- Narrator: কেউ টাকা দিয়া আগে আসতে পারে না। (Nobody can pay to be listed first.)
-- SFX: One tap sound
-
-**On screen:** দাম · দূরত্ব · মজুদ
-
-**Labels:** demo data (on screen the whole time)
-
-**App screen:** R6 (see below)
-
-### S16 · 1:42–1:49 (7 s) · Other fields, other farmers
+### S15 · 1:40–1:47 (7 s) · Other fields, other farmers
 
 From: B9 · Texture: Live action (Higgsfield)
 
@@ -419,15 +388,15 @@ From: B9 · Texture: Live action (Higgsfield)
 
 **Note:** Show only crops the system really covers. Check crop.db for potato and mustard before generating; swap for covered crops if not.
 
-## Act 5: The dream (1:49–1:59)
+## Act 5: The dream (1:47–1:59)
 
 _The emotional close and the name_
 
-### S17 · 1:49–1:55 (6 s) · The dream
+### S16 · 1:47–1:54 (7 s) · The dream
 
 From: A12 · Texture: Live action (Higgsfield)
 
-**Hook:** The emotional peak: his daughter running through ripe gold paddy.
+**Hook:** The emotional peak, and a rhyme with the opening: the green dawn field is now gold, and his daughter runs through it.
 
 **Picture:** Harvest time. The field is gold. Tumpa runs along the ridge with her school bag, laughing, and Mahmud watches her from the paddy with a full sheaf in his arms.
 
@@ -444,7 +413,7 @@ From: A12 · Texture: Live action (Higgsfield)
 
 > @MAHMUD stands in ripe golden paddy holding a sheaf of harvested rice, watching his daughter run past, and smiles, eyes crinkling. Golden hour backlight. Medium close-up, slow push-in. 5 seconds.
 
-### S18 · 1:55–1:59 (4 s) · স্বপ্ন ফলুক
+### S17 · 1:54–1:59 (5 s) · স্বপ্ন ফলুক
 
 From: C10 · Texture: Line art (HTML motion graphics)
 
@@ -458,9 +427,9 @@ From: C10 · Texture: Line art (HTML motion graphics)
 
 **On screen:** উর্বরা · স্বপ্ন ফলুক · Team credit · disclosures
 
-**Labels:** Credits line: dramatization · AI-generated footage (Higgsfield) · keypad shown in simulator · marketplace uses demo data
+**Labels:** Credits line: dramatization · AI-generated footage (Higgsfield) · keypad shown in simulator
 
-**Motion graphics:** Reverse of S05: the photo traces into line art. The sun circle moves up and morphs into the seal (shape tween). Tagline in Galada. Hold the card 2 s; the video ends at 1:59.
+**Motion graphics:** Reverse of S06: the photo traces into line art. The sun circle moves up and morphs into the seal (shape tween). Tagline in Galada. Hold the card 2 s; the video ends at 1:59.
 
 ## App screens (one real run of Mahmud's case feeds all of them)
 
@@ -468,11 +437,9 @@ From: C10 · Texture: Line art (HTML motion graphics)
 - **R2 Three ways in** (S11), from `#/phone (PhonePage.jsx): voice, USSD, SMS`: Three phones side by side. USSD uses the exact menu text from backend/channels/ussd.py main_menu (1. নতুন পরামর্শ … 7. শেষ উত্তর) and a "simulator" tag under that phone for the whole shot. All three end on the same diagnosis and dose from the same real run as R1.
 - **R3 Diagnosis SMS** (S12), from `SMS channel output (backend/channels/sms.py)`: The SMS text copied verbatim from the real run: cause, product, amount for 2 bigha, safety line. Big, readable type. Crop above any footer rather than editing it.
 - **R4 Rain alert SMS** (S13), from `alerts_job.py output`: The real rain-alert text for the pilot upazila, from an Open-Meteo forecast run. Keep its forecast wording and date exactly as produced.
-- **R5 Provenance graph** (S14), from `Web app chat → GraphPanel.jsx`: Record the real app, not a replica: run the same case in the web chat and screen-record the graph as its nodes light up. Then run one unknown-symptom question to record the "তথ্য যথেষ্ট নয়" branch.
-- **R6 Dealer list** (S15), from `#/market (MarketPage.jsx)`: Record the real page. The demo label must stay in frame. One scroll, one tap.
 
 ## Honesty
 
-- Credits line: dramatization · AI-generated footage (Higgsfield) · keypad shown in simulator · marketplace uses demo data (CLAUDE.md rules 13, 15, 16).
+- Credits line: dramatization · AI-generated footage (Higgsfield) · keypad shown in simulator (CLAUDE.md rules 13 and 15).
 - Every number on screen comes from the real run. Blanks such as "__ গ্রাম" are filled from that output, never typed.
 - No generated shot shows a readable phone screen; screens are composited from the replicas.

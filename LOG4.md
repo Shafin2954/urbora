@@ -162,3 +162,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** Each earlier storyboard ran about 2:00 alone and each was strong on one thing only; the team asked for one engaging cut that holds judges to the end.
 **Rejected:** Keeping one storyboard and trimming (loses either the warmth or the proof); 16123 framing (brand rule: no blaming the hotline).
 **Impacts:** Name in the video is উর্বরা (Urbora) pending team confirmation; the code still says Agrosfeer. Every on-screen number must come from one real run of Mahmud's case (2 bigha boro, dead centre shoots); blanks like "__ গ্রাম" stay blank until then. S16 crops (potato, mustard) must be checked against crop.db before generating.
+
+## [23:55] Video storyboard v2: dawn intro, shorter turn, C9 trust shot
+**Did:** Edited `video/storyboard/shots.js` (and regenerated `video/FINAL_STORYBOARD.md`) on team feedback. Now 17 shots, still 1:59.
+**Decision:** Opens on A1/A2 (dawn over the boro, "এ দেশের মাটি উর্বর…", then "কিন্তু একই জমিতে এখন আর আগের মতো ধান হয় না"), then the question slam. The office line no longer says the advice exists; it only says reaching the upazila office takes a whole day. Mobile banking is a 3 s passing reference ("মোবাইল ব্যাংকিং যেমন…", flowing into "তেমনি কৃষি পরামর্শও এখন হাতের ফোনে"). Cut: the "money comes home" shot, the "50 → 30 মণ" shot and the dealer-list shot. The trust shot is storyboard C9 (engraved diagram + channel icons) instead of the recorded tool graph.
+**Why:** Team feedback: the emotional land intro is stronger, the bank was taking too much time, and the dealer-list wording was not right.
+**Rejected:** none.
+**Impacts:** App recordings drop to R1–R4; the provenance graph (old R5) and dealer list (old R6) are no longer filmed. The tool graph is no longer shown anywhere in the video.

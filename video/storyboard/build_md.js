@@ -57,7 +57,7 @@ REPLICAS.forEach(r => w(`- **${r.id} ${r.name}** (${r.shots}), from \`${r.page}\
 w('');
 w('## Honesty');
 w('');
-w('- Credits line: dramatization · AI-generated footage (Higgsfield) · keypad shown in simulator · marketplace uses demo data (CLAUDE.md rules 13, 15, 16).');
+w('- Credits line: dramatization · AI-generated footage (Higgsfield) · keypad shown in simulator (CLAUDE.md rules 13 and 15).');
 w('- Every number on screen comes from the real run. Blanks such as "__ গ্রাম" are filled from that output, never typed.');
 w('- No generated shot shows a readable phone screen; screens are composited from the replicas.');
 w('');
