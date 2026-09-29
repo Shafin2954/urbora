@@ -14,7 +14,7 @@ import logging
 import os
 from datetime import date
 
-from backend.branding import BRAND_NAME
+from backend.branding import BRAND_NAME_BN as BRAND_NAME  # farmer-facing: Bangla name
 from backend.memory import store
 
 from . import sms

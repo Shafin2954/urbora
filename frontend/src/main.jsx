@@ -2,9 +2,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import Root from './Root.jsx'
-import { BRAND_NAME, BRAND_TAGLINE_BN } from './branding.js'
+import { BRAND_NAME_BN, BRAND_TAGLINE_BN } from './branding.js'
 
-document.title = `${BRAND_NAME} — ${BRAND_TAGLINE_BN}`
+document.title = `${BRAND_NAME_BN} · ${BRAND_TAGLINE_BN}`
 
 // NOTES.md #8 — a stale service worker serves ghost JS, and you lose an hour
 // debugging code that isn't running. We never register one (vite.config.js

@@ -295,7 +295,7 @@ const TOOL_LABELS = {
  * top of every node it passes.
  */
 function EdgeView({ edge, isNew, isActive }) {
-  const toKind = edge.tool === 'rag_query' || edge.to.startsWith('source:') ? 'var(--leaf)' : edge.to.startsWith('weather:') || edge.to.startsWith('place:') ? 'var(--soil)' : edge.to === 'plan' || edge.to === 'finance' ? 'var(--green-dark)' : 'var(--green)'
+  const toKind = edge.tool === 'rag_query' || edge.to.startsWith('source:') ? 'var(--leaf)' : edge.to.startsWith('weather:') || edge.to.startsWith('place:') ? 'var(--soil)' : edge.to === 'plan' || edge.to === 'finance' ? 'var(--brand-dark)' : 'var(--brand)'
   const label = TOOL_LABELS[edge.tool] ?? 'কাজ'
   const labelWidth = Math.max(26, label.length * 7 + 12)
   // A straight drop has its midpoint ON the line; nudge the caption clear of it.

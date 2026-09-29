@@ -1,0 +1,39 @@
+{
+  "$schema_note": "Brand tokens v0.1. Source of truth; brand-tokens.css mirrors this file. See brand/BRAND.md.",
+  "version": "0.1.0",
+  "color": {
+    "shyamol": { "value": "#0F5C3B", "name_bn": "শ্যামল", "role": "primary: identity, headings, primary buttons" },
+    "akash":   { "value": "#1570B8", "name_bn": "আকাশ",  "role": "secondary: phone, SMS, links, try-it" },
+    "dhani":   { "value": "#E3A92F", "name_bn": "ধানি",  "role": "accent: key numbers, active step, badges; ink text on it" },
+    "poli":    { "value": "#F6F4EC", "name_bn": "পলি",   "role": "ground: page background" },
+    "ink":     { "value": "#14221A", "name_bn": "কালো মাটি", "role": "all text; never pure black" },
+    "mati":    { "value": "#B34A24", "name_bn": "মাটি লাল", "role": "real warnings only" },
+    "white":   { "value": "#FFFFFF", "role": "cards and surfaces" },
+    "shyamol-50":  { "value": "#EAF3EC" },
+    "shyamol-100": { "value": "#D3E6D8" },
+    "shyamol-300": { "value": "#8DBB9C" },
+    "shyamol-600": { "value": "#1E7A4F" },
+    "shyamol-900": { "value": "#0A3F28" },
+    "akash-50":  { "value": "#E8F2FA" },
+    "akash-100": { "value": "#CFE3F4" },
+    "akash-700": { "value": "#0F5690" },
+    "dhani-50":  { "value": "#FCF5E3" },
+    "dhani-100": { "value": "#F7E6B8" },
+    "dhani-700": { "value": "#A8761A" },
+    "ink-soft":  { "value": "#44564B" },
+    "ink-faint": { "value": "#6E7F74" }
+  },
+  "ratio": { "ground_and_white": 0.60, "shyamol": 0.25, "akash": 0.10, "dhani_max": 0.05 },
+  "font": {
+    "display": { "family": "Tiro Bangla", "fallback": "Noto Serif Bengali, Hind Siliguri, serif", "weights": [400], "min_px": 28, "source": "Google Fonts, SIL OFL" },
+    "text":    { "family": "Hind Siliguri", "fallback": "Noto Sans Bengali, system-ui, sans-serif", "weights": [400, 500, 600], "source": "Google Fonts, SIL OFL" },
+    "mono":    { "family": "JetBrains Mono", "fallback": "ui-monospace, Consolas, monospace", "weights": [400, 600], "source": "Google Fonts, SIL OFL" }
+  },
+  "type_scale_px": [14, 16, 18, 22, 28, 36, 48, 64],
+  "line_height": { "body": 1.6, "display": 1.2 },
+  "radius_px": { "control": 10, "card": 16, "pill": 999 },
+  "border": { "width_px": 1, "color": "shyamol-100" },
+  "space_unit_px": 8,
+  "touch_target_min_px": 48,
+  "motion": { "duration_ms": [200, 300], "easing": "ease-out", "respect_reduced_motion": true }
+}

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brand Guide v0.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&family=Hind+Siliguri:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one editorial column; colour swatches as tall "fabric" strips; type specimens at real size. Tokens mirror brand/tokens/brand-tokens.css. */
+:root {
+  --shyamol: #0F5C3B; --akash: #1570B8; --dhani: #E3A92F; --poli: #F6F4EC; --ink: #14221A; --mati: #B34A24; --white: #FFFFFF;
+  --shyamol-50: #EAF3EC; --shyamol-100: #D3E6D8; --shyamol-600: #1E7A4F; --shyamol-900: #0A3F28;
+  --akash-50: #E8F2FA; --dhani-50: #FCF5E3; --ink-soft: #44564B; --ink-faint: #6E7F74;
+  --display: 'Tiro Bangla', 'Noto Serif Bengali', serif;
+  --text: 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--poli); color: var(--ink); font: 17px/1.65 var(--text); }
+.wrap { max-width: 1040px; margin: 0 auto; padding-inline: 20px; padding-block: 48px 80px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; font-synthesis: none; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(40px, 7vw, 72px); line-height: 1.1; color: var(--shyamol); margin-top: 10px; }
+h2 { font-size: 34px; line-height: 1.2; color: var(--shyamol); margin-bottom: 14px; }
+h3 { font-size: 22px; }
+p { margin: 0; max-width: 64ch; }
+section { padding-top: 56px; margin-top: 56px; border-top: 1px solid var(--shyamol-100); display: grid; gap: 16px; }
+.lead { font-size: 20px; color: var(--ink-soft); margin-top: 14px; }
+.promise { margin-top: 28px; padding: 22px 26px; background: var(--shyamol); color: var(--white); border-radius: 16px; font-family: var(--display); font-size: 28px; line-height: 1.35; }
+.promise small { display: block; font-family: var(--text); font-size: 15px; color: var(--shyamol-100); margin-top: 6px; }
+.swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.sw { border-radius: 16px; overflow: hidden; border: 1px solid var(--shyamol-100); background: var(--white); display: grid; }
+.chip { height: 150px; display: flex; align-items: flex-end; padding: 14px; font-family: var(--display); font-size: 26px; }
+.meta { padding: 12px 14px 16px; display: grid; gap: 2px; font-size: 14px; }
+.meta b { font-size: 16px; }
+.meta code { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); }
+.ratio { display: flex; height: 44px; border-radius: 12px; overflow: hidden; border: 1px solid var(--shyamol-100); }
+.ratio div { display: grid; place-items: center; font-family: var(--mono); font-size: 12px; }
+.minor { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 900px) { .minor { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); } }
+.minor div { border-radius: 10px; padding: 10px 12px; font-family: var(--mono); font-size: 12px; min-height: 64px; display: flex; align-items: flex-end; border: 1px solid var(--shyamol-100); }
+.type-row { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 20px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--shyamol-100); }
+.type-row .lab { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); line-height: 1.5; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.card { background: var(--white); border: 1px solid var(--shyamol-100); border-radius: 16px; padding: 22px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card ul { margin: 0; padding-left: 20px; }
+.do { border-top: 4px solid var(--shyamol-600); }
+.dont { border-top: 4px solid var(--mati); }
+.demo-ui { background: var(--white); border: 1px solid var(--shyamol-100); border-radius: 16px; padding: 24px; display: grid; gap: 14px; }
+.btn { font: 600 17px var(--text); min-height: 48px; padding: 0 22px; border-radius: 10px; border: 0; cursor: default; }
+.btn-p { background: var(--shyamol); color: #fff; }
+.btn-s { background: var(--white); color: var(--akash); border: 1.5px solid var(--akash); }
+.btn-g { background: var(--dhani); color: var(--ink); }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.alert { border-left: 4px solid var(--mati); background: #FBEFE9; padding: 12px 14px; border-radius: 0 10px 10px 0; }
+.num { font-family: var(--display); font-size: 44px; color: var(--shyamol); line-height: 1; }
+.num span { font-family: var(--text); font-size: 16px; color: var(--ink-soft); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+td, th { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--shyamol-100); vertical-align: top; }
+th { font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .06em; }
+.tablewrap { overflow-x: auto; }
+@media (max-width: 760px) {
+  .swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+  .type-row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .wrap { padding-inline: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Brand guide · v0.1 draft · name pending (see NAMES.md)</div>
+  <h1>যে জানে, সোজা বলে।</h1>
+  <p class="lead">The farmer hears many voices: the seller, the neighbour, what his father did. Our brand is the one calm voice that knows his land and tells him straight. Everything below serves that trust.</p>
+  <div class="promise">একবার জিগান, সোজা উত্তর পান, নিজের জমির হিসাবে।<small>Ask once, get a straight answer, for your own land.</small></div>
+
+  <section>
+    <h2>Colour</h2>
+    <p>Four colours from the Bengali landscape. Green is home and growth, blue is the phone people already trust, gold is the ripe paddy and is used sparingly, ivory is the silt of the ground.</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:var(--shyamol);color:#fff">শ্যামল</div><div class="meta"><b>Shyamol Green</b><code>#0F5C3B</code><span>Primary · identity, headings, main buttons</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--akash);color:#fff">আকাশ</div><div class="meta"><b>Akash Blue</b><code>#1570B8</code><span>Secondary · phone, SMS, links</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--dhani);color:var(--ink)">ধানি</div><div class="meta"><b>Dhani Gold</b><code>#E3A92F</code><span>Accent · at most 5%, ink text on it</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--poli);color:var(--ink)">পলি</div><div class="meta"><b>Poli Ivory</b><code>#F6F4EC</code><span>Ground · page background</span></div></div>
+    </div>
+    <div class="ratio" aria-label="Usage ratio">
+      <div style="flex:60;background:var(--poli)">60% ground</div>
+      <div style="flex:25;background:var(--shyamol);color:#fff">25%</div>
+      <div style="flex:10;background:var(--akash);color:#fff">10%</div>
+      <div style="flex:5;background:var(--dhani)">5</div>
+    </div>
+    <div class="minor">
+      <div style="background:var(--ink);color:#fff">Ink #14221A</div>
+      <div style="background:var(--mati);color:#fff">Mati red #B34A24<br>warnings only</div>
+      <div style="background:var(--shyamol-900);color:#fff">Green 900 #0A3F28</div>
+      <div style="background:var(--shyamol-600);color:#fff">Green 600 #1E7A4F</div>
+      <div style="background:var(--shyamol-50)">Green 50 #EAF3EC</div>
+      <div style="background:var(--akash-50)">Blue 50 #E8F2FA</div>
+      <div style="background:var(--dhani-50)">Gold 50 #FCF5E3</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Type</h2>
+    <div class="type-row"><div class="lab">Display · Tiro Bangla<br>28px and up, weight 400</div><div style="font-family:var(--display);font-size:44px;line-height:1.2;color:var(--shyamol)">জেনে বুঝে চাষ</div></div>
+    <div class="type-row"><div class="lab">Text · Hind Siliguri<br>16–18px, 1.6 line height</div><div>মাত্রা: ভিরতাকো 40WG, হেক্টরে 75 গ্রাম (আপনার 2 বিঘায় মোট 20 গ্রাম)। স্প্রের আগে স্থানীয় কৃষি অফিসারকে দেখান।</div></div>
+    <div class="type-row"><div class="lab">Number · Tiro Bangla<br>Western numerals, unit beside</div><div class="num">20 <span>গ্রাম · আপনার 2 বিঘায়</span></div></div>
+    <div class="type-row"><div class="lab">Mono · JetBrains Mono<br>judge-facing trace only</div><div style="font-family:var(--mono);font-size:14px">triage.diagnose(boro_rice, tillering, deadheart) → stem_borer</div></div>
+  </section>
+
+  <section>
+    <h2>In use</h2>
+    <div class="demo-ui">
+      <h3 style="color:var(--shyamol)">ফসলে কী হয়েছে?</h3>
+      <p style="color:var(--ink-soft)">কোন ফসল, কত দিন আগে লাগানো, কোথায় কী দেখছেন, বলুন।</p>
+      <div class="row">
+        <button class="btn btn-p" type="button">সমস্যা বলুন</button>
+        <button class="btn btn-s" type="button">📞 কল করুন</button>
+        <button class="btn btn-g" type="button">নতুন</button>
+      </div>
+      <div class="alert"><b>বৃষ্টির পূর্বাভাস:</b> বৃহস্পতিবার ভারী বৃষ্টি হতে পারে। ইউরিয়া শুক্রবারের পরে দিন। <span style="color:var(--ink-faint)">(Open-Meteo)</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why it will be trusted</h2>
+    <div class="tablewrap"><table>
+      <tr><th>Village trust comes from</th><th>So the brand</th></tr>
+      <tr><td>Having nothing to sell</td><td>Never pushes a product; nobody can pay to rank higher, and we say so.</td></tr>
+      <tr><td>Being right, specifically</td><td>Gives his land's numbers in bigha and মণ, with the source.</td></tr>
+      <tr><td>Admitting limits</td><td>Says "তথ্য যথেষ্ট নয়" instead of guessing.</td></tr>
+      <tr><td>Familiarity</td><td>Field colours, spoken Bangla, "ভাই", not a foreign tech product.</td></tr>
+      <tr><td>Calm</td><td>No alarm colours except real warnings; unhurried layouts.</td></tr>
+      <tr><td>Respect</td><td>Farmers shown as capable, never pitiable.</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Do and don't</h2>
+    <div class="grid2">
+      <div class="card do"><h3>Do</h3><ul>
+        <li>Deep green fields, white space, one clear action</li>
+        <li>Real morning light, hands, paddy, a phone in a weathered hand</li>
+        <li>Spoken Bangla, short sentences, exact numbers</li>
+        <li>Gold only for the one thing that matters on the screen</li>
+      </ul></div>
+      <div class="card dont"><h3>Don't</h3><ul>
+        <li>Gradients, glows, shadows, glass effects</li>
+        <li>Robots, circuit brains, glowing "AI" imagery</li>
+        <li>Pity images, crying farmers, cracked earth</li>
+        <li>Formal Bangla ("প্রদান করা হইবে"), English jargon to farmers</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Name and logo</h2>
+    <p>Ten checked names are in <code>brand/NAMES.md</code>. The recommendation is <b>জিগাই (Jigai)</b> with the tagline <b>জেনে বুঝে চাষ</b>. The logo brief, with three concepts and a prompt, is in <code>brand/LOGO-BRIEF.md</code>. The logo stays green and gold; blue belongs to the phone.</p>
+  </section>
+</div>
+</body>
+</html>

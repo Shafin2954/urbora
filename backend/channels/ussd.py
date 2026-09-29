@@ -504,7 +504,7 @@ def _state_key(ussd_session_id: str) -> str:
 
 
 def build_context(farm_id: str, resume: dict | None = None) -> UssdContext:
-    from backend.branding import BRAND_NAME
+    from backend.branding import BRAND_NAME_BN as BRAND_NAME  # farmer-facing: Bangla name
     from backend.memory import store
     last = next((m["body"] for m in store.list_sms(farm_id, 20) if m["direction"] == "out"), None)
     submenus: dict[str, Any] = {}

@@ -265,6 +265,6 @@ def test_adapter_keeps_the_ranking_and_flows_text_it(monkeypatch):
         reply = asyncio.run(run_channel_turn("01812345678", "কী চাষ করব", "sms"))
         assert reply.ranking_season == "rabi" and reply.ranking["candidates"][0]["crop"] == "boro_rice"
         flows.send_summary(reply)
-        assert rec.sent[-1].startswith("Agrosfeer: রবি মৌসুমে ফসলের ক্রম")
+        assert rec.sent[-1].startswith("উর্বরা: রবি মৌসুমে ফসলের ক্রম")
     finally:
         sms.set_provider(None)

@@ -1,40 +1,50 @@
-/* Agrosfeer design tokens.
+/* Design tokens: the app's mapping of the brand (brand/BRAND-CORE.md §5, palette v2,
+ * 2026-09-30). One scene with one light: deep crop green holds everything steady, turmeric
+ * sunlight is the rare warmth, straw is the ground, kraft + sepia carry the engraved grain.
  *
- * Constraints these values answer to (CLAUDE.md frontend rules):
- *   - a cheap Android phone, possibly held in direct sunlight
- *   - a low-literacy Bangla reader
- *   - a judge who needs to find a number fast
- * So: earthy agricultural palette, high contrast, big type, generous touch
- * targets. No purple/blue gradients, no glassmorphism, no decorative shadows.
+ * Constraints (CLAUDE.md frontend rules) still hold: a cheap Android phone in sunlight, a
+ * low-literacy Bangla reader, big type, 44px+ touch targets, no gradients, no glassmorphism,
+ * no decorative shadows. Deliberately light-only: one palette, tuned for daylight.
  *
- * Deliberately light-only. `color-scheme: light dark` plus a dark override is
- * how you get a half-legible screen in daylight on a phone that happens to be
- * in dark mode. One palette, tuned for the worst lighting we expect.
+ * Token names are kept from earlier passes so App.css and the pages keep working:
+ * --brand* = Deep Shyamol (primary), --sky = Leaf (links, phone moments; the old blue is
+ * retired), --gold = Turmeric Sun, --paddy* = Leaf/Young Paddy (crop facts, healthy states).
  */
 :root {
-  --bg: #f7f4ec; /* cream — paper, not screen-white glare */
+  --bg: #faf5ea; /* Straw */
   --surface: #ffffff;
-  --surface-sunk: #f1ece0;
+  --surface-sunk: #f1eadb;
+  --kraft: #ebd9b4; /* pattern ground */
+  --sepia: #6b4a1e; /* engraved line on kraft */
 
-  --ink: #17251b; /* near-black green; 15:1 on --bg */
-  --ink-soft: #4c5b51;
-  --ink-faint: #77857c;
+  --ink: #11201a; /* Soil Ink; 15.5:1 on --bg */
+  --ink-soft: #3f4f46;
+  --ink-faint: #66766c;
 
-  --green: #2f6b3f; /* primary action + brand; matches PWA theme_color */
-  --green-dark: #24522f;
-  --green-tint: #e6efe4;
-  --leaf: #9ec27a;
+  --brand: #0d3b2e; /* Deep Shyamol; 12.5:1 with white; PWA theme_color */
+  --brand-dark: #082a20;
+  --brand-tint: #e6efe8;
+  --sky: #1b7048; /* Leaf: links and phone moments, 6.1:1 on white */
+  --sky-tint: #e5f1e9;
+  --gold: #f2a231; /* Turmeric Sun: <=8% of a screen, ink text on it (8:1) */
+  --gold-deep: #9a5a06; /* turmeric for text on straw (5:1) */
+  --gold-tint: #fcf1dc;
+
+  --paddy: #1b7048;
+  --paddy-dark: #0d3b2e;
+  --paddy-tint: #e5f1e9;
+  --leaf: #a8d65c; /* Young Paddy: highlights on dark only */
   --soil: #8a6a4a;
-  --clay: #b4531f; /* warnings, exclusions */
-  --border: #ddd6c6;
+  --clay: #b8472a; /* Terracotta: real warnings only */
+  --border: #e2d9c6;
 
-  /* Noto Sans Bengali first: PRD.md §9 names it, and most Android devices
-   * already ship it. NOT loaded from a CDN — venue wifi is assumed hostile
-   * (NOTES.md #11), and a webfont that fails to load at the demo is worse
-   * than a system font that always works. TODO before the offline boot test
-   * (H20-H22): self-host the woff2 in public/ so desktops match phones. */
-  --sans: 'Noto Sans Bengali', 'Hind Siliguri', system-ui, 'Segoe UI', Roboto,
-    sans-serif;
+  /* Noto Serif Bengali for display (textbook/newspaper forms read as trustworthy), Noto Sans
+   * Bengali for reading (ships on most Android phones), Instrument Sans and Fraunces for Latin,
+   * Galada only for the tagline. Loaded in index.html with display=swap. */
+  --sans: 'Instrument Sans', 'Noto Sans Bengali', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --display: 'Noto Serif Bengali', 'Fraunces', Georgia, serif;
+  --latin-display: 'Fraunces', 'Noto Serif Bengali', Georgia, serif;
+  --hand: 'Galada', 'Noto Serif Bengali', serif;
   --mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
   font: 15px/1.5 var(--sans);
@@ -64,7 +74,9 @@ h1,
 h2,
 h3 {
   margin: 0;
-  font-weight: 650;
+  font-family: var(--display);
+  font-weight: 700;
+  font-synthesis: none;
   line-height: 1.25;
   color: var(--ink);
 }
@@ -95,14 +107,14 @@ button {
   padding: 0 20px;
   border: 1px solid transparent;
   border-radius: 10px;
-  background: var(--green);
+  background: var(--brand);
   color: #fff;
   font-weight: 600;
   cursor: pointer;
 }
 
 button:hover:not(:disabled) {
-  background: var(--green-dark);
+  background: var(--brand-dark);
 }
 
 button:disabled {
@@ -114,16 +126,16 @@ button:disabled {
 
 button.secondary {
   background: var(--surface);
-  color: var(--green-dark);
+  color: var(--brand-dark);
   border-color: var(--border);
 }
 
 button.secondary:hover:not(:disabled) {
-  background: var(--green-tint);
+  background: var(--brand-tint);
 }
 
 /* Visible focus is an accessibility floor, not decoration. */
 :focus-visible {
-  outline: 3px solid var(--green);
+  outline: 3px solid var(--brand);
   outline-offset: 2px;
 }

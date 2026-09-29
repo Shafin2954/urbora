@@ -260,3 +260,164 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The team wants a farmer to never repeat himself, and the next question to depend on how long he has been away.
 **Rejected:** Letting the model infer "how long since" or the crop stage from history (rule 1); storing free-text LLM summaries with figures (rule 15).
 **Impacts:** Next session is the Round 1 docs (team's call); this plan is ready for the docs' "solution" section and for a later build.
+
+## [01:55] Round 1 form answers v2: the problem is the farmer's, not ours
+**Did:** `ROUND1_FORM.md` (new): rewrite of Shafin Bhai's form draft. Every section is under its word limit (counted with a script). Checked the facts against sources. The AIS 16123 page says 8 am to 8 pm, closed Fri/Sat/government holidays, 25 paisa/min. BSS says "around 200 calls daily" (Aug 2024 to Mar 2025). Rahaman et al. 2018 (120 rice farmers, 3 districts): 69.16% get pesticide advice from dealers, 7.5% from extension workers. Tools = 17 (tools_spec.py), default model gpt-4o, tests 636.
+**Decision:** Lead with one farmer problem: when something goes wrong in the field, the reachable adviser is the pesticide seller. Order of jobs: crop problem → this week's tasks/alerts → what to grow and its profit. The marketplace is reduced to one paragraph as the funding model. "Digital inclusion" is how the solution fits the category, not the headline problem.
+**Why:** A senior reviewer asked "what one problem do you solve for a farmer?" and "consultancy by an AI agent" is a solution, not a problem. The crop-problem menu matches most 16123 calls and works without reading, but v1 never mentioned it.
+**Rejected:** Pitching "access to AI" as the problem (farmers do not ask for AI; judges have heard "digital divide" often). Claiming a digital-literacy training effect (we have no mechanism or evidence). Dropping 16123 as a competitor (we pitch it as a partner and handover target).
+**Impacts:** Before submitting, reconcile GSMA 26% (rural adults who own a smartphone) with BBS 69% (almost certainly rural household access). Open the second dealer source before quoting it. The video storyboard should follow this problem framing.
+
+## [02:45] Video tooling: FFmpeg on D:, brag plugin installed
+**Did:** FFmpeg 9.0.2 (gyan.dev full build) unpacked to `D:\tools\ffmpeg-9.0.2-full_build\bin` and added to the user PATH. Brag plugin 0.4.0 (latent-spaces/brag, a HyperFrames launch-video skill) installed at user scope from its HTTPS URL. Deleted the two failed FFmpeg downloads in the WinGet temp folder.
+**Decision:** Use HyperFrames (through brag) as the video renderer, not Remotion. Direct it with our own storyboard; plain one-command `/brag` output is off-genre for a problem/impact pitch.
+**Why:** The winget package for Gyan 9.0.2 is broken (its manifest expects an `ffplay.exe` the zip does not have), but the zip itself passed winget's hash check. The BtbN 8.1 download failed its hash check, so it was not used. The SSH clone of the marketplace failed because github.com is not in known_hosts; HTTPS works.
+**Rejected:** Skipping the hash check (security). Running two renderers.
+**Impacts:** Brag's voiceover (Kokoro) has no Bangla voice; use Sarvam or a human voice. Brag has no hooks; its inspect step skips .env/keys.
+
+## [11:42] Round 1 form answers v3: the idea and the plan, not the gaps
+**Did:** Rewrote `ROUND1_FORM.md`. Removed "Current status" and "Limitations and risks". Added a farmer's journey (Rahima, a made-up example) and "Responsible by design" (read-back, keypad fallback, hashed numbers, handover). Unbuilt parts (handover, speech tuning on farmers' voices) now sit in the Year 1 plan. Every section is under its word limit (script count: 267/472/287/297/296/187).
+**Decision:** Round 1 answers describe the idea, how AI enables it and the 2–3 year plan. They do not list what the prototype lacks.
+**Why:** Round 1 asks for an idea; a prototype is not required. Listing gaps spent words on things the judges did not ask about.
+**Rejected:** Dropping the prior-work mention (the FAQ requires disclosing prior development; it stays as one positive sentence in Feasibility). Dropping risks entirely ("Responsible & ethical AI use" is a judging criterion; kept as safeguards).
+**Impacts:** What really works today (SMS real, USSD simulator, voice via the Android bridge, demo marketplace rows) is in the team notes for Q&A. Answer honestly if judges ask. The video is next, in a separate session.
+
+## [12:08] Video storyboards: Mahmud, three versions; the form's crop problem has no rule
+**Did:** Wrote `VIDEO_STORYBOARDS.md`: three ~1:55 storyboards (A: a story film of one Friday night; B: a proof demo with voice, keypad and SMS side by side; C: a split screen of the same night with and without the service), a comparison, and shared rules.
+**Decision:** The farmer is **Mahmud** (male, 2 bigha boro, button phone), replacing Rahima, as the team asked. His problem is **stem borer / deadheart** (boro, 20–54 days; Virtako 40WG 75 g/ha scaled to his land by code), not brown leaf spots. Recommended cut: C's split-screen structure, with every "with the service" beat a real recording (call, SMS, rain alert).
+**Why:** `backend/kb/triage.py` has no rule for boro + leaf + spots, so the form's journey shows an answer our own system cannot give. The rain alert's real wording is "do it on the next dry day", not "wait two days".
+**Rejected:** Illustrative ৳ loss counters in version C (rule 2: invented numbers). Kokoro TTS for the narration (no Bangla voice).
+**Impacts:** `ROUND1_FORM.md` still tells the Rahima / brown-spot story. It should change to match the video before submission (waiting on the team). Before shooting, run Mahmud's case through the real system and use its exact text and gram figure.
+
+## [13:10] Drawn storyboards for the three video versions
+**Did:** Drew all three storyboards (A 11 shots, B 11, C 9) as sketch panels on one page, with timecodes, shot types, Bangla voice-over, honesty labels and an edit timeline per version. Published as a private artifact (https://claude.ai/artifact/XHgd7nBEVBPdda1sTY7ynm). The source HTML lives in the session scratchpad, not the repo.
+**Decision:** No new decisions; the drawings follow `VIDEO_STORYBOARDS.md`. Where the system gives a figure (the gram dose, the rain date), the panels leave a "__" blank to fill from real output.
+**Why:** The team wanted to see the shots, not just read about them.
+**Rejected:** AI-generated images per shot (30 frames that don't match each other, and fake-looking farmers).
+**Impacts:** The team has to share the artifact from its Share menu before others can open it.
+
+## [13:40] Team direction: new problem framing and tone for the video; the build works here
+**Did:** Took the team's feedback on the storyboards. Ran `npm run build`: it passes (3 s, only a chunk-size warning). The dev server (:5000) and the built app served by the backend (:8000) both open the sign-in screen on this machine.
+**Decision:** 16123 is not mentioned anywhere in the video. We do not compete with it. The problem is that a rural farmer's advice comes from whoever sells the inputs, while expert, data-backed advice (the kind city people get through smartphones and AI) does not reach him. What we offer: it works out the numbers, answers any time, scales, and has no social barrier. Digital inclusion means rural people get the same digital advantage. Tone: warm, everyday Bangla in the style of a Bangladeshi ad (bKash as a reference), not dramatic and not formal. Brand colours should echo Grameenphone, with a green tone.
+**Why:** Farmers can call a hotline the next morning, so "it is closed at night" is not the real problem. The old copy sounded machine-written.
+**Rejected:** The 16123-closed storyline; the dramatic night-rescue tone.
+**Impacts:** The storyboards get redone (v2) after the team answers the palette, logo and footage questions. "Build does not work" needs the team's exact symptom, because the build passes here.
+
+## [14:40] Root npm scripts; website redesign, first pass (home page + GP-blue palette)
+**Did:** The team's "npm run dev fails" was `npm run dev` run in the repo root, whose Replit-made `package.json` had no dev script. Added `scripts/dev.mjs` plus root scripts: `npm run dev` starts the API (:8000) and Vite (:5000) together; `npm run app` builds and serves the site from the API on :8000, as Replit does; `npm run build`. Redesign: new tokens in `frontend/src/index.css` (telecom blue `--brand*` #0071bc for actions and identity, paddy green `--paddy*` for crop facts; `--green*` renamed to `--brand*` everywhere), Baloo Da 2 headings and Hind Siliguri body from Google Fonts, `components/BrandMark.jsx` placeholder mark (paddy stalk over a signal arc) and new `public/icon*.svg`, and a new `pages/HomePage.jsx` + `home.css` as the front door. The chat advisor moved to `#/app`.
+**Decision:** The home page links every working part (button-phone emulator, web advisor as guest, market, live monitor, dealer and buyer pages). Every statistic shows its source. The phone mock shows the system's real SMS for Mahmud's case (boro, deadheart, 2 bigha → "ভিরতাকো 40WG … মোট 20 গ্রাম"), shortened only by leaving lines out.
+**Why:** The team wants a brand people feel close to, like GP or bKash, and judges need to reach the whole system, not only the chat.
+**Rejected:** A full-viewport hero or gradients (CLAUDE.md frontend rules). Committing on the team's behalf (they did not ask).
+**Impacts:** The live SMS still ends with "কৃষি কল সেন্টার: 16123" (`HOTLINE_LINE`, triage.py); the video must not show it, so the team has to decide whether to drop it. Name and logo are open: `BrandMark.jsx` and `public/icon.svg` are placeholders. Verified: build passes; home, #/app?guest, #/phone and #/market render; no horizontal overflow at 375 px.
+
+## [16:30] Farmer interview, brand kit v0.1, name candidates, handoffs for the next sessions
+**Did:**
+- Turned Shafin Bhai's call with his uncle (Parhail, Dinajpur) into `FIELD_INSIGHTS.md`.
+- Built `brand/`, laid out like the team's WaffleUp brand kit: `BRAND.md`, `VOICE.md`, `NAMES.md`, `LOGO-BRIEF.md`, `tokens/brand-tokens.{json,css}`, `assets/{logo,fonts}/README.md`, `guidelines/index.html`.
+- Mapped the brand into `frontend/src/index.css`: Shyamol green `#0F5C3B` primary, Akash blue `#1570B8` for phone and links, Dhani gold `#E3A92F` as the accent, Poli ivory `#F6F4EC` as the ground, Tiro Bangla display and Hind Siliguri text. Restyled `home.css`, the icons and the PWA theme colour.
+- Wrote `WEBSITE_HANDOFF.md` and updated `VIDEO_HANDOFF.md`.
+
+**Decision:**
+- The brand's role is "the one calm voice that knows" (Sage with a Caregiver's heart). Green leads; blue is kept for phone and channel moments (the GP echo); gold is rare.
+- Recommended name: জিগাই (Jigai). Tagline: জেনে বুঝে চাষ.
+- Ten names came back with no existing organisation found by web search (not a legal clearance).
+
+**Why:**
+- The interview shows the pain is confusion and having no one to trust ("every seller says something different"), plus losses from fertiliser amounts and timing. Weather warnings only help when they say what to do. His village is mostly on smartphones.
+- The team found the all-blue look casual.
+
+**Rejected:**
+- Agrosfeer: AgroSpheres is a US pesticide-delivery firm working with BASF and Bayer.
+- Names already in use: Shufola, Folon, Fosholi, Krishi Bondhu, Abad, Nidan, Thikthak, Thaor, Shalik, Jiggasha, Shoja Kotha, Nishchinto (Agro).
+- Dosor: it means "accomplice" in current politics.
+- Baloo Da 2: too playful.
+
+**Impacts:**
+- Name and logo are still open. Rename only in `branding.py` and `branding.js`; logo files go to `brand/assets/logo/`.
+- iFarmer's Folon already has an AI voice agent, and DAE's BAMIS has AI disease detection. Both are competitors the docs should know about.
+- The contrast ratios in BRAND.md were computed by hand: re-check them with a tool.
+- The web search tool failed for about 20 minutes this session. If a later session sees "classifier gave no verdict", wait and retry.
+
+## [18:30] Name is Sudin (সুদিন); brand direction v1 with a new palette and four logo concepts
+**Did:** Wrote `brand/guidelines/sudin-brand-v1.html` (published privately: https://claude.ai/artifact/6xE7GtKaMbxuR32vcNLQFt). It holds the brand essence, a new palette with the colour-psychology reasoning, WCAG contrast figures computed by script, four vector logo concepts (A sunrise with a sprout, B leaf, C rising grains, D leaves holding the sun) shown in context, and five tagline options. Code is not renamed yet.
+**Decision:** The name is সুদিন / Sudin (team decision). The problem framing moves to diagnosis and falling yield: farmers are trying, but they can't tell what disease or nutrient gap is hurting the crop, the expert help at the agriculture office is far away, and yields are falling ("50 মণ to 30 মণ", one farmer's figures). Sudin brings that expertise to the phone, the way mobile banking brought banking to the hand. Never say the hotline fails. Palette v2 is one scene with one light: Deep Shyamol #0D3B2E, Turmeric Sun #F2A231, Leaf #1B7048, Young Paddy #A8D65C, Straw #FAF5EA, Soil Ink #11201A, and Terracotta #B8472A for warnings only. Akash blue is dropped. My recommendation is logo A and tagline T1, "ফলন ফিরুক, সুদিন ফিরুক".
+**Why:** The team said v0.1 felt detached, sloppy and like a government portal, and that the "সোজা বলে" line described our tone instead of the farmer's problem.
+**Rejected:** AI image-model logos, because they produce raster output that is hard to edit or keep consistent. The flag green #006A4E, because it reads as a government portal. Blue as a brand colour, because it made the palette feel detached.
+**Impacts:** The team must pick a logo (A–D) and a tagline (T1–T5). After that: export the logo set to `brand/assets/logo/`, rename in `branding.py` and `branding.js`, replace the tokens, then redesign the UI. `brand/BRAND.md` and `brand/tokens/` still describe v0.1 until then.
+
+## [23:05] Round 1 form v4: rebuilt on the farmer interview, 16123 removed
+**Did:** Rewrote `ROUND1_FORM.md` as v4 and kept the old version as `ROUND1_FORM_v3.md`. Added "Part 0", a table that maps each thing the Dinajpur farmer said to a feature. All six answers are within the form's word limits (Problem 294/300, Solution 495/500, AI 288, Impact 290, Feasibility 285, Differentiation 170). Updated repograph.md.
+**Decision:** The name is Sudin (সুদিন), from the branding session. The problem is confusion, with no one to trust, plus not being able to describe the crop problem, plus losses from fertiliser amount and timing. The seller's profit motive is the opening fact. 16123 and the extension office are gone from the form; hard cases go to "a human agronomist". Smartphone and button phone are presented as equals, and the photo check is described for smartphones. The farmer is Mahmud (boro, stem borer, 2 bigha), as in the storyboards. The marketplace is one paragraph. Technical detail is turned into plain words.
+**Why:** The team asked for the form to follow the farmer's view and the social good, not the technology. v3 still used the 16123 and Rahima story, which the team dropped.
+**Rejected:** Button-phone-first framing (the interview says smartphones are common in his village); marketplace as a full pillar (dilutes the advice story).
+**Impacts:** The photo check and the agronomist handover are in the idea but not live in the phone flows (see the team notes). The live SMS still ends with the 16123 line. The team will rewrite the prose in their own words.
+
+## [18:55] Brand line: two words for the long run; "ফলন ফিরুক, সুদিন ফিরুক" dropped
+**Did:** Replaced the tagline section of `brand/guidelines/sudin-brand-v1.html` (artifact v2) with five two-word brand lines. The masthead now shows the recommended one.
+**Decision:** Recommended brand line: **স্বপ্ন ফলুক** ("may your dreams bear fruit"). ফলা means both "to grow a harvest" and "to come true", so one word covers the field and the family's future. Other options: সোনা ফলাও, আসছে সুদিন, জেনে ফলাও, নতুন ভোর. The team picks. Problem-led lines stay as ad headlines, not as the brand line.
+**Why:** The team wants a line that lasts for years, like GP's "চলো বহুদূর", that looks to a better future instead of "getting good days back".
+**Rejected:** "ফলন ফিরুক, সুদিন ফিরুক": it looks backward and it is a sentence, not a line. A web search found no brand already using স্বপ্ন ফলুক or সোনা ফলাও. That was a quick check, not a trademark clearance.
+**Impacts:** Once the team picks, the line goes under the logo, on video end cards and as the SMS sign-off.
+
+# 2026-09-30
+## [01:10] Name is now উর্বর / Urbor; brand v1 built in Figma (three marks, fonts, engraved paddy pattern)
+**Did:**
+- Made the Figma file "উর্বর Urbor · Brand v1" (https://www.figma.com/design/GxcGtl0gc4w8QSVzmCNn9m) with five frames: cover, three logo concepts, colour, type, pattern.
+- Added `brand/scripts/marks.mjs`, which writes the three marks to `brand/assets/logo/concepts/`: A the bowing ear, B fertile-land seal, C alpana of grain.
+- Added `brand/scripts/paddy-engraving.mjs`, a seeded engraved-paddy line-art generator. It writes `brand/assets/pattern/paddy-hero.svg`, and the Figma board runs the same function.
+
+**Decision:**
+- Name: উর্বর / Urbor (team: "সুদিন" has a bad homophone). Tagline: স্বপ্ন ফলুক.
+- Story: fertile soil is Bangladesh's gift, it is being lost, and expert diagnosis is how we protect it.
+- Palette v2 is kept.
+- Brand fonts:
+  - Noto Serif Bengali: Bangla display and wordmark.
+  - Noto Sans Bengali: Bangla text; it ships on most Android phones.
+  - Fraunces: Latin display.
+  - Instrument Sans: Latin text.
+  - Galada: tagline only, as a hand-signed note.
+- The pattern is rice, not wheat: the team's reference images were wheat. My recommendation is mark A.
+
+**Why:**
+- The team found the earlier fonts unnatural and asked for elegance built on engraved grain patterns.
+- Handwritten type raises perceived human presence (Schroll et al., JCR 2018).
+- Familiar textbook-style Bangla reads as trustworthy.
+
+**Rejected:**
+- Tiro Bangla: felt stiff.
+- Anek, Atma, Mina, Baloo: too techy or too playful.
+- Raster AI illustration for the pattern: it can't be recoloured or kept consistent, and it is heavy on cheap phones.
+- Hand-pasting SVG path data into Figma: too big for one call, so the generator runs inside Figma instead.
+
+**Impacts:**
+- **Name risk:** Crunchbase lists "Urbor", a Dhaka agri-fintech for farmers (finance, market data, guidance). Its site urbor.io did not resolve on 30 Sep. urbor.net is an organic shop. The team must decide before the code is renamed.
+- `branding.py`/`branding.js` still say Agrosfeer.
+- The website redesign waits on the logo choice.
+
+## [01:40] Name final: উর্বরা / Urbora; seal logo, engraved grain, website v1 with a web crop-problem check
+**Did:**
+- Docs now use উর্বরা: `brand/BRAND-CORE.md`, `VIDEO_HANDOFF.md`, `ROUND1_FORM.md`, and notes in `BRAND.md` and `NAMES.md`.
+- The logo is a seal. Canva AI made a study of it; `frontend/src/lib/seal.js` is the vector master. `brand/scripts/seal.mjs` writes it to `brand/assets/logo/`, and `export-logos.ps1` writes the PNGs and lockups.
+- The grain pattern is redrawn in the style of the team's references. The source is `frontend/src/lib/engraving.js`; `brand/scripts/build-web-assets.mjs` writes `frontend/public/{icon*,pattern/*}`.
+- Website:
+  - palette v2 and brand fonts, via the tokens in `index.css`
+  - new `BrandMark` and `Lockup` components
+  - home page rebuilt around the brand story
+  - new `CropCheck` component with `/api/triage/{options,check}` (`backend/api/triage.py`), running the deterministic keypad-menu table
+  - dose scaled by `units.scale_rate`, with provenance
+- Farmer-facing SMS and USSD text now uses the Bangla name (same length as "Urbora", so segment budgets are unchanged).
+- Dev ports can be changed: `VITE_PORT` / `API_PROXY_TARGET`, plus `backend-alt`/`frontend-alt` in launch.json.
+
+**Decision:** The web crop check never shows the 16123 line; it keeps the SAAO and safety lines.
+
+**Why:** Diagnosis is the farmer's first pain (FIELD_INSIGHTS), and the team asked for richer features.
+
+**Rejected:** A raster AI logo as the final mark: it can't scale to a favicon or be recoloured.
+
+**Impacts:**
+- Tests: 646 green (5 new).
+- Build passes.
+- Verified in the browser at about 800px and 1366px: the crop check runs end to end and shows boro deadheart, 2 bigha, 20 g.
+- Not yet restyled or checked on the new brand: `#/app`, `#/phone`, `#/market`. They inherit the tokens.
+- The Figma board still shows the old marks.
+- Nothing is committed.

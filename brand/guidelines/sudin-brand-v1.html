@@ -1,0 +1,414 @@
+<title>Sudin Brand Direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;600;700&family=Figtree:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&family=Tiro+Bangla&display=swap">
+<style>
+/* Layout: a brand sheet. A deep-green masthead, then palette, four logo boards, words. Brand colours are fixed values, so the page commits to one look in both themes. */
+:root{
+  --forest:#0D3B2E; --forest-2:#134A3A; --leaf:#1B7048; --shoot:#A8D65C;
+  --turmeric:#F2A231; --straw:#FAF5EA; --straw-2:#F1EADB; --ink:#11201A;
+  --ink-2:#4A5A51; --line:#E2D9C6; --clay:#B8472A; --white:#FFFFFF;
+  --f-display:"Tiro Bangla","Noto Serif Bengali",Georgia,serif;
+  --f-bn:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;
+  --f-ui:"Figtree","Hind Siliguri",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--straw);color:var(--ink);font:16px/1.6 var(--f-ui);margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{text-wrap:balance;margin:0}
+p{margin:0}
+.eyebrow{font:600 12px/1 var(--f-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.bn{font-family:var(--f-bn)}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.acc{fill:var(--acc,var(--turmeric))}
+.on{fill:var(--on,var(--white))}
+.mk{--on:var(--white);color:var(--forest)}
+.mk.dark{--on:var(--forest);color:var(--straw)}
+.mk.mono{--acc:var(--forest)}
+.mk.mono.dark{--acc:var(--straw)}
+
+/* masthead */
+.mast{background:var(--forest);color:var(--straw);padding-block:40px 44px}
+.mast .top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.mast .eyebrow{color:#A9C1B5}
+.mast .lock{display:flex;align-items:center;gap:18px;margin-top:36px}
+.mast .lock svg{width:84px;height:84px;flex:none}
+.mast .name{font:400 clamp(56px,11vw,104px)/1 var(--f-display);color:var(--straw)}
+.mast .latin{font:600 14px/1 var(--f-ui);letter-spacing:.32em;color:var(--turmeric);margin-top:10px}
+.mast .thesis{font:500 clamp(22px,3.4vw,30px)/1.45 var(--f-bn);margin-top:32px;max-width:30ch}
+.mast .thesis b{color:var(--turmeric);font-weight:600}
+.mast .sub{color:#C9D8CF;margin-top:14px;max-width:62ch}
+.pill{display:inline-block;font:600 12px/1 var(--f-ui);padding:7px 10px;border-radius:99px;border:1px solid #3F6B5B;color:#C9D8CF}
+
+section{padding-block:56px;border-bottom:1px solid var(--line)}
+section h2{font:400 clamp(28px,4vw,38px)/1.2 var(--f-display);margin-top:10px}
+section .lede{color:var(--ink-2);margin-top:12px;max-width:66ch}
+
+/* story */
+.story{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.fact{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.fact .big{font:600 30px/1.2 var(--f-bn);color:var(--forest);font-variant-numeric:tabular-nums}
+.fact .big s{color:var(--ink-2);text-decoration-thickness:2px;font-weight:500}
+.fact p{color:var(--ink-2);font-size:15px}
+.fact .src{font-size:12px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:10px;margin-top:auto}
+.analogy{margin-top:16px;background:var(--forest);color:var(--straw);border-radius:16px;padding:24px;display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center}
+.analogy .col{min-width:0}
+.analogy .k{font:600 12px/1 var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:#A9C1B5}
+.analogy .v{font:500 20px/1.45 var(--f-bn);margin-top:8px}
+.analogy .arrow{color:var(--turmeric);font-size:28px}
+
+/* palette */
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
+.sw{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--white);display:flex;flex-direction:column;min-width:0}
+.sw .chip{height:120px;padding:14px;display:flex;flex-direction:column;justify-content:space-between}
+.sw .chip .bnname{font:600 22px/1 var(--f-bn)}
+.sw .chip .hex{font:600 13px/1 var(--f-ui);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.sw .meta{padding:14px;display:flex;flex-direction:column;gap:6px}
+.sw .meta b{font:700 15px/1.2 var(--f-ui)}
+.sw .meta .role{font:600 11px/1 var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--leaf)}
+.sw .meta p{font-size:14px;color:var(--ink-2);line-height:1.5}
+.sw.wide{grid-column:span 2}
+.sw.row{grid-column:1/-1;flex-direction:row}
+.sw.row .chip{width:220px;flex:none;height:auto;min-height:110px}
+.ratio{display:flex;height:44px;border-radius:12px;overflow:hidden;margin-top:24px;border:1px solid var(--line)}
+.ratio div{display:flex;align-items:center;padding-inline:10px;font:600 12px/1 var(--f-ui);white-space:nowrap;overflow:hidden}
+.why{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px}
+.why .box{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:22px;min-width:0}
+.why h3{font:700 17px/1.3 var(--f-ui)}
+.why ul{margin:12px 0 0;padding-left:18px;color:var(--ink-2);font-size:15px;display:flex;flex-direction:column;gap:8px}
+.why ul b{color:var(--ink)}
+.tbl{overflow-x:auto;margin-top:16px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font:600 11px/1 var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.sample{display:inline-block;padding:3px 9px;border-radius:6px;font-weight:700}
+.ok{color:var(--leaf);font-weight:700}
+
+/* logos */
+.boards{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px}
+.board{background:var(--white);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.board.rec{border:2px solid var(--forest)}
+.board .hd{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);gap:10px}
+.board .hd .letter{font:700 13px/1 var(--f-ui);letter-spacing:.12em}
+.board .hd .tag{font:600 12px/1 var(--f-ui);background:var(--turmeric);color:var(--ink);padding:6px 9px;border-radius:99px}
+.stage{display:grid;grid-template-columns:1fr 1fr}
+.stage > div{display:flex;align-items:center;justify-content:center;padding:30px 16px;min-height:190px}
+.stage .l{background:var(--straw)}
+.stage .d{background:var(--forest)}
+.stage svg{width:112px;height:112px}
+.lockup{display:flex;align-items:center;gap:14px;padding:22px 20px;border-top:1px solid var(--line);flex-wrap:wrap}
+.lockup svg{width:54px;height:54px;flex:none}
+.lockup .wm{display:flex;flex-direction:column}
+.lockup .wm .n{font-size:44px;line-height:1.05;color:var(--forest)}
+.lockup .wm .l{font:600 11px/1 var(--f-ui);letter-spacing:.3em;color:var(--ink-2);margin-top:6px}
+.sizes{display:flex;align-items:center;gap:18px;padding:14px 20px;border-top:1px solid var(--line);background:var(--straw);flex-wrap:wrap}
+.sizes .appicon{width:56px;height:56px;border-radius:14px;background:var(--forest);display:grid;place-items:center}
+.sizes .appicon svg{width:36px;height:36px}
+.sizes .fav{display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--ink-2)}
+.sizes .fav svg{width:16px;height:16px}
+.sizes .s24 svg{width:24px;height:24px}
+.sizes small{font-size:12px;color:var(--ink-2)}
+.board .body{padding:20px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line)}
+.board .body h3{font:600 22px/1.3 var(--f-bn);color:var(--forest)}
+.board .body p{font-size:15px;color:var(--ink-2)}
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px}
+.pc div{min-width:0}
+.pc b{display:block;font:600 11px/1 var(--f-ui);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.pc .pro b{color:var(--leaf)} .pc .con b{color:var(--clay)}
+.pc span{color:var(--ink-2)}
+.fontnote{font-size:12px;color:var(--ink-2)}
+
+/* words */
+.lines{display:flex;flex-direction:column;gap:12px;margin-top:28px}
+.line{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.line .id{font:700 13px/1 var(--f-ui);color:var(--ink-2)}
+.line .t{font:600 clamp(20px,2.6vw,26px)/1.35 var(--f-bn);color:var(--forest);min-width:0}
+.line .t small{display:block;font:400 14px/1.4 var(--f-ui);color:var(--ink-2);margin-top:4px}
+.line.rec{border:2px solid var(--forest)}
+.line .tag{font:600 12px/1 var(--f-ui);background:var(--turmeric);color:var(--ink);padding:6px 9px;border-radius:99px;white-space:nowrap}
+.dont{margin-top:20px;background:var(--straw-2);border-radius:14px;padding:18px 20px;font-size:15px;color:var(--ink-2)}
+.dont b{color:var(--ink)}
+
+.next{padding-block:48px 64px}
+.next ol{margin:16px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:8px;max-width:70ch}
+.src-list{font-size:13px;color:var(--ink-2);margin-top:24px;display:flex;flex-direction:column;gap:4px}
+.src-list a{color:var(--leaf)}
+a:focus-visible{outline:3px solid var(--turmeric);outline-offset:2px}
+
+@media (max-width:820px){
+  .story,.why,.boards{grid-template-columns:1fr}
+  .swatches{grid-template-columns:1fr 1fr}
+  .analogy{grid-template-columns:1fr}
+  .analogy .arrow{transform:rotate(90deg);justify-self:start}
+}
+@media (max-width:460px){
+  .swatches{grid-template-columns:1fr}
+  .sw.wide{grid-column:auto}
+  .sw.row{flex-direction:column}
+  .sw.row .chip{width:auto;height:120px}
+  .pc{grid-template-columns:1fr}
+  .line{grid-template-columns:1fr}
+  .line .id{display:none}
+  .lockup .wm .n{font-size:38px}
+}
+</style>
+
+<svg class="sprite" aria-hidden="true">
+  <symbol id="m-a" viewBox="0 0 64 64"><path class="acc" d="M10 38a22 22 0 0 1 44 0z"/><path class="on" d="M30.6 38V27.5a1.4 1.4 0 0 1 2.8 0V38z"/><path class="on" d="M32 30C31 23.5 26 20 19 20.5C20 27 25 30.5 32 30Z"/><path class="on" d="M32 27C33 20 38 16.5 45.5 17C44.5 24 39 27.5 32 27Z"/><rect fill="currentColor" x="6" y="43" width="52" height="5.5" rx="2.75"/><rect fill="currentColor" x="15" y="52.5" width="34" height="5.5" rx="2.75"/></symbol>
+  <symbol id="m-b" viewBox="0 0 64 64"><path fill="currentColor" d="M9 57C9 30 26 9 55 9C55 38 37 52 19 52Z"/><path d="M16 50L46 18M24 41.5L22 32M24 41.5L33.5 43M32.5 32.5L31 24M32.5 32.5L41.5 34" stroke="var(--on,#fff)" stroke-width="2.6" stroke-linecap="round" fill="none"/><circle class="acc" cx="47.5" cy="16.5" r="5"/></symbol>
+  <symbol id="m-c" viewBox="0 0 64 64"><ellipse fill="currentColor" cx="14" cy="46" rx="6" ry="11" transform="rotate(18 14 46)"/><ellipse fill="currentColor" cx="30.5" cy="38" rx="7" ry="16" transform="rotate(18 30.5 38)"/><ellipse class="acc" cx="49" cy="30" rx="8" ry="22" transform="rotate(18 49 30)"/></symbol>
+  <symbol id="m-d" viewBox="0 0 64 64"><path fill="currentColor" d="M32 55C15 53 8 42 9 27C23 28 32 39 32 55Z"/><path fill="currentColor" d="M32 55C49 53 56 42 55 27C41 28 32 39 32 55Z"/><path d="M32 53V61" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><circle class="acc" cx="32" cy="20" r="9.5"/></symbol>
+</svg>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="top"><span class="eyebrow">Brand direction v1 · for team approval</span><span class="pill">29 Sep 2026 · draft</span></div>
+    <div class="lock">
+      <svg class="mk dark" viewBox="0 0 64 64" aria-hidden="true"><use href="#m-a"/></svg>
+      <div><div class="name">সুদিন</div><div class="latin">SUDIN</div></div>
+    </div>
+    <p class="thesis">ফসলের আসল সমস্যাটা চিনে, সমাধান পৌঁছে দেয় কৃষকের হাতে।<br><b>স্বপ্ন ফলুক।</b></p>
+    <p class="sub">সুদিন means "good days". The name carries the promise: the yields a family remembers can come back, when someone finally tells them what is actually wrong with the crop.</p>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="wrap">
+    <span class="eyebrow">The essence</span>
+    <h2>Farmers are already trying. Expert help is just too far away.</h2>
+    <p class="lede">We are not selling information the farmer lacks. He already asks the shop, his neighbours and the agriculture office. What he can't get easily is an expert who can name the disease or nutrient gap and tell him what to do about it. Sudin brings that expert to the phone in his hand.</p>
+    <div class="story">
+      <div class="fact">
+        <div class="big"><s>50 মণ</s> → 30 মণ</div>
+        <p>Hybrid seed raised yields 15–20 years ago. For the last ten years the same land gives less while fertiliser costs keep rising. Nobody tells him why: tired soil, pests, or a missing nutrient.</p>
+        <div class="src">One farmer's own figures, Parhail, Dinajpur (FIELD_INSIGHTS.md). Evidence of the feeling, not a statistic.</div>
+      </div>
+      <div class="fact">
+        <div class="big">"কী রোগ হইছে?"</div>
+        <p>His biggest problem. He can't tell what is wrong with the crop, and he can't describe it well enough for the shopkeeper. So he can't know which fertiliser or medicine will fix it.</p>
+        <div class="src">Same interview, point 4. This is the job the product does first.</div>
+      </div>
+      <div class="fact">
+        <div class="big">কৃষি অফিস দূরে</div>
+        <p>The upazila office is where the expertise sits. For him it is a long trip that costs a day. He went once and has not gone back.</p>
+        <div class="src">Same interview, point 3. Frame it as distance, never as anyone failing.</div>
+      </div>
+    </div>
+    <div class="analogy">
+      <div class="col"><div class="k">Then: banking</div><div class="v">ব্যাংক ছিল শহরে, দূরে। টাকা পাঠাতে দিন চলে যেত।</div></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="col"><div class="k">Now: farm expertise</div><div class="v">মোবাইল ব্যাংকিং সেটা হাতের মুঠোয় এনেছে। সুদিন একইভাবে কৃষি বিশেষজ্ঞের পরামর্শ ঘরে পৌঁছে দেয়।</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Colour · research-led</span>
+    <h2>A sunrise over a healthy field</h2>
+    <p class="lede">The old palette came from four separate ideas: government green, telecom blue, a gold and an ivory. That is why it felt detached. The new one is a single scene with one light source. Deep crop green holds it steady, turmeric sunlight is the warmth that draws people in, and everything else comes from the same field.</p>
+    <div class="swatches">
+      <div class="sw wide">
+        <div class="chip" style="background:var(--forest);color:var(--straw)"><span class="bnname">গভীর শ্যামল</span><span class="hex">#0D3B2E</span></div>
+        <div class="meta"><span class="role">Primary · ~30%</span><b>Deep Shyamol</b><p>Identity, headers, primary buttons on light. A darker, bluer green than the flag's #006A4E, so it reads as a considered private brand rather than a ministry portal. Dark, low-saturation greens read as calm, stable and safe.</p></div>
+      </div>
+      <div class="sw wide">
+        <div class="chip" style="background:var(--turmeric);color:var(--ink)"><span class="bnname">হলুদ রোদ</span><span class="hex">#F2A231</span></div>
+        <div class="meta"><span class="role">Signature · ~8%</span><b>Turmeric Sun</b><p>The "good day" itself. Mustard fields, marigold and গায়ে হলুদ: the colour of Bangladeshi celebration and renewal. Warm, saturated hues pull the eye and signal approach. Used for the logo's sun, the one main CTA on dark, and key numbers.</p></div>
+      </div>
+      <div class="sw">
+        <div class="chip" style="background:var(--leaf);color:var(--white)"><span class="bnname">পাতা</span><span class="hex">#1B7048</span></div>
+        <div class="meta"><span class="role">Action · links</span><b>Leaf</b><p>Links, secondary buttons, "done" states. Readable as text on white (6.1:1).</p></div>
+      </div>
+      <div class="sw">
+        <div class="chip" style="background:var(--shoot);color:var(--forest)"><span class="bnname">কচি ধান</span><span class="hex">#A8D65C</span></div>
+        <div class="meta"><span class="role">Recovery · on dark</span><b>Young Paddy</b><p>Health restored, yield up. Highlights on green grounds only. It never carries text on white.</p></div>
+      </div>
+      <div class="sw">
+        <div class="chip" style="background:var(--straw);color:var(--forest);border-bottom:1px solid var(--line)"><span class="bnname">খড়</span><span class="hex">#FAF5EA</span></div>
+        <div class="meta"><span class="role">Ground · ~55%</span><b>Straw</b><p>Page background. Warmer than white and less glare in sunlight, with full contrast.</p></div>
+      </div>
+      <div class="sw">
+        <div class="chip" style="background:var(--ink);color:var(--straw)"><span class="bnname">মাটি</span><span class="hex">#11201A</span></div>
+        <div class="meta"><span class="role">Text</span><b>Soil Ink</b><p>All body text. Green-black, never pure black. 15.5:1 on Straw.</p></div>
+      </div>
+      <div class="sw row">
+        <div class="chip" style="background:var(--clay);color:var(--white)"><span class="bnname">পোড়ামাটি</span><span class="hex">#B8472A</span></div>
+        <div class="meta"><span class="role">Warnings only · &lt;2%</span><b>Terracotta</b><p>"Rain tomorrow, hold the urea." A real warning only, never decoration. Red in Bangladesh carries sacrifice and protest, so it stays out of the identity.</p></div>
+      </div>
+    </div>
+    <div class="ratio" aria-label="Usage ratio">
+      <div style="flex:55;background:var(--straw);color:var(--forest)">Straw + white 55%</div>
+      <div style="flex:30;background:var(--forest);color:var(--straw)">Shyamol 30%</div>
+      <div style="flex:5;background:var(--leaf);color:var(--white)">Leaf</div>
+      <div style="flex:8;background:var(--turmeric);color:var(--ink)">Sun 8%</div>
+      <div style="flex:2;background:var(--shoot)"></div>
+    </div>
+
+    <div class="why">
+      <div class="box">
+        <h3>How colour builds trust here</h3>
+        <ul>
+          <li><b>Hue, saturation and brightness shift what people believe about a brand.</b> In controlled experiments, blue raised perceived competence and red and orange raised excitement (Labrecque &amp; Milne, 2012). Colour causes these impressions; it does not just decorate them.</li>
+          <li><b>We need two feelings at once.</b> <i>Safe</i> (can I trust this with my crop?) comes from the deep, low-saturation green. <i>Drawn in</i> (I want to open this) comes from the warm, saturated turmeric. Calm, then warmth.</li>
+          <li><b>Familiar colours read as "ours".</b> Green is the fertile countryside. Yellow and marigold are Falgun, mustard fields and wedding haldi: renewal and good times. Our name <i>is</i> good times.</li>
+          <li><b>Being different helps people remember you.</b> Wise left "safe blue" for green and saw conversion rise about 10%. Our sector is flat government green or tech blue, so the turmeric sun makes us easy to spot.</li>
+          <li><b>Restraint reads as confidence.</b> Two identity colours, one signature. Every extra colour costs trust.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>Contrast, checked with the WCAG formula</h3>
+        <div class="tbl"><table>
+          <thead><tr><th>Pair</th><th>Ratio</th><th>Use</th></tr></thead>
+          <tbody>
+            <tr><td><span class="sample" style="background:var(--straw);color:var(--ink)">Ink on Straw</span></td><td>15.5</td><td class="ok">Body</td></tr>
+            <tr><td><span class="sample" style="background:var(--straw);color:var(--forest)">Shyamol on Straw</span></td><td>11.5</td><td class="ok">Headings</td></tr>
+            <tr><td><span class="sample" style="background:var(--forest);color:var(--white)">White on Shyamol</span></td><td>12.5</td><td class="ok">Buttons</td></tr>
+            <tr><td><span class="sample" style="background:var(--turmeric);color:var(--ink)">Ink on Turmeric</span></td><td>8.0</td><td class="ok">Sun CTA</td></tr>
+            <tr><td><span class="sample" style="background:var(--forest);color:var(--shoot)">Shoot on Shyamol</span></td><td>7.4</td><td class="ok">Highlight</td></tr>
+            <tr><td><span class="sample" style="background:var(--forest);color:var(--turmeric)">Sun on Shyamol</span></td><td>5.9</td><td class="ok">Numbers</td></tr>
+            <tr><td><span class="sample" style="background:var(--white);color:var(--leaf)">Leaf on White</span></td><td>6.1</td><td class="ok">Links</td></tr>
+            <tr><td><span class="sample" style="background:var(--white);color:var(--clay)">Clay on White</span></td><td>5.3</td><td class="ok">Warnings</td></tr>
+          </tbody>
+        </table></div>
+        <p class="fontnote" style="margin-top:12px">All pass AA for body text (4.5:1), and most pass AAA (7:1). That matters for a phone read outdoors at noon.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Logo · four concepts</span>
+    <h2>Pick one, and I'll build the full set from it</h2>
+    <p class="lede">Each concept is drawn on a 64-unit grid as clean vector. It is tested on light and dark, as an app icon, at favicon size and in one colour. Each one pairs with a different Bangla wordmark face, so you can judge the type too.</p>
+    <div class="boards">
+
+      <article class="board rec">
+        <div class="hd"><span class="letter">A · সুদিনের সূর্য</span><span class="tag">Recommended</span></div>
+        <div class="stage">
+          <div class="l"><svg class="mk" viewBox="0 0 64 64" aria-label="Concept A on light"><use href="#m-a"/></svg></div>
+          <div class="d"><svg class="mk dark" viewBox="0 0 64 64" aria-label="Concept A on dark"><use href="#m-a"/></svg></div>
+        </div>
+        <div class="lockup"><svg class="mk" viewBox="0 0 64 64" aria-hidden="true"><use href="#m-a"/></svg><div class="wm"><span class="n" style="font-family:'Tiro Bangla',serif">সুদিন</span><span class="l">SUDIN</span></div></div>
+        <div class="sizes">
+          <div class="appicon"><svg class="mk dark" viewBox="0 0 64 64"><use href="#m-a"/></svg></div>
+          <span class="s24"><svg class="mk" viewBox="0 0 64 64"><use href="#m-a"/></svg></span>
+          <span class="s24"><svg class="mk mono" viewBox="0 0 64 64"><use href="#m-a"/></svg></span>
+          <span class="fav"><svg class="mk" viewBox="0 0 64 64"><use href="#m-a"/></svg>সুদিন</span>
+          <small>app · 24px · 1-colour · tab</small>
+        </div>
+        <div class="body">
+          <h3>নতুন চারা, নতুন দিন</h3>
+          <p>A seedling rises inside the morning sun, over the furrows of his own field. It is the name drawn as a picture: good days coming back from the land itself. The sprout is cut out of the sun, so it still reads when the logo is one colour.</p>
+          <div class="pc"><div class="pro"><b>Strong</b><span>Says the name without words. Holds up at 24px. The warmest first impression.</span></div><div class="con"><b>Watch</b><span>Sun-over-field is a familiar farm motif. The cut-out sprout is what makes it ours, so the sprout must never be dropped.</span></div></div>
+          <p class="fontnote">Wordmark: Tiro Bangla. A calm serif with the authority of a schoolbook.</p>
+        </div>
+      </article>
+
+      <article class="board">
+        <div class="hd"><span class="letter">B · চেনা পাতা</span></div>
+        <div class="stage">
+          <div class="l"><svg class="mk" viewBox="0 0 64 64" aria-label="Concept B on light"><use href="#m-b"/></svg></div>
+          <div class="d"><svg class="mk dark" viewBox="0 0 64 64" aria-label="Concept B on dark"><use href="#m-b"/></svg></div>
+        </div>
+        <div class="lockup"><svg class="mk" viewBox="0 0 64 64" aria-hidden="true"><use href="#m-b"/></svg><div class="wm"><span class="n" style="font-family:'Anek Bangla',sans-serif;font-weight:600">সুদিন</span><span class="l">SUDIN</span></div></div>
+        <div class="sizes">
+          <div class="appicon"><svg class="mk dark" viewBox="0 0 64 64"><use href="#m-b"/></svg></div>
+          <span class="s24"><svg class="mk" viewBox="0 0 64 64"><use href="#m-b"/></svg></span>
+          <span class="s24"><svg class="mk mono" viewBox="0 0 64 64"><use href="#m-b"/></svg></span>
+          <span class="fav"><svg class="mk" viewBox="0 0 64 64"><use href="#m-b"/></svg>সুদিন</span>
+          <small>app · 24px · 1-colour · tab</small>
+        </div>
+        <div class="body">
+          <h3>পাতা দেখে রোগ চেনা</h3>
+          <p>A single crop leaf with its veins drawn in, the way you look at a leaf closely to find what is wrong. The sun-dot at the tip is the answer arriving. It is about the product's first job: someone reads your leaf and tells you what is wrong.</p>
+          <div class="pc"><div class="pro"><b>Strong</b><span>Speaks straight to diagnosis, the #1 pain. Modern and simple.</span></div><div class="con"><b>Watch</b><span>Leaf logos are common (eco brands, Plantix-style apps), so on its own it says "plant" more than "Sudin".</span></div></div>
+          <p class="fontnote">Wordmark: Anek Bangla SemiBold. Contemporary and clean, the most "app" of the four.</p>
+        </div>
+      </article>
+
+      <article class="board">
+        <div class="hd"><span class="letter">C · ফলন ফেরে</span></div>
+        <div class="stage">
+          <div class="l"><svg class="mk" viewBox="0 0 64 64" aria-label="Concept C on light"><use href="#m-c"/></svg></div>
+          <div class="d"><svg class="mk dark" viewBox="0 0 64 64" aria-label="Concept C on dark"><use href="#m-c"/></svg></div>
+        </div>
+        <div class="lockup"><svg class="mk" viewBox="0 0 64 64" aria-hidden="true"><use href="#m-c"/></svg><div class="wm"><span class="n" style="font-family:'Noto Serif Bengali',serif;font-weight:600">সুদিন</span><span class="l">SUDIN</span></div></div>
+        <div class="sizes">
+          <div class="appicon"><svg class="mk dark" viewBox="0 0 64 64"><use href="#m-c"/></svg></div>
+          <span class="s24"><svg class="mk" viewBox="0 0 64 64"><use href="#m-c"/></svg></span>
+          <span class="s24"><svg class="mk mono" viewBox="0 0 64 64"><use href="#m-c"/></svg></span>
+          <span class="fav"><svg class="mk" viewBox="0 0 64 64"><use href="#m-c"/></svg>সুদিন</span>
+          <small>app · 24px · 1-colour · tab</small>
+        </div>
+        <div class="body">
+          <h3>৩০ মণ থেকে আবার ৫০</h3>
+          <p>Three paddy grains, each larger than the last, rise like a bar chart, and the tallest is golden. It tells the yield story directly: the decline turns around.</p>
+          <div class="pc"><div class="pro"><b>Strong</b><span>The most ownable shape of the four. Bold and legible at any size. Easy to animate in the video.</span></div><div class="con"><b>Watch</b><span>Abstract. Without the word "paddy" nearby it can read as beans or a finance chart.</span></div></div>
+          <p class="fontnote">Wordmark: Noto Serif Bengali SemiBold. Sturdy, and reads well in print and on signage.</p>
+        </div>
+      </article>
+
+      <article class="board">
+        <div class="hd"><span class="letter">D · আগলে রাখা</span></div>
+        <div class="stage">
+          <div class="l"><svg class="mk" viewBox="0 0 64 64" aria-label="Concept D on light"><use href="#m-d"/></svg></div>
+          <div class="d"><svg class="mk dark" viewBox="0 0 64 64" aria-label="Concept D on dark"><use href="#m-d"/></svg></div>
+        </div>
+        <div class="lockup"><svg class="mk" viewBox="0 0 64 64" aria-hidden="true"><use href="#m-d"/></svg><div class="wm"><span class="n" style="font-family:'Hind Siliguri',sans-serif;font-weight:600">সুদিন</span><span class="l">SUDIN</span></div></div>
+        <div class="sizes">
+          <div class="appicon"><svg class="mk dark" viewBox="0 0 64 64"><use href="#m-d"/></svg></div>
+          <span class="s24"><svg class="mk" viewBox="0 0 64 64"><use href="#m-d"/></svg></span>
+          <span class="s24"><svg class="mk mono" viewBox="0 0 64 64"><use href="#m-d"/></svg></span>
+          <span class="fav"><svg class="mk" viewBox="0 0 64 64"><use href="#m-d"/></svg>সুদিন</span>
+          <small>app · 24px · 1-colour · tab</small>
+        </div>
+        <div class="body">
+          <h3>চারা আগলে রাখে সূর্য</h3>
+          <p>Two leaves of a seedling open like cupped hands and hold the sun. It is about care: the brand looks after your crop, and the crop holds the good days.</p>
+          <div class="pc"><div class="pro"><b>Strong</b><span>The friendliest and most human of the four. Works well as a round app icon.</span></div><div class="con"><b>Watch</b><span>Sprout-and-sun is close to many eco, wellness and NGO marks, so it is the least distinctive.</span></div></div>
+          <p class="fontnote">Wordmark: Hind Siliguri SemiBold. Plain and friendly, and the same face as the UI text.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Words · the brand line</span>
+    <h2>Two words, for years</h2>
+    <p class="lede">Like GP's "চলো বহুদূর": short, spoken, pointing forward, and bigger than any one feature. The line is not about getting back what was lost. It is about the future a farming family is working towards: a good harvest, a child's schooling, a pucca house. Each option below has been said aloud next to the name.</p>
+    <div class="lines">
+      <div class="line rec"><span class="id">L1</span><span class="t">স্বপ্ন ফলুক<small>"May your dreams bear fruit." ফলা means both "to grow a harvest" and "to come true", so one word holds the field and the future. It is a wish, warm like a blessing from an elder, and it works for decades: first rice, then fish, poultry, the next generation. Said with the name: <b>সুদিন · স্বপ্ন ফলুক</b>.</small></span><span class="tag">Recommended</span></div>
+      <div class="line"><span class="id">L2</span><span class="t">সোনা ফলাও<small>"Grow gold." It echoes সোনার ধান and "এ মাটিতে সোনা ফলে". Proud, an imperative like "চলো". It leans on harvest more than on the wider future.</small></span><span></span></div>
+      <div class="line"><span class="id">L3</span><span class="t">আসছে সুদিন<small>"Good days are coming." Hopeful and very easy to remember, but it repeats the name, so it can't sit beside the logo. Better as a campaign or video end line.</small></span><span></span></div>
+      <div class="line"><span class="id">L4</span><span class="t">জেনে ফলাও<small>"Know, then grow." The clearest link to what the product does (knowing the problem first). Less emotional, more practical.</small></span><span></span></div>
+      <div class="line"><span class="id">L5</span><span class="t">নতুন ভোর<small>"A new dawn." It matches logo A's rising sun. Poetic, but it doesn't say farming by itself.</small></span><span></span></div>
+    </div>
+    <div class="dont"><b>How the line is used.</b> Under the logo, at the end of every video, and as the sign-off of SMS replies ("— সুদিন · স্বপ্ন ফলুক"). Problem lines such as "ফসলের কী হয়েছে, জানুন ঘরে বসেই" stay as ad headlines; they change with each campaign, while the brand line stays. <b>We never say</b> that farmers can't get through to a hotline. We say they are trying and that distance makes it hard.</div>
+  </div>
+</section>
+
+<section class="next">
+  <div class="wrap">
+    <span class="eyebrow">What happens after you choose</span>
+    <h2>Reply with a logo letter (A–D) and a brand line (L1–L5)</h2>
+    <ol>
+      <li>I refine the chosen mark (optical balance, a 16px-tuned variant) and export the full set to <code>brand/assets/logo/</code>: SVG, 512 and 2000px PNG, maskable app icon, white version, and wordmarks as outlined paths.</li>
+      <li>Rename the product to সুদিন / Sudin in <code>branding.py</code> and <code>branding.js</code>, and replace the tokens in <code>brand/tokens</code> and <code>index.css</code>.</li>
+      <li>Redesign the website and app screens on this system. I'll show you the home page first, before touching the rest.</li>
+    </ol>
+    <div class="src-list">
+      <span>Sources</span>
+      <a href="https://www.researchgate.net/publication/251277565_Exciting_red_and_competent_blue_the_importance_of_color_in_marketing">Labrecque &amp; Milne (2012), Exciting red and competent blue, J. Academy of Marketing Science</a>
+      <a href="https://tearsheet.co/marketing/from-safe-blue-to-citrus-green-how-wise-rebranded-to-an-identity-that-is-exciting-and-good-for-its-bottom-line/">Tearsheet: How Wise went from safe blue to citrus green</a>
+      <a href="https://www.thedailystar.net/life-living/fashion-beauty/news/how-colours-define-every-festival-bangladeshi-culture-4144136">The Daily Star: How colours define every festival in Bangladeshi culture</a>
+      <a href="https://www.thedailystar.net/news/bangladesh/news/how-our-red-and-green-came-be-3777466">The Daily Star: How our red and green came to be</a>
+    </div>
+  </div>
+</section>
+</main>

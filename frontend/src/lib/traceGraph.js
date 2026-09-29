@@ -53,13 +53,13 @@ function round2(n) {
 // finer one (see GraphPanel.jsx: label vs sub vs edge-tool each get their own
 // ink). One dict, shared by GraphPanel and the legend, so they can't drift.
 export const NODE_STYLE = {
-  farm: { shape: 'hexagon', r: 20, fill: 'var(--green)', stroke: 'var(--green-dark)', textFill: '#fff' },
+  farm: { shape: 'hexagon', r: 20, fill: 'var(--brand)', stroke: 'var(--brand-dark)', textFill: '#fff' },
   place: { shape: 'triangle', r: 13, fill: 'var(--surface)', stroke: 'var(--soil)' },
   weather: { shape: 'triangle', r: 13, fill: 'var(--surface)', stroke: 'var(--soil)' },
   source: { shape: 'pentagon', r: 11, fill: 'var(--surface)', stroke: 'var(--leaf)' },
-  crop: { shape: 'circle', r: 15, fill: 'var(--green-tint)', stroke: 'var(--green)' },
-  plan: { shape: 'square', r: 14, fill: 'var(--surface-sunk)', stroke: 'var(--green-dark)' },
-  finance: { shape: 'square', r: 14, fill: 'var(--surface-sunk)', stroke: 'var(--green-dark)' },
+  crop: { shape: 'circle', r: 15, fill: 'var(--brand-tint)', stroke: 'var(--brand)' },
+  plan: { shape: 'square', r: 14, fill: 'var(--surface-sunk)', stroke: 'var(--brand-dark)' },
+  finance: { shape: 'square', r: 14, fill: 'var(--surface-sunk)', stroke: 'var(--brand-dark)' },
   question: { shape: 'circle', r: 9, fill: 'var(--surface)', stroke: 'var(--ink-faint)' },
 }
 

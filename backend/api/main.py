@@ -1,4 +1,4 @@
-"""Agrosfeer API — FastAPI skeleton.
+"""Urbora API — FastAPI skeleton.
 
 H0-H1 scope (PLAN.md §3): the app, CORS, and a hello-world SSE endpoint that
 proves browser -> stream plumbing works. Real routes (/api/chat, /api/farms,
@@ -32,6 +32,7 @@ from .diagnose import router as diagnose_router
 from .transcribe import router as transcribe_router
 from .channels import router as channels_router
 from .market import router as market_router
+from .triage import router as triage_router
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -74,6 +75,7 @@ app.include_router(diagnose_router)
 app.include_router(transcribe_router)
 app.include_router(channels_router)
 app.include_router(market_router)
+app.include_router(triage_router)
 
 
 @app.get("/api/health")

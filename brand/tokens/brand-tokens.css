@@ -1,0 +1,36 @@
+/* Brand tokens v0.1 — mirrors brand-tokens.json (edit the JSON first).
+   Import into any page, then use var(--b-*). See brand/BRAND.md. */
+@import url('https://fonts.googleapis.com/css2?family=Tiro+Bangla&family=Hind+Siliguri:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  /* core */
+  --b-shyamol: #0F5C3B;   /* primary: identity, headings, primary buttons */
+  --b-akash:   #1570B8;   /* secondary: phone, SMS, links */
+  --b-dhani:   #E3A92F;   /* accent: <=5%, ink text on it */
+  --b-poli:    #F6F4EC;   /* ground */
+  --b-ink:     #14221A;   /* text, never #000 */
+  --b-mati:    #B34A24;   /* real warnings only */
+  --b-white:   #FFFFFF;
+
+  /* tints */
+  --b-shyamol-50: #EAF3EC;  --b-shyamol-100: #D3E6D8;  --b-shyamol-300: #8DBB9C;
+  --b-shyamol-600: #1E7A4F; --b-shyamol-900: #0A3F28;
+  --b-akash-50: #E8F2FA;    --b-akash-100: #CFE3F4;    --b-akash-700: #0F5690;
+  --b-dhani-50: #FCF5E3;    --b-dhani-100: #F7E6B8;    --b-dhani-700: #A8761A;
+  --b-ink-soft: #44564B;    --b-ink-faint: #6E7F74;
+
+  /* type */
+  --b-font-display: 'Tiro Bangla', 'Noto Serif Bengali', 'Hind Siliguri', serif;
+  --b-font-text: 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif;
+  --b-font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  --b-text-14: 0.875rem; --b-text-16: 1rem; --b-text-18: 1.125rem; --b-text-22: 1.375rem;
+  --b-text-28: 1.75rem;  --b-text-36: 2.25rem; --b-text-48: 3rem; --b-text-64: 4rem;
+  --b-leading-body: 1.6; --b-leading-display: 1.2;
+
+  /* shape and space */
+  --b-radius-control: 10px; --b-radius-card: 16px; --b-radius-pill: 999px;
+  --b-border: 1px solid var(--b-shyamol-100);
+  --b-space: 8px;
+  --b-touch: 48px;
+  --b-motion: 240ms ease-out;
+}

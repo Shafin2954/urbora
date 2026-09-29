@@ -16,6 +16,7 @@ import { useCrops } from './state/useCrops.js'
 import { useSettings } from './state/useSettings.js'
 import { translator } from './i18n.js'
 import { BRAND_NAME } from './branding.js'
+import BrandMark from './components/BrandMark.jsx'
 
 /**
  * One responsive page (PRD.md §9): chat primary, with the provenance graph
@@ -165,12 +166,7 @@ export default function App() {
     <button
       type="button"
       onClick={() => setGuestMode(true)}
-      style={{
-        position: 'fixed', bottom: '16px', left: '50%', transform: 'translateX(-50%)',
-        zIndex: 1000, padding: '12px 20px', minHeight: '44px', borderRadius: '8px',
-        border: '1px solid #2f6b3f', background: '#f7f4ec', color: '#2f6b3f',
-        fontWeight: 600, cursor: 'pointer',
-      }}
+      className="secondary guest-button"
     >
       অতিথি হিসেবে দেখুন
     </button>
@@ -200,13 +196,14 @@ export default function App() {
       {settingsOpen && <SettingsModal settings={settings} t={t} onClose={() => setSettingsOpen(false)} />}
       <div className="app-main">
       <header className="topbar">
-        <div className="brand">
-          <img src="/icon.svg" alt="" width="30" height="30" />
+        <a className="brand" href="#/">
+          <BrandMark size={32} />
           <h1>{BRAND_NAME}</h1>
-        </div>
+        </a>
         <nav className="topnav" aria-label="অন্য পাতা">
-          <a href="#/market">বাজার</a>
+          <a href="#/">হোম</a>
           <a href="#/phone">বাটন ফোন</a>
+          <a href="#/market">বাজার</a>
         </nav>
         <div className="health" title={apiUrl('/api/health')}>
           <span className={`dot dot-${health.state}`} aria-hidden="true" />

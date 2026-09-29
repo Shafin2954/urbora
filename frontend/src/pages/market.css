@@ -24,7 +24,7 @@
 }
 
 .market-tabs button.active {
-  background: var(--green);
+  background: var(--brand);
   color: #fff;
 }
 
@@ -47,8 +47,8 @@
 }
 
 .chip-on {
-  border: 2px solid var(--green);
-  background: var(--green-tint);
+  border: 2px solid var(--brand);
+  background: var(--brand-tint);
 }
 
 .offers,
@@ -134,7 +134,7 @@
 }
 
 .guide {
-  background: var(--green-tint);
+  background: var(--brand-tint);
   border-radius: 10px;
   padding: 10px 14px;
 }
