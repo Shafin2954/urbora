@@ -5,17 +5,17 @@ import { BRAND_NAME, BRAND_NAME_BN, BRAND_TAGLINE_BN } from '../branding.js'
 import './home.css'
 
 // The public front door (brand/BRAND-CORE.md). It leads with what Urbora is: one farm advisor
-// for every question across the season, not a disease checker. Order: the promise (hero), the
-// eight kinds of help on a real phone, why farmers need it (story), how to reach it from any
-// phone, the crop-problem check working right here (CropCheck, the deterministic KB table),
-// trust, market, try-it doors, closing blessing.
+// for every question across the season, not a disease checker. Order: the promise with a real
+// phone cycling through example answers (hero), the eight kinds of help, why farmers need it
+// (story), how to reach it from a button phone, the crop-problem check working right here
+// (CropCheck, the deterministic KB table), trust, market, try-it doors.
 //
-// Photos in public/img/ are AI-generated illustrations (Higgsfield, 2026-09-30; prompts in
-// brand/IMAGE_PROMPTS.md) and are labelled প্রতীকী ছবি on the page. The phone screens are
-// live HTML laid over the blank screens in those photos, so they can change on click.
+// Look follows brand/BRAND-CORE.md §5: straw ground, kraft panels with the engraved paddy,
+// Deep Shyamol, turmeric for one CTA, no gradients, no field photos. The two phones in
+// public/img/ are AI-generated product shots (Higgsfield, 2026-09-30) cut out with blank
+// screens; the screens are live HTML laid over them, so they change as you watch or click.
 
 const ADVISOR_URL = '/?guest=1#/app'
-const ILLUSTRATIVE = 'প্রতীকী ছবি'
 
 // Example conversations for the eight kinds of help. Numbers appear only where they are the
 // system's real output or a cited public figure: the pest dose is the real reply from
@@ -24,18 +24,21 @@ const ILLUSTRATIVE = 'প্রতীকী ছবি'
 const TOPICS = [
   {
     id: 'crop', icon: 'seed', label: 'কী চাষ করব',
+    blurb: 'জমি, মাটি, সেচ আর এলাকার আবহাওয়া মিলিয়ে কোন ফসল মানাবে।',
     ask: 'রাজশাহী, ২ বিঘা দোআঁশ জমি, নলকূপ আছে। এবার রবিতে কী লাগাব?',
     reply: ['জেলার ফলনের রেকর্ড আর আবহাওয়া মিলিয়ে কোন ফসল মানাবে, সেটা সাজিয়ে দিলাম।',
       'প্রতিটার খরচ, ফলন আর লাভের হিসাব SMS-এ পাঠালাম।'],
   },
   {
     id: 'soil', icon: 'soil', label: 'মাটি ও সার',
+    blurb: 'কোন সার, কতটুকু, কবে দেবেন, আপনার জমির মাপে।',
     ask: 'বোরো ধানে ইউরিয়া কখন, কতটুকু দেব?',
     reply: ['তিন কিস্তিতে দেবেন, কোনটা কবে তা আপনার প্ল্যানে তারিখসহ বসিয়ে দিলাম।',
       'মোট পরিমাণ আপনার জমির মাপে, BRRI-র নির্দেশিকা থেকে হিসাব করা।'],
   },
   {
     id: 'pest', icon: 'bug', label: 'রোগ ও পোকা',
+    blurb: 'লক্ষণ শুনে সমস্যা চেনে, তারপর ওষুধ আর সঠিক মাত্রা।',
     ask: 'বোরো ধানের মাঝের ডগা শুকিয়ে যাচ্ছে। ২ বিঘা জমি।',
     reply: ['হতে পারে: মাজরা পোকা। আক্রমণ দেখা দিলে কীটনাশক দিন।',
       'মাত্রা: ভিরতাকো 40WG, হেক্টরে 75 গ্রাম (আপনার 2 বিঘায় মোট 20 গ্রাম)।',
@@ -44,24 +47,28 @@ const TOPICS = [
   },
   {
     id: 'water', icon: 'drop', label: 'সেচ',
+    blurb: 'লাগানোর তারিখ ধরে কবে পানি দেবেন, বৃষ্টি থাকলে কোনটা বাদ।',
     ask: 'আলুতে সেচ কবে কবে দেব?',
     reply: ['লাগানোর তারিখ ধরে সেচের দিনগুলো আপনার প্ল্যানে বসিয়ে দিলাম।',
       'সামনে বৃষ্টি থাকলে সেই সেচ বাদ দিতে আগেই জানাব।'],
   },
   {
     id: 'weather', icon: 'rain', label: 'আবহাওয়া',
+    blurb: 'সার বা স্প্রের দিনে বৃষ্টির পূর্বাভাস থাকলে আগেই SMS।',
     ask: 'কাল ইউরিয়া দেওয়ার কথা। দেব?',
     reply: ['কাল বৃষ্টির পূর্বাভাস আছে (Open-Meteo)।',
       'ইউরিয়া আজ দেবেন না, পরের শুকনো দিনে দিন। বৃষ্টিতে সার ধুয়ে যায়।'],
   },
   {
     id: 'money', icon: 'coin', label: 'খরচ ও লাভ',
+    blurb: 'খরচ, ফলন আর লাভের হিসাব, প্রতিটা সংখ্যার তথ্যসূত্রসহ।',
     ask: 'আলু করলে খরচ কত, লাভ থাকবে?',
     reply: ['বীজ, সার, সেচ আর মজুরি ধরে খরচ; জেলার গড় ফলন আর বাজারদর ধরে আয়।',
       'খারাপ, স্বাভাবিক আর ভালো মৌসুম, তিনটা হিসাবই দিলাম। প্রতিটা সংখ্যার পাশে তথ্যসূত্র।'],
   },
   {
     id: 'buy', icon: 'cart', label: 'সার-বীজ কেনা',
+    blurb: 'কাছের দোকান, দাম, দূরত্ব আর মজুদ দেখে সাজানো।',
     ask: 'কাছে ইউরিয়া কোথায় পাব?',
     reply: ['কাছের ৩টা দোকান পেলাম, দাম আর দূরত্ব দেখে সাজানো। ইউরিয়া সরকারি দর ৳27/কেজি।',
       'অর্ডার দিতে 1 চাপুন। দাম দোকানে নগদে।'],
@@ -69,6 +76,7 @@ const TOPICS = [
   },
   {
     id: 'sell', icon: 'sack', label: 'ফসল বেচা',
+    blurb: 'SMS-এ বিক্রির তালিকা, ক্রেতার দাম দেখে নিজেই সিদ্ধান্ত।',
     ask: 'বিক্রি আলু 500 কেজি 22 টাকা',
     reply: ['আপনার 500 কেজি আলু বিক্রির তালিকায় উঠেছে।',
       'ক্রেতা দাম দিলে SMS পাবেন। পছন্দ হলে "গ্রহণ" লিখে রাজি হবেন।'],
@@ -140,82 +148,86 @@ function Glyph({ name }) {
 const reducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-// Smartphone photo with the chat for the chosen topic laid over its blank screen.
+// The smartphone photo with the chat for one topic laid over its blank screen.
 function SmartPhone({ topic }) {
   return (
     <figure className="photo-phone phone-android">
-      <img src="/img/phone-android.webp" width="1040" height="1620" loading="lazy"
-        alt="কৃষকের হাতে একটা সাধারণ অ্যান্ড্রয়েড ফোন" />
-      <div className="phone-screen chat-screen" aria-live="polite">
-        <div className="chat-bar"><BrandMark size={22} /><b>{BRAND_NAME_BN}</b></div>
-        <div className="chat-body" key={topic.id}>
-          <p className="bubble bubble-me">{topic.ask}</p>
-          <div className="bubble bubble-bot">
-            {topic.reply.map((line) => <p key={line}>{line}</p>)}
+      <div className="phone-frame"><div className="phone-zoom">
+        <img src="/img/phone-android.webp" width="900" height="1456" loading="lazy"
+          alt="কৃষকের হাতে একটা সাধারণ অ্যান্ড্রয়েড ফোন" />
+        <div className="phone-screen chat-screen" aria-live="polite">
+          <div className="chat-bar"><BrandMark size={22} /><b>{BRAND_NAME_BN}</b></div>
+          <div className="chat-body" key={topic.id}>
+            <p className="bubble bubble-me">{topic.ask}</p>
+            <div className="bubble bubble-bot">
+              {topic.reply.map((line) => <p key={line}>{line}</p>)}
+            </div>
           </div>
-          {topic.demo && <p className="chat-note">দোকান ও ক্রেতা ডেমো তথ্য</p>}
         </div>
-      </div>
+      </div></div>
       <figcaption>
-        {topic.real ? 'এই উত্তরটা সিস্টেমের আসল উত্তর।' : 'উদাহরণ কথোপকথন।'} {ILLUSTRATIVE}।
+        {topic.real ? 'সিস্টেমের আসল উত্তর' : 'উদাহরণ কথোপকথন'}{topic.demo ? ' · দোকান ও ক্রেতা ডেমো' : ''}
       </figcaption>
     </figure>
   )
 }
 
-// Button-phone photo showing the real USSD main menu; tapping the screen turns the page (9 / 0).
+// The button phone showing the real USSD main menu; tapping the screen turns the page (9 / 0).
 function ButtonPhone() {
   const [page, setPage] = useState(0)
   return (
     <figure className="photo-phone phone-button">
-      <img src="/img/phone-button.webp" width="860" height="1344" loading="lazy"
-        alt="কৃষকের হাতে একটা বাটন ফোন" />
-      <button type="button" className="phone-screen ussd-screen" onClick={() => setPage(1 - page)}
-        aria-label={page ? 'আগের মেনু দেখুন' : 'মেনুর বাকি অংশ দেখুন'}>
-        {USSD_PAGES[page].map((line, i) => <span key={line} className={i === 0 && !page ? 'ussd-head' : ''}>{line}</span>)}
-      </button>
-      <figcaption>*3700# ডায়াল করলে এই মেনু আসে। পর্দায় চাপ দিলে পরের পাতা। {ILLUSTRATIVE}।</figcaption>
+      <div className="phone-frame"><div className="phone-zoom">
+        <img src="/img/phone-button.webp" width="800" height="1608" loading="lazy"
+          alt="কৃষকের হাতে একটা বাটন ফোন" />
+        <button type="button" className="phone-screen ussd-screen" onClick={() => setPage(1 - page)}
+          aria-label={page ? 'আগের মেনু দেখুন' : 'মেনুর বাকি অংশ দেখুন'}>
+          {USSD_PAGES[page].map((line, i) => <span key={line} className={i === 0 && !page ? 'ussd-head' : ''}>{line}</span>)}
+        </button>
+      </div></div>
+      <figcaption>*3700# ডায়াল করলে এই মেনু। পর্দায় চাপ দিলে পরের পাতা।</figcaption>
     </figure>
   )
 }
 
-function Topics() {
+// Eight kinds of help. The phone steps through them on its own until the visitor picks one.
+function Services() {
   const [active, setActive] = useState(0)
   const [auto, setAuto] = useState(true)
   useEffect(() => {
     if (!auto || reducedMotion()) return undefined
-    const t = setInterval(() => setActive((i) => (i + 1) % TOPICS.length), 5200)
+    const t = setInterval(() => setActive((i) => (i + 1) % TOPICS.length), 5600)
     return () => clearInterval(t)
   }, [auto])
-  const pick = (i) => { setAuto(false); setActive(i) }
-
+  const topic = TOPICS[active]
   return (
     <section id="services" className="services" aria-labelledby="services-h">
       <div className="section-inner services-inner">
-        <div className="services-copy reveal">
+        <div className="services-copy">
           <p className="eyebrow">সারা মৌসুমের পরামর্শ</p>
           <h2 id="services-h">একটা সমস্যা নয়,<br />চাষের সব প্রশ্নে পাশে</h2>
           <p className="section-lead">
-            বীজ বোনার আগে থেকে ফসল বেচা পর্যন্ত, যেখানে আটকাবেন সেখানেই জিজ্ঞেস করুন।
-            {' '}{BRAND_NAME_BN} আপনার জেলা, জমি আর মৌসুম মনে রাখে, তাই প্রতিবার শুরু থেকে বলতে হয় না।
+            বীজ বোনার আগে থেকে ফসল বেচা পর্যন্ত। {BRAND_NAME_BN} আপনার জেলা, জমি আর মৌসুম মনে রাখে,
+            তাই প্রতিবার শুরু থেকে বলতে হয় না।
           </p>
           <div className="topic-grid" role="group" aria-label="কোন বিষয়ে পরামর্শ">
             {TOPICS.map((t, i) => (
               <button key={t.id} type="button" className={`topic ${i === active ? 'on' : ''}`}
-                aria-pressed={i === active} onClick={() => pick(i)}>
+                aria-pressed={i === active} onClick={() => { setAuto(false); setActive(i) }}>
                 <Glyph name={t.icon} /><span>{t.label}</span>
               </button>
             ))}
           </div>
+          <p className="topic-blurb" aria-live="polite"><b>{topic.label}:</b> {topic.blurb}</p>
         </div>
-        <div className="services-art reveal"><SmartPhone topic={TOPICS[active]} /></div>
+        <div className="services-art"><SmartPhone topic={topic} /></div>
       </div>
     </section>
   )
 }
 
-// Fade sections in as they scroll into view, and drift the hero photo a little slower than
-// the page. The scroller is .home, not the window. Both are off under reduced motion.
+// Fade sections in once as they scroll into view. The scroller is .home, not the window.
+// Off under reduced motion.
 function useMotion(rootRef) {
   useEffect(() => {
     const root = rootRef.current
@@ -225,13 +237,7 @@ function useMotion(rootRef) {
       entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } })
     }, { root, threshold: 0.12 })
     root.querySelectorAll('.reveal').forEach((el) => io.observe(el))
-    let frame = 0
-    const onScroll = () => {
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => root.style.setProperty('--scroll', `${Math.min(root.scrollTop, 1200)}px`))
-    }
-    root.addEventListener('scroll', onScroll, { passive: true })
-    return () => { io.disconnect(); root.removeEventListener('scroll', onScroll); cancelAnimationFrame(frame) }
+    return () => io.disconnect()
   }, [rootRef])
 }
 
@@ -260,21 +266,17 @@ export default function HomePage() {
       </header>
 
       <section className="hero">
-        <picture className="hero-photo" aria-hidden="true">
-          <source media="(max-width: 820px)" srcSet="/img/hero-field-1200.webp" />
-          <img src="/img/hero-field.webp" alt="" width="2400" height="1357" fetchPriority="high" />
-        </picture>
-        <div className="hero-inner">
+        <div className="hero-copy-wrap">
           <div className="hero-copy">
             <p className="kicker">বীজ থেকে বিক্রি, পুরো মৌসুম পাশে</p>
-            <h1>চাষের যেকোনো প্রশ্নে<br /><span>কৃষি বিশেষজ্ঞ এখন আপনার ফোনে।</span></h1>
+            <h1>চাষের যেকোনো প্রশ্নে,<br /><span>কৃষি পরামর্শ এখন হাতের ফোনে।</span></h1>
             <p className="lead">
               কী চাষ করবেন, কোন সার কতটুকু, রোগ না পোকা, কবে সেচ, বৃষ্টি আসছে কি না, খরচ আর লাভ কত,
-              কোথায় কিনবেন, কোথায় বেচবেন। {BRAND_NAME_BN} আপনার জমির মাপে পরামর্শ দেয়, যেকোনো ফোনে, বাংলায়।
+              কোথায় কিনবেন, কোথায় বেচবেন। {BRAND_NAME_BN} আপনার জমির মাপে উত্তর দেয়, যেকোনো ফোনে, বাংলায়।
             </p>
             <div className="hero-actions">
-              <a className="btn btn-primary" href="#services">কী কী পারে দেখুন</a>
-              <a className="btn btn-quiet" href="#/phone">বাটন ফোনে চেষ্টা করুন</a>
+              <a className="btn btn-primary" href="#/phone">ফোনে চেষ্টা করুন</a>
+              <a className="btn btn-quiet" href="#services">কী কী পারে দেখুন</a>
             </div>
             <ul className="channels" aria-label="তিনভাবে পৌঁছানো যায়">
               <li><Glyph name="call" />কল করে বলুন</li>
@@ -283,20 +285,20 @@ export default function HomePage() {
             </ul>
           </div>
         </div>
-        <p className="photo-credit">{ILLUSTRATIVE}</p>
+        <figure className="hero-photo">
+          <picture>
+            <source media="(max-width: 900px)" srcSet="/img/hero-field-band.webp" />
+            <img src="/img/hero-field.webp" width="1400" height="1323" fetchPriority="high"
+              alt="ভোরে ধানক্ষেতের আল ধরে হাঁটছেন একজন কৃষক, হাতে ফোন" />
+          </picture>
+          <figcaption>প্রতীকী ছবি</figcaption>
+        </figure>
       </section>
 
-      <Topics />
+      <Services />
 
       <section id="story" className="story" aria-labelledby="story-h">
-        <figure className="story-photo" aria-hidden="true">
-          <picture>
-            <source media="(max-width: 820px)" srcSet="/img/story-land-1200.webp" />
-            <img src="/img/story-land.webp" alt="" width="2400" height="1029" loading="lazy" />
-          </picture>
-          <figcaption>{ILLUSTRATIVE}</figcaption>
-        </figure>
-        <div className="section-inner story-inner">
+        <div className="section-inner">
           <p className="eyebrow eyebrow-light">কেন দরকার</p>
           <h2 id="story-h">উর্বরতা আমাদের উপহার।<br />সেটা ধরে রাখার সময় এখন।</h2>
           <p className="section-lead">
@@ -454,20 +456,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="closing" aria-labelledby="closing-h">
-        <picture className="closing-photo" aria-hidden="true">
-          <source media="(max-width: 820px)" srcSet="/img/closing-dawn-1200.webp" />
-          <img src="/img/closing-dawn.webp" alt="" width="2400" height="1029" loading="lazy" />
-        </picture>
-        <div className="section-inner closing-inner reveal">
-          <p className="closing-tag" id="closing-h">{BRAND_TAGLINE_BN}</p>
-          <p className="closing-text">মাটি উর্বর থাকুক, ফলন ফিরুক, কৃষকের পরিশ্রমের দাম মিলুক।</p>
-          <a className="btn btn-sun" href="#/phone">ফোনে চেষ্টা করুন</a>
-        </div>
-        <p className="photo-credit">{ILLUSTRATIVE}</p>
-      </section>
-
       <footer className="home-foot">
+        <div className="section-inner foot-blessing">
+          <p className="foot-bless">{BRAND_TAGLINE_BN}</p>
+          <p>মাটি উর্বর থাকুক, ফলন ফিরুক, পরিশ্রমের দাম মিলুক।</p>
+        </div>
         <div className="section-inner foot-inner">
           <div className="foot-brand">
             <BrandMark size={72} />

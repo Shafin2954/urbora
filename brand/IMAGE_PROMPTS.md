@@ -1,16 +1,14 @@
 # Website image prompts
 
-**Status (2026-09-30):** five images were generated on Higgsfield (model GPT Image 2.5, quality
-high, 2k) and are live in `frontend/public/img/` as WebP:
+**Status (2026-09-30, second pass):** live in `frontend/public/img/` (WebP):
 
-| File on the site | Prompt below | Where |
+| File on the site | Source | Where |
 |---|---|---|
-| `hero-field.webp` (+ `-1200`) | 1 | hero background |
-| `phone-android.webp` | 2 (cropped to the phone) | "every problem" section, live chat on the screen |
-| `phone-button.webp` | 3 (cropped to the phone) | "how to reach it", real USSD menu on the screen |
-| `story-land.webp` (+ `-1200`) | 13 | above the story band |
-| `closing-dawn.webp` (+ `-1200`) | 14 | closing band with the tagline |
+| `hero-field.webp`, `hero-field-band.webp` | prompt 1 | hero, right half (band crop on phones) |
+| `phone-android.webp` | in-hand smartphone on a plain cream (#F3EBDA) backdrop, blank white screen, straight on | services, live chat on the screen |
+| `phone-button.webp` | in-hand keypad phone on a plain kraft (#EBD9B4) backdrop, blank white screen, straight on | "how to reach it", real USSD menu |
 
+Prompts 13 and 14 were generated once and then dropped (field photos behind text need a gradient scrim, which the brand forbids).
 The rest (4–12, 15) were not generated; the team asked for only a few. They are kept here in
 case a section needs one later. Phone screens must stay blank white: the site draws the
 screen, and the overlay rectangle is set in `frontend/src/pages/home.css`. If a phone photo
