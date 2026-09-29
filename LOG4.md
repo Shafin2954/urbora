@@ -169,3 +169,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** Team feedback: the emotional land intro is stronger, the bank was taking too much time, and the dealer-list wording was not right.
 **Rejected:** none.
 **Impacts:** App recordings drop to R1–R4; the provenance graph (old R5) and dealer list (old R6) are no longer filmed. The tool graph is no longer shown anywhere in the video.
+
+## [00:40] Video storyboard v3: natural flow, far fewer people, silent S11
+**Did:** Edited `video/storyboard/shots.js` and `build_md.js`; regenerated `video/FINAL_STORYBOARD.md`. Still 17 shots, 1:59; Higgsfield clips down to 16.
+**Decision:** S03 no longer slams "ধানের হইলো কী?"; the S02 push-in carries on and the narrator says "কেন হয় না? প্রশ্ন একটাই, উত্তর অনেক।", which leads into the four answers. People appear only small, from behind or as hands, and never face the lens: the four answers are off-screen voices over four places (shop counter, tea glass, a phone video, father's old sack); the shrug shot is now an empty field where the voices blur out; the call, shop, rain and "other fields" shots are hands only; the close mirrors S01 with his daughter small on the same ridge. Shop dialogue removed. S11 has no voice-over or captions, only the three phones and their own sounds (the simulator tag stays). Cast cut to Mahmud (hands/ring) and Tumpa.
+**Why:** Team feedback: S02 → S03 felt abrupt, the acting felt overdone, and S11 should speak for itself.
+**Rejected:** none.
+**Impacts:** Anyone generating footage: prompts now forbid faces to camera and big expressions; keep that when writing retakes.

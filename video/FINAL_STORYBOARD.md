@@ -10,31 +10,28 @@ One film built from the three earlier storyboards: A (the family story) gives th
 |---|---|---|---|---|
 | 0:00–0:07 | S01 Dawn over the boro | 1 | HF | yes |
 | 0:07–0:14 | S02 Something is off | 1 | HF |  |
-| 0:14–0:16 | S03 The question | 1 | HYP + HF | yes |
-| 0:16–0:25 | S04 Four faces, four answers | 1 | HF | yes |
-| 0:25–0:29 | S05 Buried in bubbles | 1 | HF + HYP |  |
+| 0:14–0:17 | S03 One question, many answers | 1 | HF | yes |
+| 0:17–0:26 | S04 Four answers | 1 | HF | yes |
+| 0:26–0:29 | S05 The voices blur | 1 | HF |  |
 | 0:29–0:37 | S06 A whole day for one answer | 2 | HYP | yes |
 | 0:37–0:40 | S07 Mobile banking, in passing | 2 | HYP | yes |
 | 0:40–0:45 | S08 The field's road rolls up too | 2 | HYP | yes |
 | 0:45–0:48 | S09 He calls | 3 | HF |  |
 | 0:48–1:04 | S10 It asks him | 3 | REC + HF | yes |
-| 1:04–1:12 | S11 Three ways in, one answer | 3 | REC | yes |
+| 1:04–1:12 | S11 Three ways in | 3 | REC | yes |
 | 1:12–1:20 | S12 At the shop, with the SMS | 3 | HF + REC | yes |
 | 1:20–1:28 | S13 Before the rain | 3 | HF + REC | yes |
 | 1:28–1:40 | S14 Why it can be trusted | 4 | HYP | yes |
-| 1:40–1:47 | S15 Other fields, other farmers | 4 | HF | yes |
+| 1:40–1:47 | S15 Other fields | 4 | HF | yes |
 | 1:47–1:54 | S16 The dream | 5 | HF | yes |
 | 1:54–1:59 | S17 স্বপ্ন ফলুক | 5 | HYP |  |
 
 ## Cast (generate a character sheet for each before any shot; prompts refer to them as @NAME)
 
-- **@MAHMUD**, Mahmud, the farmer: A Bangladeshi rice farmer in his early 40s. Lean, sun-darkened skin, short black hair with a little grey at the temples, short trimmed beard. Faded blue-and-white checked lungi, off-white cotton half-sleeve shirt, a red-and-white checked gamcha over his right shoulder. Calm, kind face; tired eyes that crinkle when he smiles. Holds a small black button phone (no brand).
-- **@RAHIMA**, Rahima, his wife: A Bangladeshi woman in her mid 30s, a green cotton sari with a thin red border, hair tied back, a warm confident smile. Uses a basic smartphone (no brand).
-- **@RAFI**, Rafi, their son (16): A Bangladeshi teenage boy, 16, slim, school uniform: white shirt, navy trousers, a cheap digital watch. Reads the SMS aloud.
-- **@TUMPA**, Tumpa, their daughter (9): A Bangladeshi girl, 9, yellow cotton frock, two plaits with red ribbons, a blue school bag. Runs barefoot along the ridge, laughing.
-- **@SELLER**, The shopkeeper: A friendly Bangladeshi input-shop owner in his 50s, grey stubble, a checked shirt with a sleeveless sweater vest, reading glasses on his forehead. Shelves of pesticide bottles and fertiliser sacks behind him. He is helpful, never a villain.
+- **@MAHMUD**, Mahmud, the farmer (seen from behind, far away, or as hands): A Bangladeshi rice farmer in his early 40s. Lean, sun-darkened skin, short black hair with a little grey at the temples. Faded blue-and-white checked lungi, off-white cotton half-sleeve shirt, a red-and-white checked gamcha over his right shoulder. Weathered, work-worn hands with short nails and a thin copper ring on the right hand (the ring keeps his hands recognisable across the insert shots). Holds a small black button phone (no brand).
+- **@TUMPA**, Tumpa, his daughter (9), seen small and from behind: A Bangladeshi girl, 9, yellow cotton frock, two plaits with red ribbons, a blue school bag.
 
-**Style line, appended to every Higgsfield prompt:** Cinematic documentary realism, shot on 35mm, natural light, northern Bangladesh (Dinajpur), boro season. Shallow depth of field, soft film grain, warm but true colours. No text, no captions, no logos, no watermarks. Phone screens face away from camera or are dark (the screen is composited later).
+**Style line, appended to every Higgsfield prompt:** Cinematic documentary realism, shot on 35mm, natural light, northern Bangladesh (Dinajpur), boro season. Shallow depth of field, soft film grain, warm but true colours. Quiet, observational camera: nothing staged-looking. People appear only small in frame, from behind, or as hands; never looking into the lens, no exaggerated expressions or gestures. No text, no captions, no logos, no watermarks. Phone screens face away from camera or are dark (the screen is composited later).
 
 ## Act 1: The land (0:00–0:29)
 
@@ -64,7 +61,7 @@ From: A1 · Texture: Live action (Higgsfield)
 
 From: A2 · Texture: Live action (Higgsfield)
 
-**Picture:** Close-up: his hand parts the plants. A few centre shoots are dry and brown (deadheart, from stem borer). He frowns, puzzled rather than upset.
+**Picture:** Close-up: his hand parts the plants. A few centre shoots are dry and brown (deadheart, from stem borer). The hand stays there a moment. Only the hand is in frame.
 
 **Camera:** Macro, shallow focus; hand enters from the right
 
@@ -78,79 +75,71 @@ From: A2 · Texture: Live action (Higgsfield)
 
 > Macro close-up in a boro rice field: a farmer's weathered hand (@MAHMUD) enters from the right and parts the green rice plants, revealing a tiller whose centre shoot is dry and straw-brown (deadheart from stem borer) among bright green leaves. The hand pauses on it. Morning sidelight, dew. Shallow depth of field, slow push-in. 5 seconds.
 
-### S03 · 0:14–0:16 (2 s) · The question
+### S03 · 0:14–0:17 (3 s) · One question, many answers
 
-From: B1 · Texture: Line art (HTML motion graphics), Live action (Higgsfield)
+From: B1, softened · Texture: Live action (Higgsfield)
 
-**Hook:** The mood breaks on a drum hit: snap zoom onto the dead shoot and the question slams on screen. The pace changes here.
+**Hook:** The question arrives quietly and sets up what comes next: many answers.
 
-**Picture:** The last frame of S02 snap-zooms onto the dry shoot on a drum hit, and the question slams on screen in big Bangla type.
+**Picture:** The camera keeps moving slowly in on the dry shoot until it fills the frame, then holds. No text on screen.
 
-**Camera:** Snap zoom on the beat (digital push into the S02 footage, no new clip)
-- SFX: One sharp dhol hit; the dotara riff starts
-
-**On screen:** ধানের হইলো কী?
-
-**Motion graphics:** Digital snap zoom into the last frame of S02 (6 frames). Type slam: "ধানের হইলো কী?" in Noto Serif Bengali Bold, straw on a 70% shyamol band, scales 120%→100% in 6 frames on the drum hit.
-
-### S04 · 0:16–0:25 (9 s) · Four faces, four answers
-
-From: B2 + A3–A5 · Texture: Live action (Higgsfield)
-
-**Hook:** Four cuts in nine seconds, one per music beat, a little funny. The pace itself holds the viewer.
-
-**Picture:** Four people, each straight to camera, each sure of a different answer: the shopkeeper with a bottle, a neighbour at the tea stall, a cousin on a video call, and his late father in a sepia memory. About 2.2 seconds each, cut on the beat.
-
-**Camera:** Four static medium shots, straight to lens, cut on the beat
+**Camera:** Continuation of the S02 push-in (the same clip, slowed), a held beat at the end
 
 **Sound:**
-- Shopkeeper: এইটা দেন, দুই দিনে ঠিক হয়া যাবে। (Put this on, it'll be fine in two days.)
-- Neighbour: ইউরিয়া একটু বেশি দেও, সবুজ হয়া যাবে। (Put a bit more urea, it'll go green.)
-- Cousin (video call): ইউটিউবে দেখলাম, এইটা দিলেই হয়। (Saw it on YouTube, just use this.)
-- Father (memory): আব্বা সবসময় এইটাই দিত। (Father always used this.)
-- SFX: One percussion hit per face; tea-stall chatter under the neighbour
+- Narrator: কেন হয় না? প্রশ্ন একটাই, উত্তর অনেক। (Why not? One question, many answers.)
+- SFX: The flute holds one note; wind in the leaves
+
+**Motion graphics:** No graphics. Use the tail of the S02 clip slowed to 70%, so the push-in carries on unbroken from S02 into S03.
+
+### S04 · 0:17–0:26 (9 s) · Four answers
+
+From: B2 + A3–A5, without faces · Texture: Live action (Higgsfield)
+
+**Hook:** Four quick cuts, each a different place and a different voice. The rhythm carries it, no acting.
+
+**Picture:** Four still, everyday places, about 2.2 s each, with each answer heard as an ordinary off-screen voice: a hand setting a pesticide bottle on a shop counter; a glass of tea on a bench at the tea stall; a phone playing a farming video, propped on a window sill; an old fertiliser sack in the corner of a shed. No faces.
+
+**Camera:** Four static close shots, cut on the beat
+
+**Sound:**
+- Shopkeeper (off screen): এইটা দেন, দুই দিনে ঠিক হয়া যাবে। (Put this on, it'll be fine in two days.)
+- Neighbour (off screen): ইউরিয়া একটু বেশি দেও। (Put a bit more urea.)
+- Video on a phone: এইটা দিলেই হয়। (Just use this.)
+- Mahmud, remembering: আব্বা সবসময় এইটাই দিত। (Father always used this.)
+- SFX: Voices spoken plainly, as in everyday talk; shop, tea-stall and courtyard ambience under each
 
 **Labels:** AI-generated footage; dramatization
 
 **Higgsfield prompt 1 (16:9):**
 
-> @SELLER stands behind the counter of a small village agri-input shop and holds a pesticide bottle (plain label, no brand) out towards the camera with a confident, friendly smile. Medium shot, static, eye level. 5 seconds.
+> Close-up of the wooden counter of a small village agri-input shop. A shopkeeper's hand (only the hand and sleeve in frame) sets a plain pesticide bottle (no readable label) down on the counter. Shelves of bottles softly blurred behind. Static. 5 seconds.
 
 **Higgsfield prompt 2 (16:9):**
 
-> A Bangladeshi man in his 50s with a white stubble beard, lungi and shawl, sits on a bamboo bench at a village tea stall holding a small glass of milk tea. He leans towards the camera and gives advice with a knowing nod. Medium shot, static. 5 seconds.
+> Close-up of a small glass of milk tea on a worn bamboo bench at a village tea stall, steam rising, blurred people and a kettle in the background. Static. 5 seconds.
 
 **Higgsfield prompt 3 (16:9):**
 
-> A young Bangladeshi man in his 20s in a bright T-shirt, filmed as if on a vertical video call, holding the phone at arm's length, talking fast and pointing at the camera, enthusiastic. Handheld selfie framing. 5 seconds.
+> A cheap smartphone propped against a window sill in a village house, its screen glowing with an out-of-focus video (no readable content), soft daylight, rice fields blurred outside. Static. 5 seconds.
 
 **Higgsfield prompt 4 (16:9):**
 
-> Sepia-toned memory: an old Bangladeshi farmer in his 70s, white beard, white vest and lungi, stands in a rice field holding an open fertiliser sack, looking calmly into the camera. Soft vignette, faded film look. Static medium shot. 5 seconds.
+> An old, faded fertiliser sack folded in the corner of a mud-walled shed, dust in a beam of light, a hoe leaning beside it. Static, slightly sepia. 5 seconds.
 
-**Motion graphics:** A thin 2×2 grid line appears for 6 frames between cuts (the four answers belong together).
+### S05 · 0:26–0:29 (3 s) · The voices blur
 
-### S05 · 0:25–0:29 (4 s) · Buried in bubbles
+From: B3, without faces · Texture: Live action (Higgsfield)
 
-From: B3 · Texture: Live action (Higgsfield), Line art (HTML motion graphics)
+**Picture:** A still, wide view of the field at midday. The four voices overlap, blur into a murmur and fade to silence.
 
-**Picture:** Mahmud faces the camera and shrugs while the four answers pile up around him as speech bubbles until his face is almost hidden. Light, not sad.
+**Camera:** Wide, locked off
+- SFX: The four lines overlap and fade out; then only wind
 
-**Camera:** Medium shot, static; bubbles animate in over the live frame
-
-**Sound:**
-- Mahmud: একেকজন একেক কথা কয়। (Everyone says something different.)
-- SFX: Bubbles pop in on the off-beats
-
-**On screen:** একেকজন একেক কথা কয়।
-
-**Labels:** AI-generated footage; dramatization
+**Labels:** AI-generated footage
 
 **Higgsfield prompt (16:9):**
 
-> @MAHMUD stands at the edge of his rice field, facing the camera, and gives a slow, good-humoured shrug with both palms up, eyebrows raised. Overcast soft light. Static medium shot, locked off, plain background of paddy. 5 seconds.
-
-**Motion graphics:** Four cream speech bubbles (the S04 lines, 60% opacity) stack in over his head and shoulders, 4 frames each. The caption lands last.
+> Wide, locked-off shot of a flat boro rice field at midday under a pale sky, a single palm tree at the edge, light wind moving across the rice in waves. No people. 5 seconds.
 
 ## Act 2: The turn (0:29–0:45)
 
@@ -162,7 +151,7 @@ From: C4 + A6 · Texture: Line art (HTML motion graphics)
 
 **Hook:** Style switch: the live frame freezes and redraws itself as engraved line art. A new texture resets attention at 0:29.
 
-**Picture:** The shrug freezes, and pencil lines trace over it until it is line art on kraft paper. The camera pulls out: a long road winds from his field to the upazila agriculture office on the horizon. The sun crosses the sky while a tiny figure walks.
+**Picture:** The still field freezes, and pencil lines trace over it until it is line art on kraft paper. The camera pulls out: a long road winds from his field to the upazila agriculture office on the horizon. The sun crosses the sky while a tiny figure walks.
 
 **Camera:** Freeze → redraw (12 frames) → slow pull-out along the road
 
@@ -212,22 +201,18 @@ _The real product answering the real problem_
 
 ### S09 · 0:45–0:48 (3 s) · He calls
 
-From: A8 · Texture: Live action (Higgsfield)
+From: A8, hands only · Texture: Live action (Higgsfield)
 
-**Picture:** Mahmud sits on the earthen ridge, gamcha on his shoulder, and dials on the button phone. A close-up of his thumb pressing the keys.
+**Picture:** Insert: his thumb presses the keys of the button phone, the paddy blurred behind.
 
-**Camera:** Two cuts: wide on the ridge, then an insert of the keypad
+**Camera:** Close insert, shallow focus
 - SFX: Keypad beeps; a ring tone
 
-**Labels:** AI-generated footage; dramatization
+**Labels:** AI-generated footage
 
-**Higgsfield prompt 1 (16:9):**
+**Higgsfield prompt (16:9):**
 
-> @MAHMUD sits on the raised earthen ridge (ail) between two rice paddies, legs folded, and lifts a small black button phone to his ear. Late morning, bright soft light. Wide shot, static. 5 seconds.
-
-**Higgsfield prompt 2 (16:9):**
-
-> Insert close-up: a farmer's weathered thumb presses the keys of a small black button phone (no brand, no readable screen). Shallow depth of field, green paddy blurred behind. 5 seconds.
+> Insert close-up: @MAHMUD's weathered hand with a thin copper ring presses the keys of a small black button phone (no brand, no readable screen). Shallow depth of field, green paddy blurred behind. Static. 5 seconds.
 
 ### S10 · 0:48–1:04 (16 s) · It asks him
 
@@ -235,9 +220,9 @@ From: A8 + B5 + C7 · Texture: Real app (recording or HTML replica), Live action
 
 **Hook:** The real product speaks. Its voice asking the questions is the "aha": he does not have to explain.
 
-**Picture:** The real voice call from the #/phone page, shown in a clean phone frame with the live transcript as subtitles. It asks how many days since transplanting and which part is hit, then names stem borer and gives the dose for 2 bigha. Two short cutaways to Mahmud nodding. The dose punches in large with its source chip.
+**Picture:** The real voice call from the #/phone page, shown in a clean phone frame with the live transcript as subtitles. It asks how many days since transplanting and which part is hit, then names stem borer and gives the dose for 2 bigha. Beside it, his hand holds the button phone on loudspeaker over the paddy. The dose punches in large with its source chip.
 
-**Camera:** Replica full frame (left 60%) with live-action Mahmud (right 40%); punch-in on the dose
+**Camera:** Replica (left 60%) beside a plate of his hand holding the phone on loudspeaker (right 40%); punch-in on the dose
 
 **Sound:**
 - Narrator (first 3 s): বুঝায়া বলতে হবে না। উর্বরা নিজেই জিজ্ঞেস করে নেয়। (No need to explain. Urbora asks you itself.)
@@ -246,52 +231,41 @@ From: A8 + B5 + C7 · Texture: Real app (recording or HTML replica), Live action
 
 **On screen:** [real transcript as subtitles]; the dose card with its source chip
 
-**Labels:** real system output; dramatization
+**Labels:** real system output
 
 **Higgsfield prompt (16:9):**
 
-> @MAHMUD on the ridge with the button phone at his ear, listening closely, then nodding slowly, relief starting in his face. Medium close-up, static, soft backlight. 5 seconds.
+> @MAHMUD's hand holds a small black button phone on loudspeaker at chest height over the rice field (only the hand, wrist and the edge of the gamcha in frame; screen facing away). Soft backlight, paddy gently moving. Static. 5 seconds.
 
 **Motion graphics:** Split: replica left, footage right, 4 px straw divider. At the dose line, scale the dose card to 140% for 1.5 s, then settle.
 
 **App screen:** R1 (see below)
 
-### S11 · 1:04–1:12 (8 s) · Three ways in, one answer
+### S11 · 1:04–1:12 (8 s) · Three ways in
 
 From: B6 · Texture: Real app (recording or HTML replica)
 
-**Hook:** A triptych that resolves: three different phones land on the same answer at the same moment.
+**Hook:** No words. Three phones run side by side and end on the same answer; the viewer sees it for themselves.
 
-**Picture:** Three phones side by side: a voice call, the keypad menu (labelled simulator) and an SMS thread. Each runs through the same questions quickly and they all land on the same diagnosis and the same gram figure together.
+**Picture:** The simulation only: three phones side by side (a voice call, the keypad menu, an SMS thread) run through the same case and each ends on the same diagnosis and gram figure.
 
-**Camera:** HTML replica, three phones, fast-forwarded 3×; all three answers land on one frame
-
-**Sound:**
-- Narrator: মুখে বলেন, বাটন চাপেন, বা SMS দেন। উত্তর একটাই। (Speak it, press buttons, or send an SMS. One answer.)
-- SFX: Voice murmur, keypad beeps, SMS tones, then one clean chime as the three answers match
-
-**On screen:** কল · বাটন · SMS → মাজরা পোকা · __ গ্রাম
+**Camera:** HTML replica, three phones, fast-forwarded 3×
+- SFX: Only the phones' own sounds: call murmur, keypad beeps, SMS tones
 
 **Labels:** real system output; simulator (on the keypad phone, the whole time)
-
-**Motion graphics:** A bracket draws under all three answers when they match.
 
 **App screen:** R2 (see below)
 
 ### S12 · 1:12–1:20 (8 s) · At the shop, with the SMS
 
-From: A9 + B7 · Texture: Live action (Higgsfield), Real app (recording or HTML replica)
+From: A9, hands only · Texture: Live action (Higgsfield), Real app (recording or HTML replica)
 
-**Hook:** The payoff of S04: the same shopkeeper, now reading the answer and giving only what it says.
+**Hook:** The quiet payoff of S04: the same counter, but now the hand sets down only what the SMS says.
 
-**Picture:** Next morning at the same shop. Rafi holds up the button phone and reads the SMS. The shopkeeper leans in, reads it, nods, and measures out just the amount it says. Mahmud smiles.
+**Picture:** The same shop counter as S04. A hand lays the button phone on the counter showing the SMS. The shopkeeper's hand slides it closer, then sets down one small bottle beside it. No dialogue.
 
-**Camera:** Over-the-shoulder on the phone (real SMS composited), then a medium two-shot
-
-**Sound:**
-- Shopkeeper: হিসাব তো লেখাই আছে। দুই বিঘার জন্য এইটুকু। (The amount's written right here. This much for two bigha.)
-- Mahmud: যাক, এইবার বুঝলাম। (Well, now I understand.)
-- SFX: Shop ambience, a bottle set on the counter
+**Camera:** Top-down on the counter (real SMS composited on the phone), then the same close angle as S04
+- SFX: Shop ambience; a bottle set on the counter
 
 **On screen:** [real diagnosis SMS, cropped above any footer]
 
@@ -299,13 +273,13 @@ From: A9 + B7 · Texture: Live action (Higgsfield), Real app (recording or HTML 
 
 **Higgsfield prompt 1 (16:9):**
 
-> Over-the-shoulder: @RAFI holds up a small black button phone towards @SELLER across the counter of a village agri-input shop; the shopkeeper leans in, lowers his reading glasses and reads the screen. Screen faces away from camera. 5 seconds.
+> Top-down close-up of a wooden shop counter: @MAHMUD's hand with a thin copper ring lays a small black button phone flat on the counter; a second hand (the shopkeeper's sleeve) slides it closer to read. Screen dark (composited later). Static. 5 seconds.
 
 **Higgsfield prompt 2 (16:9):**
 
-> @SELLER nods, takes one small bottle from the shelf and sets it on the counter with a smile; @MAHMUD, standing beside @RAFI, smiles with relief. Medium two-shot, static. 5 seconds.
+> Same wooden counter as before, same close angle: the shopkeeper's hand sets one small bottle (no readable label) down next to the button phone. Static. 5 seconds.
 
-**Motion graphics:** Composite the R3 SMS onto the phone screen in shot 1 (corner-pin), then pop it out to a large, readable card for 2 s.
+**Motion graphics:** Corner-pin the R3 SMS onto the phone screen in shot 1, then pop it out to a large, readable card for 2 s.
 
 **App screen:** R3 (see below)
 
@@ -315,9 +289,9 @@ From: A10 + C8 · Texture: Live action (Higgsfield), Real app (recording or HTML
 
 **Hook:** A time jump and a buzz. He did not ask, and the phone told him first.
 
-**Picture:** Ten days later. Mahmud is about to spread urea when the button phone buzzes in his pocket. The real rain-alert SMS pops up. He reads it, looks at the gathering clouds and sets the sack down.
+**Picture:** Ten days later. A hand is untying a urea sack on the ridge when the button phone beside it buzzes. The real rain-alert SMS pops up. The hand ties the sack shut again as the clouds gather.
 
-**Camera:** Medium wide; insert of the buzzing phone; back to Mahmud setting the sack down
+**Camera:** Close on the sack and phone on the ridge; clouds in the soft background
 
 **Sound:**
 - Narrator: শুধু বৃষ্টির খবর না, কী করবেন সেইটাও বলে দেয়। (Not just "rain is coming": it tells you what to do.)
@@ -329,7 +303,7 @@ From: A10 + C8 · Texture: Live action (Higgsfield), Real app (recording or HTML
 
 **Higgsfield prompt (16:9):**
 
-> @MAHMUD stands in his rice field holding a white fertiliser sack (no label) ready to spread urea. His pocket phone buzzes; he takes it out, reads, looks up at dark rain clouds gathering, and sets the sack down on the ridge. Overcast, wind in the rice. Medium-wide shot, slight handheld. 5 seconds.
+> Close-up on an earthen ridge beside a rice field: @MAHMUD's hands begin untying a plain white fertiliser sack (no label); a small black button phone lying on the grass next to it vibrates; the hands pause, then tie the sack shut again. Dark rain clouds gathering, wind in the rice. Static, shallow focus. 5 seconds.
 
 **Motion graphics:** "১০ দিন পর" as a hand-lettered card for 1 s. The R4 SMS slides up from the bottom right on the buzz.
 
@@ -358,33 +332,33 @@ From: C9 · Texture: Line art (HTML motion graphics)
 
 **Motion graphics:** Kraft ground, sepia engraved line style (same as S06–S08). Ear → arrow → calculator → arrow → book draw in with stroke-dashoffset, 0.8 s each, timed to the three words of "শোনে · হিসাব করে · উৎস দেখায়" appearing in the shyamol band. Then the three channel phones (call waveform, keypad, SMS bubble) pop in on the REACH line.
 
-### S15 · 1:40–1:47 (7 s) · Other fields, other farmers
+### S15 · 1:40–1:47 (7 s) · Other fields
 
-From: B9 · Texture: Live action (Higgsfield)
+From: B9, hands only · Texture: Live action (Higgsfield)
 
-**Hook:** Three new faces in seven seconds. The story widens from one man to everyone.
+**Hook:** Three new fields in seven seconds. The story widens from one farm to many, without new faces.
 
-**Picture:** Three quick shots: a woman in a potato field talking into a button phone, an older man in a mustard field reading an SMS, a young farmer on a smartphone by a pond. Each one listens and nods.
+**Picture:** Three quick shots of a hand holding a phone in three different fields: a button phone over a potato field, a button phone over yellow mustard, a smartphone beside a village pond.
 
-**Camera:** Three medium shots, about 2.3 s each, gentle handheld
+**Camera:** Three matching close shots, same framing, about 2.3 s each
 
 **Sound:**
 - Narrator: স্মার্টফোন হোক বা বাটন ফোন। দিন হোক বা রাত। (Smartphone or button phone. Day or night.)
 - SFX: Music lifts here
 
-**Labels:** AI-generated footage; dramatization
+**Labels:** AI-generated footage
 
 **Higgsfield prompt 1 (16:9):**
 
-> A Bangladeshi woman farmer in her 40s in a printed cotton sari, standing in a potato field at harvest, talks into a small button phone and nods, smiling. Medium shot, gentle handheld. 5 seconds.
+> A woman's hand with glass bangles holds a small button phone at chest height over a potato field at harvest (only the hand and a sari edge in frame; screen facing away). Static, shallow focus. 5 seconds.
 
 **Higgsfield prompt 2 (16:9):**
 
-> An older Bangladeshi farmer in his 60s with a white beard and a shawl stands in a blooming yellow mustard field, holding a button phone close to his eyes and reading, then smiles. Medium shot. 5 seconds.
+> An older man's hand holds a small button phone over a blooming yellow mustard field (only the hand and a shawl edge in frame; screen facing away). Static, shallow focus. 5 seconds.
 
 **Higgsfield prompt 3 (16:9):**
 
-> A young Bangladeshi farmer in his 20s in a T-shirt and lungi crouches by a village fish pond at dusk, listening to a voice message on a smartphone and nodding. Medium shot, warm dusk light. 5 seconds.
+> A young man's hand holds a smartphone beside a village fish pond at dusk (only the hand in frame; screen facing away), warm dusk light on the water. Static, shallow focus. 5 seconds.
 
 **Note:** Show only crops the system really covers. Check crop.db for potato and mustard before generating; swap for covered crops if not.
 
@@ -394,24 +368,20 @@ _The emotional close and the name_
 
 ### S16 · 1:47–1:54 (7 s) · The dream
 
-From: A12 · Texture: Live action (Higgsfield)
+From: A12, simplified · Texture: Live action (Higgsfield)
 
-**Hook:** The emotional peak, and a rhyme with the opening: the green dawn field is now gold, and his daughter runs through it.
+**Hook:** The same framing as the opening shot: the green dawn field is now gold, and it is his daughter walking the ridge.
 
-**Picture:** Harvest time. The field is gold. Tumpa runs along the ridge with her school bag, laughing, and Mahmud watches her from the paddy with a full sheaf in his arms.
+**Picture:** Harvest time, golden hour. The same wide framing as S01. Tumpa walks along the ridge with her school bag, small in frame and seen from behind, through ripe gold paddy.
 
-**Camera:** Low tracking shot alongside the girl, then his reaction, golden hour
-- SFX: Music swells; her laugh
+**Camera:** Wide, slow push-in along the ridge (mirror of S01)
+- SFX: The opening flute theme returns and swells
 
-**Labels:** AI-generated footage; dramatization
+**Labels:** AI-generated footage
 
-**Higgsfield prompt 1 (16:9):**
+**Higgsfield prompt (16:9):**
 
-> @TUMPA runs barefoot along an earthen ridge through a field of ripe golden rice at golden hour, laughing, her blue school bag bouncing. Low tracking shot alongside her, sun flare. 5 seconds.
-
-**Higgsfield prompt 2 (16:9):**
-
-> @MAHMUD stands in ripe golden paddy holding a sheaf of harvested rice, watching his daughter run past, and smiles, eyes crinkling. Golden hour backlight. Medium close-up, slow push-in. 5 seconds.
+> @TUMPA walks along a raised earthen ridge through a wide field of ripe golden rice at golden hour, seen from behind and small in frame, her blue school bag on her back. Low sun, warm haze, palm trees and a tin-roof village far away. Camera: wide shot, slow push-in along the ridge, same composition as a sunrise shot of the same field. 10 seconds.
 
 ### S17 · 1:54–1:59 (5 s) · স্বপ্ন ফলুক
 
