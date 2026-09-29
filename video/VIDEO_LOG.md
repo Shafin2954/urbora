@@ -35,3 +35,10 @@ dropped in. Waiting on the user's version pick and line picks.
 **Why:** The team asked for everything except the app/website shots first, and for economy with credits.
 **Rejected:** Re-generating clip 01 now (a trim fixes it for free).
 **Impacts:** Rebuild: `cd video/build && npm i && python3 -m http.server 8765 & node render.js S06 S07 S08 S14 S17 && python3 assemble.py`. The Higgsfield clips live in the team's Higgsfield project "Urbora Round 1 video" and are not in git.
+
+## [02:45] Rough cut v0 (silent, 1:59)
+**Did:** `python3 assemble.py` joins 23 segments into `video/build/out/urbora_roughcut.mp4` (1920x1080, 30 fps, 1:58.9, ~75 MB; not in git), plus a labelled copy and a 720p review copy. The ffmpeg build here has no drawtext, so the S11 slate and shot labels are drawn with Pillow and overlaid.
+**Decision:** S02 plays clip 01's clean first 3.5 s at half speed with frame blending; S03 is a freeze of that frame with a slow digital push-in; S10 is the loudspeaker plate slowed to 16 s until the call replica goes on its left.
+**Why:** Keeps the credits for retakes the team actually asks for.
+**Rejected:** none.
+**Impacts:** Credits left: 532.75 of 747.5 (~215 used: 17 keyframes, 16 clips). Still to do: app screens (S10 replica, S11, SMS on S12/S13, after the website is final), voice-over, music, subtitles, colour grade.
