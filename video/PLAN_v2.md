@@ -97,3 +97,43 @@ wheat; the ring and gamcha stay consistent; no morphing in the frames used; one 
 move reads at phone size. For the whole cut: a hook in the first 1.5 s; no shot longer than 6 s
 except the three emotional holds; subtitles readable at 0.3 s per word; ends at or before 2:00; no
 "draft" text or watermarks; honesty labels in the credits line.
+
+## 7. What the three Grameenphone references teach (analysed 2026-09-30)
+
+Measured with speech-to-text timings, pitch tracking and beat/key detection. The voices are real people's; we match their *style* with licensed voices and do not clone them.
+
+- **Story first, narrator last.** "মান-অভিমান" (2:18) is told entirely by a character in dialect; the brand narrator speaks only at 1:58–2:13, four short lines ("বন্ধু মানে মুখে বলা নয় / বন্ধু মানে পাশে থাকা…"). "কথাগুলো হারিয়ে না যাক" (0:50) is a real-life moment, then 6 s of narrator.
+- **Narrator profile:** deep baritone (median ≈98 Hz), lively pitch (≈3.9 semitone spread), 4–6-word phrases at ≈2.5–3 words/s, a clear pause after each phrase, close and warm, never shouted.
+- **Music:** warm major keys (A, D, B major); light under the story; the anthem ("এক আমি", 99 BPM) builds steadily and peaks at the end.
+
+**What changes in our film:** Mahmud tells his own story in first person, in spoken village Bangla (a warm, livelier male voice). The narrator (a deep, calm voice) speaks only at the turn, a few proof lines and the close. The music stays light and rhythmic under the problem and builds into an anthem-like swell from the reveal to the end card.
+
+## 8. Voice-over v3 (replaces §3)
+
+| # | Who | Line |
+|---|---|---|
+| 1 | Mahmud | গতবার পঞ্চাশ মণ পাইছিলাম। এইবার তিরিশ। |
+| 2 | Mahmud | এই মাটি আমার বাপ-দাদার। এই মাটিই আমাদের খাওয়াইছে। |
+| 3 | Mahmud | কিন্তু একই জমিতে এখন আর আগের মতো ধান হয় না। |
+| 4 | Mahmud | ডগাগুলা শুকায়া যাইতেছে। কী যে হইছে, বুঝায়াও বলতে পারি না। |
+| 5 | Shopkeeper | ভাই, এইটা নিয়া যান। এইবার সবাই এইটাই নিতেছে। |
+| 6 | Neighbour | আমি তো পটাশ দিছিলাম, কাজ হইছে। |
+| 7 | Phone video | এইটা দিলেই হয়! |
+| 8 | Father (memory) | আব্বা সবসময় এইটাই দিত। |
+| 9 | Mahmud | একেকজন একেক কথা কয়। কার কথা শুনমু? |
+| 10 | Mahmud | উপজেলা কৃষি অফিস? যাইতেই পুরা দিন। |
+| 11 | Mahmud | টাকা পাঠাইতে তো এখন আর ব্যাংকে যাইতে হয় না… |
+| 12 | Narrator | কৃষি পরামর্শও এখন তেমনি, হাতের ফোনে। উর্বরা। |
+| 13 | Narrator | একটা কল। উর্বরা নিজেই জিজ্ঞেস করে নেয়। |
+| 14 | (real call audio from the app) | |
+| 15 | Narrator | তারপর উত্তর আসে SMS-এ। কী রোগ, কোন ওষুধ, আর আপনার জমিতে ঠিক কতটুকু। |
+| 16 | Shopkeeper | ও, মাজরা পোকা? তাইলে এইটা নেন। এইটুকুই লাগবে। |
+| 17 | Mahmud | বৃষ্টির আগেই খবর আইলো। ইউরিয়াটা বাঁচলো। |
+| 18 | Narrator | বানিয়ে কিছু বলে না। হিসাব আসে পরীক্ষিত কোড থেকে। না জানলে, সোজা বলে দেয়। |
+| 19 | Narrator | স্মার্টফোন হোক বা বাটন ফোন। দিন হোক বা রাত। |
+| 20 | Mahmud | যাক… এইবার বুঝলাম। |
+| 21 | Narrator | মাটি আমাদের উপহার। তার যত্নের জ্ঞান, এখন সবার হাতে। উর্বরা। স্বপ্ন ফলুক। |
+
+## 9. Voice loop
+
+Targets: narrator median F0 95–115 Hz, spread ≥3.3 st, 2.6–3.0 words/s inside a phrase; Mahmud 115–135 Hz, spread ≥3.5 st, 2.8–3.2 words/s (livelier, a younger farmer); every line ≥0.97 speech-to-text similarity. Loop: synthesise → measure → adjust pace/voice → re-synthesise, at most three rounds per voice, then pick the closest.

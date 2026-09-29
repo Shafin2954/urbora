@@ -142,19 +142,22 @@ S14:{dur:12,draw(t){
    </svg>`;
 }},
 /* S17 · 5 s · end card: the golden field redraws into line art, the sun rises into the seal, name and tagline. */
-S17:{dur:5,draw(t){
+S17:{dur:7.8,draw(t){
   const photo=1-e(p(t,.2,1.2));
   const sunY=760-e(p(t,.8,2.2))*400, sunO=1-e(p(t,2.1,2.6));
   const sl=p(t,2.1,2.8),sS=.6+.4*back(sl);
-  const nm=fadeUp(t,2.6),tg=fadeUp(t,3.1),cr=eo(p(t,3.5,4.0));
+  const nm=fadeUp(t,2.6),tg=fadeUp(t,3.1),tm=fadeUp(t,3.9),cr=eo(p(t,4.4,4.9));
   return `<svg viewBox="0 0 1920 1080">${DEFS}${PAPER}
    <circle cx="960" cy="${sunY}" r="120" fill="${C.sun}" opacity="${sunO}"/>
-   ${seal(960,320,380,cl(sl*2),sS)}
-   ${stalks('field-gold.svg',-40,600,2000,e(p(t,.3,2.0)))}
-   <rect x="0" y="660" width="1920" height="420" fill="${C.kraft}" opacity="${.3*e(p(t,2.2,2.8))}"/>
-   ${text(960,640,'উর্বরা',{size:130,font:'NSerifB',weight:700,o:nm.o,dy:nm.dy})}
-   ${text(960,760,'স্বপ্ন ফলুক',{size:96,font:'Galada',weight:400,fill:'#8A5A0B',o:tg.o,dy:tg.dy})}
-   ${text(960,1030,'Dramatization · AI-generated footage (Higgsfield) · Keypad shown in a simulator',{size:24,font:'ISans',fill:C.sepia,o:cr*.85})}
+   ${seal(960,300,360,cl(sl*2),sS)}
+   ${stalks('field-gold.svg',-40,640,2000,e(p(t,.3,2.0)))}
+   <rect x="0" y="680" width="1920" height="400" fill="${C.kraft}" opacity="${.3*e(p(t,2.2,2.8))}"/>
+   ${text(960,610,'উর্বরা',{size:130,font:'NSerifB',weight:700,o:nm.o,dy:nm.dy})}
+   ${text(960,725,'স্বপ্ন ফলুক',{size:92,font:'Galada',weight:400,fill:'#8A5A0B',o:tg.o,dy:tg.dy})}
+   ${text(960,830,'Team Uplift',{size:44,font:'ISans',weight:500,fill:C.shyamol,o:tm.o,dy:tm.dy})}
+   <rect x="0" y="1000" width="1920" height="80" fill="${C.kraft}" opacity="${.85*cr}"/>
+   ${text(960,1034,'Dramatization · AI-generated footage (Higgsfield) · Keypad shown in a simulator · Real system output on screen',{size:22,font:'ISans',fill:C.sepia,o:cr})}
+   ${text(960,1064,'Music: Kevin MacLeod (incompetech.com), licensed under CC BY 4.0 · Voices: Sarvam Bulbul (AI)',{size:22,font:'ISans',fill:C.sepia,o:cr})}
    </svg><img src="assets/kf15.png" style="width:1920px;height:1080px;object-fit:cover;opacity:${photo};filter:sepia(${1-photo})">`;
 }}
 };
