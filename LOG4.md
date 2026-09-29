@@ -421,3 +421,12 @@ the approved plan summarized in the first entries below (phases 0–8).
 - Not yet restyled or checked on the new brand: `#/app`, `#/phone`, `#/market`. They inherit the tokens.
 - The Figma board still shows the old marks.
 - Nothing is committed.
+
+# 2026-09-30
+
+## [02:30] Home page: consultancy message, real-looking photos, interactive phones
+**Did:** `frontend/src/pages/HomePage.jsx` + `home.css` rewritten around the promise "one farm advisor for every question across the season", not just crop disease. New hero on a sunrise paddy photo. New `#services` section: eight kinds of help (what to grow, soil and fertiliser, pest and disease, irrigation, weather, cost and profit, buying inputs, selling harvest); clicking one shows an example chat on a photo of a real budget Android (HTML laid over the blank screen; auto-rotates until the visitor clicks). `#how` now shows a button-phone photo with the real USSD main menu (`backend/channels/ussd.py` MAIN_ITEMS; tap turns the page). Field photo above the story, sunrise closing band with the tagline, engraved wheat pattern in the market band. Gentle motion: sections fade in once, hero photo drifts slower than the page; all off under `prefers-reduced-motion`. Five images in `frontend/public/img/` (WebP, 1200 px copies for phones). `brand/IMAGE_PROMPTS.md` records the prompts.
+**Decision:** Images are AI-generated on the team's Higgsfield account (GPT Image 2.5), because stock-photo hosts are blocked from the build container and the team asked for it. Every one is labelled "প্রতীকী ছবি" on the page and in the footer, so none can pass as a real farmer (rule: no fake content). Example chats carry numbers only where they are real: the pest dose is the system's real triage reply, ৳27/kg urea is the cited government price, the sell line is the real SMS command; the rest are worded without figures. Screens are labelled "উদাহরণ কথোপকথন" except the real one.
+**Why:** The team said the site read as a disease checker, and the drawn phone looked fake.
+**Rejected:** a drawn/CSS phone (the old one); stock photos (hosts blocked; licence checks); 15 images (team asked for a few); a video hero (weight on cheap phones).
+**Impacts:** Build passes, lint clean. Checked at 1440 px and 390 px in Chromium: topic clicks, USSD page turn and fade-ins work. Google Fonts are blocked in the build container, so screenshots used fallback Bangla fonts; check on a normal connection. The crop check needs the backend running.

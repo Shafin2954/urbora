@@ -1,8 +1,9 @@
-/* Home page (brand/BRAND-CORE.md §5). Layout: a sticky straw bar; a kraft hero where the
- * engraved paddy sweeps in from the corner behind the words; a deep-green story band; the
- * crop-problem check on straw; then quiet bands for channels, trust, market and "try it".
- * The grain pattern is the one flourish: kraft + sepia in the hero, straw lines on green,
- * and nowhere near running text. No gradients, no shadows (CLAUDE.md frontend rules). */
+/* Home page (brand/BRAND-CORE.md §5). Layout: a sticky straw bar; a photo hero with the promise;
+ * the eight kinds of help on a real phone; the story on deep green under a field photo; the
+ * button phone with the USSD menu; the crop-problem check; trust, market, "try it", closing.
+ * Photos (public/img, AI-generated, labelled প্রতীকী ছবি) carry the hero, story and closing.
+ * Gradients appear only as legibility scrims over those photos; no shadows, no glass
+ * (CLAUDE.md frontend rules). Motion: one fade-in per section and a slow hero drift. */
 
 .home {
   height: 100%;
@@ -17,7 +18,7 @@
 .home h2 { font-size: clamp(1.75rem, 3.6vw, 2.6rem); line-height: 1.3; text-wrap: balance; }
 .home h3 { font-size: 1.2rem; line-height: 1.4; }
 .section-inner { max-width: 1160px; margin: 0 auto; padding-inline: 20px; }
-.home section { padding-block: 72px; scroll-margin-top: 76px; }
+.home section { padding-block: 72px; scroll-margin-top: 72px; }
 .eyebrow {
   margin-bottom: 10px; font: 600 .82rem/1 var(--sans); letter-spacing: .14em; text-transform: uppercase;
   color: var(--gold-deep);
@@ -69,52 +70,94 @@
 .menu-btn span { display: block; width: 18px; height: 2px; background: var(--brand); border-radius: 2px; }
 .menu-btn:hover { background: var(--brand-tint) !important; }
 
-/* --- hero: kraft ground, engraved paddy sweeping in from the lower left --- */
-.hero { position: relative; background: var(--kraft); overflow: hidden; padding-block: 64px 76px !important; }
-.hero::before {
-  content: ''; position: absolute; inset: 0;
-  background: url('/pattern/sweep-sepia.svg') left bottom / auto 120% no-repeat;
-  opacity: .5; pointer-events: none;
+/* --- hero: a real field at sunrise, the promise set on the calm sky at the left --- */
+.hero {
+  position: relative; overflow: hidden; background: var(--kraft);
+  min-height: min(88vh, 780px); display: flex; align-items: center;
+  padding-block: 88px 112px !important;
 }
-.hero::after { /* a straw veil behind the copy, so the lines never cross words */
-  content: ''; position: absolute; inset: 0 auto 0 0; width: min(62%, 760px);
-  background: var(--kraft); opacity: .78; pointer-events: none;
-  mask-image: linear-gradient(90deg, #000 70%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent);
+.hero-photo { position: absolute; inset: -4% 0 0 0; transform: translate3d(0, calc(var(--scroll, 0px) * .22), 0); }
+.hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 68% 58%; display: block; }
+.home.motion .hero-photo img { animation: hero-settle 2.4s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes hero-settle { from { transform: scale(1.06); } to { transform: scale(1); } }
+.hero::after { /* legibility scrim: straw behind the words, fading out before the farmer */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(250, 245, 234, .95) 0%, rgba(250, 245, 234, .86) 36%, rgba(250, 245, 234, 0) 64%);
 }
-.hero-inner {
-  position: relative; z-index: 1; max-width: 1160px; margin: 0 auto; padding-inline: 20px;
-  display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 48px; align-items: center;
-}
-.kicker { margin-bottom: 18px; font: 400 1.35rem/1.4 var(--hand); color: var(--sepia); }
-.hero h1 { font-size: clamp(2.4rem, 5.4vw, 4rem); line-height: 1.22; letter-spacing: -.005em; text-wrap: balance; color: var(--brand); }
+.hero-inner { position: relative; z-index: 1; width: 100%; max-width: 1160px; margin: 0 auto; padding-inline: 20px; }
+.hero-copy { max-width: 660px; }
+.kicker { margin-bottom: 16px; font: 400 1.4rem/1.4 var(--hand); color: var(--sepia); }
+.hero h1 { font-size: clamp(2.2rem, 4.4vw, 3.35rem); line-height: 1.24; letter-spacing: -.005em; text-wrap: balance; color: var(--brand); }
 .hero h1 span { color: var(--ink); }
-.lead { margin-top: 20px; font-size: 1.16rem; line-height: 1.8; color: #3a3222; max-width: 34em; }
+.lead { margin-top: 20px; font-size: 1.16rem; line-height: 1.8; color: #2f2a1c; max-width: 34em; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.hero .btn-quiet { background: rgba(250, 245, 234, .7); }
 .channels { list-style: none; margin: 28px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 22px; }
 .channels li { display: flex; align-items: center; gap: 8px; color: var(--brand); font-weight: 600; }
 .glyph { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-
-/* --- button phone showing the real SMS --- */
-.hero-art { display: flex; justify-content: center; }
-.bphone { margin: 0; width: min(100%, 300px); }
-.bphone-body { background: var(--brand); border-radius: 34px; padding: 18px 18px 22px; border: 1px solid var(--brand-dark); }
-.bphone-ear { width: 56px; height: 6px; border-radius: 3px; background: #0a3024; margin: 2px auto 14px; }
-.bphone-screen { background: #f4efd9; border-radius: 12px; padding: 12px 14px; min-height: 230px; font-size: .92rem; line-height: 1.55; color: var(--ink); }
-.bphone-screen p { margin-bottom: 4px; }
-.bphone-status { display: flex; justify-content: space-between; font: 600 .75rem/1 var(--sans); color: var(--sky); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #c9bfa0; }
-.bphone-keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
-.bphone-keys span { display: grid; place-items: center; height: 34px; border-radius: 10px; background: #155443; color: var(--bg); font-weight: 600; }
-.bphone figcaption { margin-top: 12px; font-size: .85rem; color: #5b4a2c; text-align: center; }
-
-/* --- story: deep green, straw paddy rising along the bottom --- */
-.story { position: relative; background: var(--brand); color: var(--bg); overflow: hidden; padding-bottom: 150px !important; }
-.story::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 190px;
-  background: url('/pattern/field-straw.svg') center bottom / auto 100% repeat-x; opacity: .2; pointer-events: none;
+.photo-credit {
+  position: absolute; right: 14px; bottom: 12px; z-index: 2; margin: 0;
+  font-size: .72rem; color: #fff; background: rgba(17, 32, 26, .45); padding: 3px 8px; border-radius: 999px;
 }
+
+/* --- services: eight kinds of help, shown on a real phone --- */
+.services { background: var(--bg); }
+.services-inner { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 56px; align-items: center; }
+.topic-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 30px; }
+.topic {
+  display: flex; align-items: center; gap: 12px; min-height: 58px; padding: 10px 16px; border-radius: 14px;
+  background: var(--surface); color: var(--ink); border: 1.5px solid var(--border);
+  font: 600 1.08rem/1.3 var(--sans); text-align: left; cursor: pointer;
+  transition: background var(--t, 240ms) ease-out, border-color 240ms ease-out, color 240ms ease-out;
+}
+.topic .glyph { color: var(--sky); width: 26px; height: 26px; }
+.topic:hover { border-color: var(--brand); background: var(--brand-tint); }
+.topic.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+.topic.on .glyph { color: var(--gold); }
+.services-art { display: flex; justify-content: center; }
+.services-art .photo-phone { width: min(100%, 420px); }
+
+/* --- real phone photos with live screens laid over the blank glass --- */
+.photo-phone { position: relative; margin: 0; container-type: inline-size; }
+.photo-phone img { display: block; width: 100%; height: auto; border-radius: 22px; }
+.photo-phone figcaption { margin-top: 12px; font-size: .85rem; color: var(--ink-faint); text-align: center; }
+.phone-screen { position: absolute; overflow: hidden; }
+.phone-android .phone-screen {
+  left: 23.6%; top: 12%; width: 52.8%; height: 70.2%; border-radius: 1cqw;
+  background: var(--bg); display: flex; flex-direction: column;
+}
+.chat-bar {
+  display: flex; align-items: center; gap: 2cqw; padding: 2.6cqw 3cqw;
+  background: var(--brand); color: #fff; font: 700 3.6cqw/1 var(--display);
+}
+.chat-bar .brand-mark { width: 6cqw; height: 6cqw; }
+.chat-body { display: flex; flex-direction: column; gap: 2.4cqw; padding: 3.2cqw 2.8cqw; animation: chat-in .45s ease-out both; }
+@keyframes chat-in { from { opacity: 0; transform: translateY(2cqw); } to { opacity: 1; transform: none; } }
+.bubble { margin: 0; font-size: 3.2cqw; line-height: 1.5; padding: 2cqw 2.6cqw; max-width: 90%; }
+.bubble-me { align-self: flex-end; background: var(--gold-tint); color: var(--ink); border-radius: 3cqw 3cqw .8cqw 3cqw; }
+.bubble-bot { align-self: flex-start; background: #fff; border: 1px solid var(--border); border-radius: 3cqw 3cqw 3cqw .8cqw; color: var(--ink); }
+.bubble-bot p + p { margin-top: 1.4cqw; }
+.chat-note { margin: 0; font-size: 2.6cqw; color: var(--gold-deep); font-weight: 600; }
+.phone-button .phone-screen {
+  left: 31.6%; top: 16.4%; width: 36.2%; height: 29.5%; border-radius: .4cqw;
+  background: #e6edd6; border: 0; padding: 2cqw 2.2cqw; margin: 0;
+  display: flex; flex-direction: column; align-items: flex-start; gap: .5cqw;
+  font: 600 3cqw/1.35 var(--sans); color: #17231b; text-align: left; cursor: pointer;
+}
+.phone-button .phone-screen:hover { background: #dde7c9; }
+.phone-button .phone-screen:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.ussd-head { width: 100%; color: var(--brand); font-weight: 700; padding-bottom: .6cqw; margin-bottom: .4cqw; border-bottom: 1px solid #b9c6a4; }
+
+/* --- story: the tired field, then the four truths on deep green --- */
+.story { position: relative; background: var(--brand); color: var(--bg); overflow: hidden; padding-top: 0 !important; }
+.story-photo { position: relative; margin: 0; height: clamp(220px, 32vw, 440px); }
+.story-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 60%; display: block; }
+.story-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(13, 59, 46, 0) 45%, var(--brand) 100%); }
+.story-photo figcaption { position: absolute; right: 14px; top: 12px; z-index: 1; font-size: .72rem; color: #fff; background: rgba(17, 32, 26, .45); padding: 3px 8px; border-radius: 999px; }
+.story-inner { position: relative; z-index: 1; margin-top: -40px; }
 .story h2 { color: var(--bg); }
 .story .section-lead { color: #cfe0d6; }
+
 .truths { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 40px; position: relative; z-index: 1; }
 .truth { background: #134a3a; border: 1px solid #2a5f4e; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .truth h3 { color: var(--leaf); font-size: 1.05rem; }
@@ -194,12 +237,18 @@
 .result-foot p { font-size: .9rem; color: var(--ink-faint); }
 .result-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
-/* --- how it works --- */
+/* --- how: the button phone with the real USSD menu, three steps beside it --- */
 .how { background: var(--surface-sunk); }
-.steps { list-style: none; margin: 34px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.steps li { background: var(--surface); border-radius: 18px; padding: 24px; display: grid; gap: 10px; align-content: start; border: 1px solid var(--border); }
-.steps .glyph { width: 32px; height: 32px; color: var(--sky); }
-.steps p { color: var(--ink-soft); line-height: 1.7; }
+.how-inner { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 56px; align-items: center; }
+.how-art { display: flex; justify-content: center; }
+.how-art .photo-phone { width: min(100%, 360px); }
+.steps { list-style: none; margin: 30px 0 0; padding: 0; display: grid; gap: 14px; }
+.steps li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: start; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 20px 22px; }
+.step-no { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--gold-tint); color: var(--gold-deep); font: 700 1.3rem/1 var(--display); }
+.steps h3 { display: flex; align-items: center; gap: 10px; }
+.steps h3 .glyph { color: var(--sky); }
+.steps p { margin-top: 6px; color: var(--ink-soft); line-height: 1.7; }
+
 .job-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
 .job-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 30px; }
 .job { background: var(--bg); border: 1px solid var(--border); border-radius: 18px; padding: 24px; display: grid; gap: 10px; align-content: start; min-width: 0; }
@@ -225,7 +274,12 @@
 .stat cite { display: block; font-size: .8rem; font-style: normal; color: var(--ink-faint); margin-top: 4px; }
 
 /* --- market + try --- */
-.market-band { background: var(--kraft); position: relative; }
+.market-band { background: var(--kraft); position: relative; overflow: hidden; }
+.market-band::before { /* the engraved wheat, sweeping in from the right, away from the words */
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .45;
+  background: url('/pattern/sweep-sepia.svg') left bottom / auto 125% no-repeat; transform: scaleX(-1);
+}
+.market-band .section-inner { position: relative; z-index: 1; }
 .market-band .job { background: #f7eed9; border-color: #d9c49a; }
 .demo-note { margin-top: 16px; font-size: .9rem; color: #5b4a2c; }
 .try { background: var(--bg); }
@@ -247,6 +301,28 @@
 .tag-demo { background: var(--gold-tint); color: var(--gold-deep); }
 .partner-links { margin-top: 18px; color: var(--ink-soft); }
 .partner-links a { color: var(--sky); font-weight: 600; }
+
+/* --- closing: ripe paddy at sunrise and the blessing --- */
+.closing {
+  position: relative; overflow: hidden; background: #4a3413; text-align: center;
+  min-height: 480px; display: flex; align-items: center; padding-block: 110px !important;
+}
+.closing-photo { position: absolute; inset: 0; }
+.closing-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 65%; display: block; }
+.closing .photo-credit { top: 12px; bottom: auto; }
+.closing::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20, 16, 8, .15) 0%, rgba(20, 16, 8, .55) 100%); }
+.closing-inner { position: relative; z-index: 1; width: 100%; display: grid; justify-items: center; gap: 12px; }
+.closing-tag { font: 400 clamp(3rem, 8vw, 5.4rem)/1.2 var(--hand); color: #fff; }
+.closing-text { font-size: 1.25rem; line-height: 1.6; color: #f7ecd4; max-width: 30em; }
+.closing .btn { margin-top: 14px; }
+
+/* --- motion: sections rise in once; nothing moves under reduced motion (see useMotion) --- */
+.home.motion .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease-out, transform .7s ease-out; }
+.home.motion .reveal.in { opacity: 1; transform: none; }
+.home.motion .truths .reveal:nth-child(2), .home.motion .steps .reveal:nth-child(2), .home.motion .stats .reveal:nth-child(2) { transition-delay: .08s; }
+.home.motion .truths .reveal:nth-child(3), .home.motion .steps .reveal:nth-child(3), .home.motion .stats .reveal:nth-child(3) { transition-delay: .16s; }
+.home.motion .truths .reveal:nth-child(4) { transition-delay: .24s; }
+@media (prefers-reduced-motion: reduce) { .chat-body { animation: none; } }
 
 /* --- footer --- */
 .home-foot { background: var(--brand); color: #cfe0d6; padding-block: 44px; }
@@ -271,9 +347,14 @@
   .home-nav a { padding-block: 14px; border-bottom: 1px solid var(--border); }
   .top-actions { margin-left: auto; }
   .menu-btn { display: inline-flex; }
-  .hero-inner { grid-template-columns: minmax(0, 1fr); gap: 36px; }
-  .hero::after { width: 100%; opacity: .7; mask-image: none; -webkit-mask-image: none; }
-  .hero::before { background-size: auto 70%; }
+  .hero { min-height: 0; align-items: flex-end; padding-block: 60vw 48px !important; }
+  .hero-photo { inset: 0 0 auto 0; height: 62vw; transform: none; }
+  .hero::after { background: linear-gradient(180deg, rgba(250, 245, 234, 0) 0%, rgba(250, 245, 234, 0) 40vw, var(--bg) 62vw); }
+  .hero { background: var(--bg); }
+  .photo-credit { top: 12px; bottom: auto; }
+  .services-inner, .how-inner { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .how-art { order: 2; }
+  .story-inner { margin-top: -20px; }
   .steps, .job-grid, .job-grid-2, .stats { grid-template-columns: minmax(0, 1fr); }
   .analogy { grid-template-columns: minmax(0, 1fr); }
   .analogy-arrow { transform: rotate(90deg); justify-self: start; }

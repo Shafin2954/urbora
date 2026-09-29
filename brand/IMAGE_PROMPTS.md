@@ -1,7 +1,22 @@
-# Website image prompts (ChatGPT image generation)
+# Website image prompts
 
-For the উর্বরা home page redesign. Generate each image in ChatGPT, save it with the
-file name given, and drop it in `frontend/public/img/`. I will crop, compress to WebP and wire it in.
+**Status (2026-09-30):** five images were generated on Higgsfield (model GPT Image 2.5, quality
+high, 2k) and are live in `frontend/public/img/` as WebP:
+
+| File on the site | Prompt below | Where |
+|---|---|---|
+| `hero-field.webp` (+ `-1200`) | 1 | hero background |
+| `phone-android.webp` | 2 (cropped to the phone) | "every problem" section, live chat on the screen |
+| `phone-button.webp` | 3 (cropped to the phone) | "how to reach it", real USSD menu on the screen |
+| `story-land.webp` (+ `-1200`) | 13 | above the story band |
+| `closing-dawn.webp` (+ `-1200`) | 14 | closing band with the tagline |
+
+The rest (4–12, 15) were not generated; the team asked for only a few. They are kept here in
+case a section needs one later. Phone screens must stay blank white: the site draws the
+screen, and the overlay rectangle is set in `frontend/src/pages/home.css`. If a phone photo
+is regenerated, re-measure its blank screen and update those percentages.
+
+Originally written for ChatGPT; they work the same on Higgsfield. Crop and compress to WebP before adding.
 
 **Rules for every image**
 - Paste the **style block** first, then the image prompt, in the same message.
