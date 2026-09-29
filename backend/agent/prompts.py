@@ -1,4 +1,4 @@
-"""System prompt for the Agrosfeer agent.
+"""System prompt for the Urbora agent.
 
 Kept as a single static string so it caches cleanly (llm_client.cached_system).
 NEVER interpolate timestamps / session ids into it — that silently breaks the
@@ -6,7 +6,7 @@ prompt cache. Volatile per-turn context (farm profile, today's date) goes into
 the message history, not here.
 """
 
-from ..branding import BRAND_NAME
+from ..branding import BRAND_NAME, BRAND_NAME_BN
 
 SYSTEM_PROMPT = """\
 You are __BRAND__, an autonomous agricultural advisor for smallholder farmers in \
@@ -234,4 +234,4 @@ scorer, finance). Each number you state should name where it came from.
 """
 
 # Resolved once at import: still a static string per process, so the prompt cache holds.
-SYSTEM_PROMPT = SYSTEM_PROMPT.replace("__BRAND__", BRAND_NAME)
+SYSTEM_PROMPT = SYSTEM_PROMPT.replace("__BRAND__", f"{BRAND_NAME_BN} ({BRAND_NAME})")

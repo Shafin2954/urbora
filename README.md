@@ -48,17 +48,20 @@ same tools:
 | Door | Phone | Status | Where |
 |---|---|---|---|
 | Web app | smartphone | **Working** (the July build) | `frontend/`, `POST /api/chat` |
-| SMS | any | **Working in the simulator; real SMS via an Android phone is built but not yet run on a device** | `backend/channels/sms.py`, `flows.py`; `POST /api/channels/sms/smsgate` |
+| SMS | any | **Verified on real SIMs** (2026-09-29): SMS in and out through an Android phone over USB, incl. the full SMS menu → crop-problem diagnosis; loop-guarded | `backend/channels/sms.py`, `flows.py`; `POST /api/channels/sms/smsgate` |
 | Missed call → SMS | any | **Working in the simulator; ADB bridge built, not yet run on a device** | `backend/channels/bridge/adb.py` |
-| USSD `*code#` | any | **Working in the simulator** (a real short code needs operator provisioning); bdapps request/response shape implemented | `backend/channels/ussd.py`; `POST /api/channels/ussd/bdapps` |
+| USSD `*code#` | any | **Working in the simulator** (a real short code needs operator provisioning); bdapps request/response shape implemented. Every screen fits one Bangla USSD page (80 UCS-2 units, tested over all reachable screens); 9 = more, 0 = back everywhere; a dropped session is offered back on redial | `backend/channels/ussd.py`; `POST /api/channels/ussd/bdapps` |
+| Crop-problem menu (USSD 2) | any | **Working in the simulator.** Crop → stage → where → what it looks like → how much, by digits; a deterministic KB-bounded table names the likely causes, the SMS answer is a template (doses only as the source states them, scaled to the farmer's bigha by `units.py`); no KB coverage → referral to SAAO / 16123. Reports aggregate by district as a pest signal | `backend/kb/triage.py`, `backend/channels/triage_menu.py`; `CHANNELS_RESEARCH.md` §4 |
 | Voice call | any | **Push-to-talk in the browser emulator; real calls through Windows Phone Link built** (bridge + Voicemeeter, no root, no modem) — **the first real call on a paired phone is still to be run.** Sarvam speech verified live (below) | `backend/channels/voice/`, `phonelink.py` |
 | Proactive alerts by SMS | any | **Working** (opt-in loop) | `backend/channels/alerts_job.py` |
+| SMS menu mode (text মেনু) | any | **Verified on real SIMs** — the USSD menu over plain SMS, so button-phone menus work today without a short code | `backend/channels/sms_menu.py` |
+| Keypad on the hotline | any | **Working in the browser emulator; DTMF detection tested on synthetic tones (noise, 8 kHz), not yet on a real call** | `backend/channels/voice/audio.py` (`DtmfDetector`), `voice/ivr.py` |
 
 And two marketplaces that turn advice into action:
 
 | Marketplace | Status | Where |
 |---|---|---|
-| **Input marketplace** — the agent's `find_inputs` tool ranks nearby dealers (price 40, distance 30, stock 15, trust 15; no paid placement); order on the web, USSD menu 4 or SMS; the dealer confirms by SMS; commission paid by the dealer | **Working, with demo dealers** (labelled ডেমো everywhere) | `backend/market/inputs.py`, `ranking.py`; `#/market`, `#/dealer` |
+| **Input marketplace** — the agent's `find_inputs` tool ranks nearby dealers (price 40, distance 30, stock 15, trust 15; no paid placement); order on the web, USSD menu 5 or SMS; the dealer confirms by SMS; commission paid by the dealer | **Working, with demo dealers** (labelled ডেমো everywhere) | `backend/market/inputs.py`, `ranking.py`; `#/market`, `#/dealer` |
 | **Produce marketplace** — the farmer lists the harvest (`বিক্রি আলু 500 কেজি 22 টাকা`), sees a cited price guide, buyers offer, the farmer accepts with one SMS reply; the platform fee is paid by the buyer | **Working, with demo buyers** | `backend/market/produce.py`; `#/market`, `#/buyer` |
 
 Try it: `#/phone` is a button-phone emulator (dial `*3700#`, SMS, missed call, call),
@@ -409,17 +412,48 @@ Then open `http://localhost:5173/#/phone` (button-phone emulator), `#/monitor`
 (live phone conversations) and `#/market`. With the default `SMS_PROVIDER=simulator`
 nothing leaves the machine and the emulator's inbox shows every SMS.
 
-**Real SMS through an Android phone** (pilot):
+**Real SMS through an Android phone** (pilot, USB only — no Wi-Fi needed):
 
-1. Install **SMS Gateway for Android** (SMSGate) on the phone, enable *Local Server*,
-   note the address, username and password it shows.
-2. In `.env`: `SMS_PROVIDER=smsgate`, `SMSGATE_URL=http://<phone-ip>:8080`,
-   `SMSGATE_USER`, `SMSGATE_PASSWORD`, and a long random `CHANNEL_ID_SALT`.
-3. Register a webhook on the phone for `sms:received` (and `sms:delivered`) pointing at
-   `http://<backend>/api/channels/sms/smsgate`; set the app's signing key as
-   `SMSGATE_SIGNING_KEY` so unsigned calls are refused.
-4. Missed calls: plug the phone in with USB debugging on, set `BRIDGE_TOKEN` on both
-   sides, and run `python -m backend.channels.bridge.adb --backend http://<backend>`.
+1. Install **SMS Gateway for Android** (SMSGate, `me.capcom.smsgateway`) from its
+   [GitHub releases](https://github.com/capcom6/android-sms-gateway/releases). In the app:
+   turn on *Local Server*, tap *Offline* so it shows *Online*, and note the username and
+   password. Samsung: set the app's battery use to *Unrestricted*.
+2. In `.env.local`: `SMS_PROVIDER=smsgate`, `SMSGATE_USER`, `SMSGATE_PASSWORD`, and the
+   app's Settings → Webhooks → Signing Key as `SMSGATE_SIGNING_KEY`. `SMSGATE_URL`
+   defaults to `http://127.0.0.1:8080`. Optional `SMSGATE_SIM=1|2` on a dual-SIM phone.
+3. Start the backend, plug the phone in with USB debugging on, then run
+   `python -m backend.channels.bridge.phone_up --watch`. It exempts the app from battery
+   optimisation, opens `adb forward tcp:8080` (laptop → phone API) and `adb reverse
+   tcp:8000` (phone → backend), and registers the `sms:received/sent/delivered/failed`
+   webhooks at `http://127.0.0.1:8000/api/channels/sms/smsgate` — the only plain-HTTP
+   webhook address SMSGate accepts. `--watch` re-applies the tunnels after a reconnect.
+4. Missed calls: set `BRIDGE_TOKEN` on both sides and run
+   `python -m backend.channels.bridge.adb --backend http://127.0.0.1:8000`.
+
+The webhook is idempotent: SMSGate retries a failed delivery for ~2 days, so each event
+id is handled once, signatures older than 5 minutes are refused, and an SMS older than
+15 minutes is recorded but not answered.
+
+**Real USSD through bdapps** (Robi/Airtel SIMs; free developer account):
+
+1. Register at [dev.bdapps.com](https://dev.bdapps.com) and create an app with **USSD** (and
+   SMS) enabled. Registration is free; bdapps charges subscribers per menu (~Tk 1–2), so ask
+   for a free/test tariff for the pilot. The service code (`*213*…#`) is assigned on approval.
+2. bdapps must reach the backend at a public **HTTPS** URL, and its outbound `/ussd/send`
+   only accepts calls from a whitelisted IP. Replit autoscale changes IP on every deploy, so
+   run the backend on the laptop and expose it with a free Cloudflare quick tunnel:
+   `cloudflared tunnel --url http://localhost:8000` → portal USSD URL
+   `https://<name>.trycloudflare.com/api/channels/ussd/bdapps`, SMS-MO URL
+   `…/api/channels/sms/bdapps`. (A quick-tunnel URL changes on restart; a free named tunnel
+   keeps it.)
+3. Portal **Allowed Host List** = the laptop's public IP (`curl ifconfig.me`; re-check on a
+   new network — `BDAPPS-PREFLIGHT-CHECKLIST.md`).
+4. `.env.local`: `BDAPPS_APP_ID`, `BDAPPS_PASSWORD`, `BDAPPS_MODE=live`. Test in the bdapps
+   web simulator first, then from a Robi SIM. Every screen already fits one Bangla USSD page.
+
+**SMS menu mode** (no short code needed): text **মেনু** (or `menu`) to the gateway phone and
+the same USSD menu arrives by SMS; reply with digits. Free text leaves the menu and goes to
+the agent. An unfinished USSD walk from the last 30 minutes is offered back.
 
 **Real voice calls through Windows Phone Link** (pilot, no root, no modem):
 
@@ -428,14 +462,24 @@ nothing leaves the machine and the emulator's inbox shows every SMS.
    the bridge also finds the Android SDK copy on its own).
 2. Phone: install **Link to Windows**; PC: **Phone Link** → Calls → pair over Bluetooth.
    Make a test call from the PC to confirm call audio plays on the laptop.
-3. Windows Settings → Sound → Volume mixer → Phone Link: **output** = "Voicemeeter Input",
-   **input** = "Voicemeeter Out B2". In Voicemeeter: the VAIO strip → **B1** only, the AUX
-   strip → **B2** only (both → A1 too if you want to listen in).
+3. Audio route (verified on a real call with **Voicemeeter Standard**, LOG4 [16:40]):
+   caller → Phone Link → **Speakers** → **Stereo Mix** (enable it under Sound → Recording)
+   → bridge; bridge → **Voicemeeter Input** (VAIO strip → **B1** only) → **Voicemeeter
+   Out B1**, set as the Windows default microphone → Phone Link. Set Voicemeeter's A1 to
+   the speakers so its engine runs. Run the bridge with
+   `--capture "Stereo Mix" --playback "Voicemeeter Input"`. (With Voicemeeter Potato the
+   AUX → B2 route in the bridge's defaults works instead.)
+   **The laptop must not take its internet from the phone that answers calls** — Android
+   drops mobile data during a non-VoLTE call, and STT/agent/TTS need the network.
 4. `BRIDGE_TOKEN` in `.env.local` (same value the backend reads), backend running, then:
    `python -m backend.channels.voice.phonelink --test-playback` (you hear the Bangla
    greeting when a call is up), `--test-capture` (speak on a call; the meter moves), and
    finally `python -m backend.channels.voice.phonelink --auto-answer`.
-5. The caller's number comes from ADB when Android reveals it; if yours hides it, pass
+5. **Keypad:** during a call the caller may press keys instead of speaking — the USSD menu is
+   read aloud ("ফসল পরামর্শ, 1 চাপুন"), numbers end with # or a pause, * repeats. A
+   crop-problem answer is spoken on the call and sent by SMS. Check first that key tones
+   survive your phone network: `--test-dtmf`, then press keys on the calling phone.
+6. The caller's number comes from ADB when Android reveals it; if yours hides it, pass
    `--caller <number>` for testing. One call at a time.
 
 A personal SIM is for a pilot only; production runs on the operator's IVR, USSD short

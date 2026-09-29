@@ -1,1 +1,1 @@
-"""Agrosfeer API package (B-owned: FastAPI routes, SSE, sessions)."""
+"""Urbora API package (B-owned: FastAPI routes, SSE, sessions)."""

@@ -6,8 +6,14 @@ Map of the tree. Update after any unit of work so nothing has to be re-explored.
 ## FutureMakers round (September 2026) — read this first
 - `video/` — the Round 1 pitch video. `storyboard/shots.js` is the single source (18 shots, prompts, replicas, cast); `storyboard/build_md.js` regenerates `FINAL_STORYBOARD.md` from it. No app code depends on it.
 Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
-- `backend/branding.py`, `frontend/src/branding.js` — the product name: **Agrosfeer**.
+- `backend/branding.py`, `frontend/src/branding.js` — the product name: **উর্বরা / Urbora**, tagline স্বপ্ন ফলুক (brand/BRAND-CORE.md is the brand source of truth).
+- `frontend/src/lib/seal.js` (logo master), `lib/engraving.js` (grain pattern), `components/BrandMark.jsx` (BrandMark + Lockup), `components/CropCheck.jsx` + `api/triage.js` → `backend/api/triage.py` (`/api/triage/options`, `/api/triage/check`). Brand files: `brand/scripts/{seal,paddy-engraving,build-web-assets}.mjs`, `export-logos.ps1`.
 - `backend/env.py` — loads `.env.local` > `backend/.env` > `.env` (both configs use it).
+- Replit (committed by the Repl itself to `master`): `.replit` (dev = `start.sh`; deployment = autoscale,
+  build `cd frontend && npm install && npm run build`, run uvicorn on :5000), `start.sh`, `pyproject.toml` +
+  `uv.lock` (**the Repl's own dependency list — separate from `backend/requirements.txt`**), `replit.md`,
+  stub `main.py`, `package.json`. `backend/api/main.py` serves `frontend/dist` + an SPA fallback when dist exists.
+  Vite dev port is **5000** since the merge (was 5173).
 - `backend/agent/intake_guard.py` — refuses planning tools on district/soil/water/season the farmer never stated.
 - `backend/channels/voice/audio.py` (pure audio helpers + VAD segmenter + ADB call-state parser) and
   `voice/phonelink.py` (real calls via Windows Phone Link + Voicemeeter; optional deps in
@@ -25,6 +31,26 @@ Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
   `voice/turn.py` (`voice_turn`, `hang_up` → SMS summary), `bridge/adb.py`
   (missed-call watcher over ADB).
 - `backend/agent/loop.py` — `run_turn(..., channel=)` + `CHANNEL_NOTES`.
+- `CHANNELS_RESEARCH.md` — verified telecom/SMSGate/16123 facts + the KB-bounded crop-problem tree. Read before touching channels.
+- `backend/channels/bridge/phone_up.py` — one command: phone as SMS gateway over USB (adb forward 8080 / reverse 8000, webhooks).
+- `backend/channels/ussd.py` — screen budget (`fits`, 80 UCS-2 / 182 GSM-7), pager (`paginate`/`paged`/`pick_paged`), 9 = more / 0 = back, resume of dropped walks.
+- `backend/kb/triage.py` (deterministic crop-problem table, SMS template) + `backend/channels/triage_menu.py` (USSD menu 2, `run_problem_action`); store table `triage_reports`, `triage_summary()`.
+- `run_turn(..., context_note=)` — server note a channel attaches (recent triage for SMS follow-ups).
+- `backend/channels/sms_menu.py` — "মেনু" → USSD menu over SMS (checked first in `flows.handle_inbound_sms`).
+- `backend/channels/voice/audio.py` `DtmfDetector` + `voice/ivr.py` (keys → spoken USSD menu); routes `/api/channels/{emulator,bridge}/voice/keys`; `phonelink --test-dtmf`.
+- `.claude/launch.json` — dev servers: backend :8000 (reload), frontend :5000.
+- Root `package.json` + `scripts/dev.mjs` — `npm run dev` (API :8000 + Vite :5000 together), `npm run app` (build + serve on :8000), `npm run build`.
+- `frontend/src/pages/HomePage.jsx` + `home.css` — public home (default route); `#/app` = chat advisor. `components/BrandMark.jsx` = placeholder logo. Tokens: `--brand*` (GP-style blue), `--paddy*` (green), `--display` font.
+- `VIDEO_HANDOFF.md` — brief + first prompt for the separate video session.
+- `WEBSITE_HANDOFF.md` — brief + first prompt for the website redesign/deploy session.
+- `FIELD_INSIGHTS.md` — real farmer interview (Dinajpur): confusion, fertiliser losses, weather must be actionable, smartphones common.
+- `brand/` — brand kit v0.1: BRAND.md, VOICE.md, NAMES.md (10 checked names), LOGO-BRIEF.md, tokens/ (json+css), assets/, guidelines/index.html. Site maps it in `frontend/src/index.css`.
+- `brand/guidelines/sudin-brand-v1.html` — Sudin brand direction v1: palette v2 (green + turmeric, no blue), four logo concepts A–D as inline SVG symbols, taglines. Waiting on the team to pick.
+- `brand/scripts/marks.mjs` (three Urbor marks, 64-grid SVG) and `brand/scripts/paddy-engraving.mjs` (seeded engraved-rice line art; same function used in Figma). Outputs: `brand/assets/logo/concepts/`, `brand/assets/pattern/`. Figma board: https://www.figma.com/design/GxcGtl0gc4w8QSVzmCNn9m
+- `PROFILE_PLAN.md` — plan (not built) for farmer profiles + return-visit personalization.
+- `FUTUREMAKERS_BRIEF.md` — competition Round 1 requirements, judging criteria, IP terms.
+- `VIDEO_STORYBOARDS.md` — Round 1 video: three storyboards around Mahmud (stem borer on boro), comparison, honesty labels, open team decisions. Drawn panels: private artifact linked in LOG4 [13:10].
+- `ROUND1_FORM.md` — Round 1 form answers v4 (name Sudin; built on the Dinajpur farmer interview; Part 0 maps his pains to features; no 16123; smartphone + button phone equal; word-counted), plus team notes for Q&A. `ROUND1_FORM_v3.md` = superseded v3.
 - `backend/market/` — `db.py` (market tables in the same SQLite file), `catalog.py`
   (generic inputs), `ranking.py` (price/distance/stock/trust), `inputs.py`
   (`find_inputs` tool, orders + state machine, dealers, SMS), `produce.py`
@@ -42,7 +68,7 @@ Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
   `#/market` (`pages/MarketPage.jsx`), `#/dealer`, `#/buyer`
   (`pages/PartnerPages.jsx`). API clients `src/api/channels.js`, `src/api/market.js`.
 - Tests: `backend/tests/test_channels_{core,sms,ussd,voice}.py`,
-  `backend/tests/test_market.py`, `tests/test_market_finance.py`. Suite 562 green.
+  `backend/tests/test_market.py`, `tests/test_market_finance.py`. Suite 632 green (2026-09-28).
 - Gone: `data/agristats.db` (0-byte decoy), `NodeInspector.jsx`, `TracePanel.jsx`.
 
 ## Ownership

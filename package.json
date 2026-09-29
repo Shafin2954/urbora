@@ -1,15 +1,19 @@
 {
   "name": "workspace",
   "version": "1.0.0",
-  "description": "A Bangla-first web app where a smallholder farmer talks to an autonomous agent that produces a costed, weather-grounded season plan for their specific farm — and every number in that plan carries provenance you can inspect.",
+  "description": "Farm advice on any phone: a Bangla voice, keypad and SMS agent whose numbers come from tested code and cited sources.",
   "main": "index.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node scripts/dev.mjs dev",
+    "app": "node scripts/dev.mjs app",
+    "build": "npm --prefix frontend run build",
+    "test": "echo \"Run: .venv/Scripts/python -m pytest tests backend/tests -q\""
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "private": true
 }

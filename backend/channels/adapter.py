@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from backend.memory import store
@@ -160,7 +161,8 @@ async def run_channel_turn(
     chunks: list[str] = []
     try:
         async for event in run_turn(session_id, farm_id, message, client=client,
-                                    language=language, channel=channel):
+                                    language=language, channel=channel,
+                                    context_note=_triage_context(farm_id, channel)):
             kind = event.get("type")
             if kind == "token":
                 chunks.append(event.get("text", ""))
@@ -193,7 +195,7 @@ async def run_channel_turn(
         if name == "finance_projection" and isinstance(params, dict):
             reply.finance_crop = params.get("crop")
 
-    reply.text = _TITLE_MARKER.sub(" ", "".join(chunks)).strip()
+    reply.text = scrub_internal(_TITLE_MARKER.sub(" ", "".join(chunks)).strip())
     if reply.error and not reply.text:
         reply.text = "দুঃখিত, এখন উত্তর দিতে পারছি না। একটু পরে আবার চেষ্টা করুন।"
     if reply.menu:
@@ -202,6 +204,42 @@ async def run_channel_turn(
     store.save_channel_turn(session_id, farm_id, channel, masked, message,
                             reply.display_text(), reply.events)
     return reply
+
+
+# Tool notes are instructions to the model. A model fed garbage (an SMS loop,
+# LOG4 2026-09-29) copied one into a farmer's SMS; any sentence carrying one of
+# these fragments is dropped from phone replies, whatever the model writes.
+_INTERNAL_FRAGMENTS = ("farmer's screen", "widget", "End your turn", "End your \nturn",
+                       "do not assume an answer", "next user message", "Authoritative farm_id",
+                       "Deterministic extraction")
+_SENTENCE = re.compile(r"[^।.!?\n]+[।.!?]?\n?")
+
+
+def scrub_internal(text: str) -> str:
+    kept = [s for s in _SENTENCE.findall(text)
+            if not any(f.lower() in s.lower() for f in _INTERNAL_FRAGMENTS)]
+    return "".join(kept).strip()
+
+
+TRIAGE_CONTEXT_WINDOW = timedelta(hours=48)
+
+
+def _triage_context(farm_id: str, channel: str) -> str | None:
+    """A crop-problem report the farmer made in the last 48 h, so an SMS follow-up
+    ("কোন দোকানে পাব?", "কতবার দেব?") is read against it."""
+    if channel not in ("sms", "ussd"):
+        return None
+    report = store.latest_triage_report(farm_id)
+    if not report:
+        return None
+    try:
+        when = datetime.fromisoformat(report["created_at"])
+    except ValueError:
+        return None
+    if datetime.now(timezone.utc) - when > TRIAGE_CONTEXT_WINDOW:
+        return None
+    from backend.kb.triage import agent_note
+    return agent_note(report["detail"])
 
 
 def cost_is_complete(crop: str | None) -> bool:

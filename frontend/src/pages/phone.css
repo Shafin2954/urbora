@@ -25,7 +25,7 @@
 }
 
 .back-link {
-  color: var(--green-dark);
+  color: var(--brand-dark);
   font-weight: 600;
   min-height: 44px;
   display: inline-flex;
@@ -177,11 +177,11 @@
 }
 
 .handset .key-green {
-  background: var(--green);
+  background: var(--brand);
 }
 
 .handset .key-green:hover:not(:disabled) {
-  background: var(--green-dark);
+  background: var(--brand-dark);
 }
 
 .handset .key-red {
@@ -204,12 +204,12 @@
 
 .btn-quiet {
   background: var(--surface);
-  color: var(--green-dark);
+  color: var(--brand-dark);
   border-color: var(--border);
 }
 
 .btn-quiet:hover:not(:disabled) {
-  background: var(--green-tint);
+  background: var(--brand-tint);
 }
 
 .btn-danger {
@@ -274,7 +274,7 @@
 }
 
 .monitor-sessions button.active {
-  border: 2px solid var(--green);
+  border: 2px solid var(--brand);
 }
 
 .monitor-sessions .chip {
@@ -316,7 +316,7 @@
 .phone-notice {
   margin: 0;
   padding: 8px 12px;
-  border-left: 4px solid var(--green);
-  background: var(--green-tint);
+  border-left: 4px solid var(--brand);
+  background: var(--brand-tint);
   border-radius: 6px;
 }

@@ -2,7 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// Agrosfeer frontend config.
+// Urbora (উর্বরা) frontend config.
 //
 // Two things here are load-bearing and should not be "tidied up" later:
 //
@@ -17,7 +17,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 //    plugin here generates a manifest and NOTHING ELSE. See the comments on
 //    injectRegister/devOptions below before changing either.
 // Product name, read from the same root .env the app uses (src/branding.js).
-const brandName = loadEnv(process.env.NODE_ENV ?? 'development', '..', 'VITE_').VITE_BRAND_NAME || 'Agrosfeer'
+const brandName = loadEnv(process.env.NODE_ENV ?? 'development', '..', 'VITE_').VITE_BRAND_NAME || 'Urbora'
 
 export default defineConfig({
   // The API and browser share one ignored root `.env`. Vite otherwise looks
@@ -41,18 +41,18 @@ export default defineConfig({
       // origin. Cost: a ~1KB stub instead of the whole workbox runtime.
       selfDestroying: true,
       manifest: {
-        name: `${brandName} — কৃষি পরামর্শ`,
+        name: `উর্বরা ${brandName} · স্বপ্ন ফলুক`,
         short_name: brandName,
         description:
-          'Bangla-first farm planning: costed, weather-grounded season plans with sources for every number.',
+          'উর্বরা: ফসলের সমস্যা চিনে, জমির মাপে সমাধান, যেকোনো ফোনে। Expert farm advice in Bangla on any phone.',
         lang: 'bn',
         start_url: '/',
         display: 'standalone',
         orientation: 'portrait',
         // Earthy, not SaaS — CLAUDE.md frontend rules. This green is the
         // single source of the brand colour; index.html and CSS read from it.
-        background_color: '#f7f4ec',
-        theme_color: '#2f6b3f',
+        background_color: '#faf5ea',
+        theme_color: '#0d3b2e',
         icons: [
           {
             src: '/icon.svg',
@@ -71,7 +71,8 @@ export default defineConfig({
     }),
   ],
   server: {
-    port: 5000,
+    // VITE_PORT / API_PROXY_TARGET let a second dev pair run beside the first (.claude/launch.json).
+    port: Number(process.env.VITE_PORT || 5000),
     strictPort: true, // fail loudly rather than drifting to another port
     // Replit's preview pane proxies through a different origin; allow all hosts.
     allowedHosts: true,
@@ -81,7 +82,7 @@ export default defineConfig({
         // API_PORT default, backend/.env.example): `uvicorn backend.api.main:app
         // --port 8000`. Production remains same-origin and does not use this
         // dev-only proxy.
-        target: 'http://127.0.0.1:8000',
+        target: process.env.API_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
         // SSE dies if anything buffers or rewrites it. The backend already
         // sends no-transform + X-Accel-Buffering: no; leaving compression off

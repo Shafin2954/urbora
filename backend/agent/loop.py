@@ -466,8 +466,13 @@ async def run_turn(
     client: ChatBackend | None = None,
     language: str = "bn",
     channel: str = "web",
+    context_note: str | None = None,
 ) -> AsyncIterator[dict]:
     """The real agent entrypoint — this is what backend/api/chat.py imports.
+
+    `context_note` is server-authored context a channel attaches (e.g. the
+    crop-problem result a farmer got by SMS, so a follow-up question is read
+    against it). Added once per session as a system note, never as farmer words.
 
     Loads `session_id`'s stored conversation history, appends `message`, runs
     the pure engine, persists the updated history, and yields plain dicts on
@@ -508,6 +513,10 @@ async def run_turn(
     # Deterministic intake extraction (see extract_known_fields above). Runs on
     # every turn, not just the first — a farmer can state a missing field in
     # any message. Only injects a note when something was actually detected.
+    if context_note and not any(m.get("role") == "system" and m.get("content") == context_note
+                                for m in messages):
+        messages.append({"role": "system", "content": context_note})
+
     extracted = extract_known_fields(message)
     if extracted:
         messages.append({

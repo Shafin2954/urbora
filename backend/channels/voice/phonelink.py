@@ -15,7 +15,9 @@ In Voicemeeter: VAIO strip -> B1 only; AUX strip -> B2 only (optionally both
 hear themselves) or AUX to B1 (the bridge would hear itself).
 
 The call is half-duplex: while the agent thinks and speaks, caller audio is
-ignored; after the reply the bridge listens again. The agent runs on the
+ignored; after the reply the bridge listens again. Keypad tones in the caller's
+audio are detected (audio.DtmfDetector) and drive the USSD menu, spoken
+(voice/ivr.py); speech still goes to the agent. The agent runs on the
 backend through the token-protected /api/channels/bridge/voice/* routes, so
 identity, memory, trace and the SMS summary are exactly the other channels'.
 
@@ -24,6 +26,7 @@ Run (repo root, backend already running, BRIDGE_TOKEN set on both sides):
     python -m backend.channels.voice.phonelink --list-devices
     python -m backend.channels.voice.phonelink --test-capture      # speak on a call; watch the meter
     python -m backend.channels.voice.phonelink --test-playback     # the caller should hear a Bangla line
+    python -m backend.channels.voice.phonelink --test-dtmf         # press keys on the calling phone
     python -m backend.channels.voice.phonelink --auto-answer       # the real thing
 
 Limits, stated plainly: one call at a time (one SIM); the caller's number comes
@@ -46,13 +49,17 @@ import uuid
 import httpx
 import numpy as np
 
-from .audio import (FRAME_SAMPLES, IDLE, OFFHOOK, RINGING, SAMPLE_RATE, Segmenter, frames,
+from .audio import (FRAME_SAMPLES, IDLE, OFFHOOK, RINGING, SAMPLE_RATE, DtmfDetector, Segmenter, frames,
                     from_wav, parse_call_state, resample, to_wav)
 
 DEFAULT_CAPTURE = "Voicemeeter Out B1"
 DEFAULT_PLAYBACK = "Voicemeeter AUX Input"
-GREETING = "আসসালামু আলাইকুম। {brand} কৃষি পরামর্শে স্বাগতম। আপনার জেলা, জমির পরিমাণ আর প্রশ্ন বলুন।"
+GREETING = ("আসসালামু আলাইকুম। {brand} কৃষি পরামর্শে স্বাগতম। আপনার জেলা, জমির পরিমাণ আর প্রশ্ন বলুন। "
+            "অথবা মেনু শুনতে যেকোনো বোতাম চাপুন।")
+NUMBER_PAUSE_S = 3.0    # number entry ends with # or this long a pause
+SPEECH_AFTER_KEY_S = 1.5  # an utterance this close to a key press is key noise, not speech
 FILLER = "একটু অপেক্ষা করুন, দেখছি।"
+SORRY = "দুঃখিত, এখন উত্তর দিতে পারছি না। আবার বলুন।"
 _HOSTAPI_PREFERENCE = ("Windows DirectSound", "MME", "Windows WASAPI")
 
 
@@ -81,8 +88,11 @@ class Adb:
         self.base = [adb] + (["-s", serial] if serial else [])
 
     def _run(self, *args: str) -> str:
-        out = subprocess.run(self.base + list(args), capture_output=True, text=True, timeout=10)
-        return out.stdout
+        # Explicit UTF-8: Windows' default cp1252 cannot decode some dumpsys bytes,
+        # which killed the reader thread and crashed the bridge mid-ring (LOG4).
+        out = subprocess.run(self.base + list(args), capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=10)
+        return out.stdout or ""
 
     def call_state(self) -> tuple[int, str | None]:
         state, number = parse_call_state(self._run("shell", "dumpsys", "telephony.registry"))
@@ -93,8 +103,11 @@ class Adb:
             number = m.group(1) if m else None
         return state, number
 
-    def answer(self) -> None:
-        self._run("shell", "input", "keyevent", "KEYCODE_CALL")
+    ANSWER_KEYS = ("KEYCODE_HEADSETHOOK", "KEYCODE_CALL")
+
+    def answer(self, attempt: int = 0) -> None:
+        # Samsung ignores KEYCODE_CALL on a ringing call; the headset button answers.
+        self._run("shell", "input", "keyevent", self.ANSWER_KEYS[attempt % len(self.ANSWER_KEYS)])
 
 
 class Bridge:
@@ -115,11 +128,18 @@ class Bridge:
         self.say_cache: dict[str, tuple[np.ndarray, int]] = {}
         self.call_id: str | None = None
         self.number: str | None = None
+        self.peak = 0  # loudest captured sample since the last level report
+        self.dtmf = DtmfDetector()
+        self.digits = ""          # number entry in progress
+        self.expect_number = False
+        self.last_key = 0.0
 
     # --- audio --------------------------------------------------------------------
 
     def _on_audio(self, indata, _frames, _time, status) -> None:
-        self.q.put(indata[:, 0].copy())
+        chunk = indata[:, 0].copy()
+        self.peak = max(self.peak, int(np.abs(chunk).max()) if chunk.size else 0)
+        self.q.put(chunk)
 
     def _drain(self) -> None:
         while not self.q.empty():
@@ -130,12 +150,29 @@ class Bridge:
     def play(self, pcm: np.ndarray, rate: int) -> None:
         self.sd.play(pcm, rate, device=self.playback, blocking=True)
 
-    def say(self, text: str) -> None:
-        if text not in self.say_cache:
+    def fetch(self, text: str) -> bool:
+        """Synthesize `text` into the cache; False (logged) if the backend or TTS failed."""
+        if text in self.say_cache:
+            return True
+        try:
             r = self.http.post("/api/channels/bridge/voice/say", json={"text": text})
             r.raise_for_status()
             self.say_cache[text] = from_wav(base64.b64decode(r.json()["audio_b64"]))
-        self.play(*self.say_cache[text])
+            return True
+        except (httpx.HTTPError, ValueError, KeyError) as exc:
+            print(f"could not synthesize speech: {exc}", file=sys.stderr)
+            return False
+
+    def warm_up(self) -> None:
+        """Cache the fixed phrases before any call, so answering never waits on the network."""
+        from backend.branding import BRAND_NAME_BN
+        for text in (GREETING.format(brand=BRAND_NAME_BN), FILLER, SORRY):
+            self.fetch(text)
+
+    def say(self, text: str) -> None:
+        # A failed clip is skipped, never fatal: the bridge must outlive a network blip.
+        if self.fetch(text):
+            self.play(*self.say_cache[text])
 
     # --- call lifecycle -----------------------------------------------------------------
 
@@ -161,6 +198,7 @@ class Bridge:
         except httpx.HTTPError as exc:
             print(f"hang-up report failed: {type(exc).__name__}", file=sys.stderr)
         self.call_id = self.number = None
+        self.digits, self.expect_number = "", False
         self._drain()
 
     def turn(self, utterance: bytes) -> None:
@@ -178,7 +216,7 @@ class Bridge:
                 body = r.json()
             except (httpx.HTTPError, ValueError) as exc:
                 print(f"turn failed: {exc}", file=sys.stderr)
-                self.say("দুঃখিত, এখন উত্তর দিতে পারছি না। আবার বলুন।")
+                self.say(SORRY)
                 return
         print(f"  heard: {body.get('transcript')!r}\n  said:  {body.get('reply_text')!r}")
         if body.get("audio_b64"):
@@ -187,42 +225,93 @@ class Bridge:
 
     # --- main loop ------------------------------------------------------------------------
 
-    def feed(self) -> bytes | None:
-        """Move captured audio through resampling and VAD; return a finished utterance."""
+    def feed(self) -> tuple[bytes | None, list[str]]:
+        """Move captured audio through resampling, the keypad-tone detector and VAD;
+        return a finished utterance (if any) and the keys pressed."""
         try:
             chunk = self.q.get(timeout=0.1)
         except queue.Empty:
-            return None
+            return None, []
         self.buffer = np.concatenate([self.buffer, resample(chunk, self.in_rate, SAMPLE_RATE)])
         whole = (self.buffer.size // FRAME_SAMPLES) * FRAME_SAMPLES
-        done = None
+        done, pressed = None, []
         for frame in frames(self.buffer[:whole]):
+            key = self.dtmf.push(np.frombuffer(frame, dtype=np.int16))
+            if key:
+                pressed.append(key)
+                self.segmenter.reset()  # a tone is not speech: drop the partial utterance
+                continue
             done = self.segmenter.push(frame) or done
         self.buffer = self.buffer[whole:]
-        return done
+        return done, pressed
+
+    # --- keypad menu -----------------------------------------------------------------------
+
+    def on_key(self, key: str) -> None:
+        self.last_key = time.monotonic()
+        print(f"  key: {key}")
+        if self.expect_number and key not in "*":
+            if key == "#":
+                self.send_keys(self.digits + "#")
+            else:
+                self.digits += key
+            return
+        self.send_keys(key)
+
+    def send_keys(self, keys: str) -> None:
+        self.digits = ""
+        if not keys.strip("#"):
+            return
+        try:
+            r = self.http.post("/api/channels/bridge/voice/keys",
+                               json={"msisdn": self.number, "call_id": self.call_id, "keys": keys})
+            r.raise_for_status()
+            body = r.json()
+        except (httpx.HTTPError, ValueError) as exc:
+            print(f"keys failed: {exc}", file=sys.stderr)
+            self.say(SORRY)
+            return
+        print(f"  menu:  {body.get('screen', '')!r}")
+        self.expect_number = bool(body.get("expects_number"))
+        if body.get("audio_b64"):
+            self.play(*from_wav(base64.b64decode(body["audio_b64"])))
+        self._drain()
 
     def run(self, always_on: bool) -> None:
         with self.sd.InputStream(device=self.capture, samplerate=self.in_rate, channels=1,
                                  dtype="int16", blocksize=int(self.in_rate * 0.03), callback=self._on_audio):
             if always_on:
                 self.start_call(self.caller)
-            last_poll, answered = 0.0, False
+            last_poll, attempts, last_try, rang_from, last_level = 0.0, 0, 0.0, None, 0.0
             while True:
                 if self.adb and time.monotonic() - last_poll > 0.5:
                     last_poll = time.monotonic()
                     state, number = self.adb.call_state()
-                    if state == RINGING and self.auto_answer and not answered:
-                        print(f"ringing from {_mask(number)}; answering")
-                        self.adb.answer()
-                        answered = True
+                    if state == RINGING and number:
+                        rang_from = number  # Android blanks the number once the call is answered
+                    # Retry while it still rings: one key press is not always taken.
+                    if state == RINGING and self.auto_answer and time.monotonic() - last_try > 3:
+                        print(f"ringing from {_mask(number)}; answering (attempt {attempts + 1})")
+                        self.adb.answer(attempts)
+                        attempts, last_try = attempts + 1, time.monotonic()
                     elif state == OFFHOOK and not self.call_id:
-                        self.start_call(number)
+                        self.start_call(number or rang_from)
                     elif state == IDLE:
-                        answered = False
+                        attempts, last_try, rang_from = 0, 0.0, None
                         if self.call_id:
                             self.end_call()
-                utterance = self.feed()
-                if utterance and self.call_id:
+                if self.call_id and time.monotonic() - last_level > 5:
+                    # Shows whether the caller's audio reaches the bridge at all.
+                    print(f"  capture level: {self.peak * 100 // 32768}%")
+                    self.peak, last_level = 0, time.monotonic()
+                utterance, pressed = self.feed()
+                if not self.call_id:
+                    continue
+                for key in pressed:
+                    self.on_key(key)
+                if self.digits and time.monotonic() - self.last_key > NUMBER_PAUSE_S:
+                    self.send_keys(self.digits)
+                if utterance and not self.digits and time.monotonic() - self.last_key > SPEECH_AFTER_KEY_S:
                     self.turn(utterance)
 
 
@@ -237,6 +326,19 @@ def _test_capture(device: int, seconds: float = 8.0) -> None:
         print(f"\r  peak level so far: {level:3d}% ", end="")
     sd.wait()
     print("\n  0% means nothing arrives: check Phone Link's speaker -> Voicemeeter Input, VAIO -> B1.")
+
+
+def _test_dtmf(device: int, seconds: float = 30.0) -> None:
+    import sounddevice as sd
+    rate = int(sd.query_devices(device)["default_samplerate"])
+    det = DtmfDetector()
+    print(f"listening {seconds:g}s — press keys on the calling phone")
+    rec = sd.rec(int(seconds * rate), samplerate=rate, channels=1, dtype="int16", device=device)
+    sd.wait()
+    pcm = resample(rec[:, 0], rate, SAMPLE_RATE)
+    heard = [k for f in frames(pcm[: (pcm.size // FRAME_SAMPLES) * FRAME_SAMPLES])
+             if (k := det.push(np.frombuffer(f, dtype=np.int16)))]
+    print(f"  keys heard: {' '.join(heard) or '(none — tones do not survive this path; use speech)'}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -254,6 +356,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--list-devices", action="store_true")
     ap.add_argument("--test-capture", action="store_true")
     ap.add_argument("--test-playback", action="store_true")
+    ap.add_argument("--test-dtmf", action="store_true",
+                    help="print keypad tones heard on a call (checks they survive the phone network)")
     args = ap.parse_args(argv)
 
     import sounddevice as sd
@@ -265,6 +369,9 @@ def main(argv: list[str] | None = None) -> int:
     capture, playback = find_device(args.capture, "input"), find_device(args.playback, "output")
     if args.test_capture:
         _test_capture(capture)
+        return 0
+    if args.test_dtmf:
+        _test_dtmf(capture)
         return 0
 
     token = os.environ.get("BRIDGE_TOKEN", "")
@@ -283,6 +390,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     print(f"bridge: capture='{sd.query_devices(capture)['name']}', playback='{sd.query_devices(playback)['name']}', "
           f"backend={args.backend}. Ctrl+C to stop.")
+    bridge.warm_up()
     try:
         bridge.run(args.always_on)
     except KeyboardInterrupt:

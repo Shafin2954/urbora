@@ -22,5 +22,7 @@ export const sendSms = (msisdn, text) => post('/api/channels/emulator/sms', { ms
 export const missedCall = (msisdn) => post('/api/channels/emulator/missed-call', { msisdn })
 export const fetchInbox = (msisdn) =>
   call(`/api/channels/emulator/inbox?msisdn=${encodeURIComponent(msisdn)}`)
+export const voiceKeys = (msisdn, callId, keys) =>
+  post('/api/channels/emulator/voice/keys', { msisdn, call_id: callId, keys })
 export const fetchSessions = () => call('/api/channels/sessions')
 export const fetchSession = (id) => call(`/api/channels/sessions/${encodeURIComponent(id)}`)

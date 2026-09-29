@@ -61,7 +61,8 @@ def read_missed_calls(adb: str = "adb", serial: str | None = None) -> list[tuple
         "shell", "content", "query", "--uri", "content://call_log/calls",
         "--projection", "number:date:type", "--sort", "date DESC",
     ]
-    out = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
+    # UTF-8, not Windows' cp1252: an undecodable byte crashed the call bridge (LOG4 [16:40]).
+    out = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=20)
     if out.returncode != 0:
         raise RuntimeError(out.stderr.strip() or f"adb exited {out.returncode}")
     return parse_call_log(out.stdout)

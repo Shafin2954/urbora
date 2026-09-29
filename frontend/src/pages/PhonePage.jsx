@@ -28,6 +28,7 @@ const PhoneIcon = () => (
 export default function PhonePage() {
   const [msisdn, setMsisdn] = useState('01712345678')
   const [view, setView] = useState('home') // home | ussd | sms | call
+  const [callKey, setCallKey] = useState(null) // latest keypad press during a call
   const [entry, setEntry] = useState('')
   const [screen, setScreen] = useState('')
   const [ussdSession, setUssdSession] = useState(null)
@@ -100,6 +101,12 @@ export default function PhonePage() {
     },
     [msisdn, ussdSession, ussdEnded],
   )
+
+  // During a call the keypad sends tones to the call (the spoken menu); otherwise it types.
+  const onKey = (k) => {
+    if (view === 'call') return setCallKey({ key: k, seq: Date.now() })
+    setEntry((e) => e + k)
+  }
 
   const onGreen = () => {
     setNotice('')
@@ -201,7 +208,7 @@ export default function PhonePage() {
                   ))}
                 </ol>
               )}
-              {view === 'call' && <VoiceCall msisdn={msisdn} onEnd={onRed} />}
+              {view === 'call' && <VoiceCall msisdn={msisdn} onEnd={onRed} pressed={callKey} />}
               {busy && <p className="lcd-hint">…</p>}
             </div>
 
@@ -214,7 +221,7 @@ export default function PhonePage() {
             </div>
             <div className="keypad">
               {KEYS.map((k) => (
-                <button key={k} className="key" onClick={() => setEntry((e) => e + k)}>{k}</button>
+                <button key={k} className="key" onClick={() => onKey(k)}>{k}</button>
               ))}
             </div>
             <button className="key key-wide" onClick={() => setEntry((e) => e.slice(0, -1))}>⌫ মুছুন</button>

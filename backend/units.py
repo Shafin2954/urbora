@@ -188,6 +188,14 @@ def convert_mass(value: float, from_unit: str, to_unit: str) -> float:
     return from_kg(to_kg(value, from_unit), to_unit)
 
 
+def scale_rate(amount: float, per_unit: str, area: float, area_unit: str) -> float:
+    """An application rate given per `per_unit` of land (e.g. 900 g per acre),
+    applied to `area` `area_unit` (e.g. 2 bigha). Quantity unit is unchanged."""
+    if area <= 0:
+        raise ValueError("area must be positive")
+    return float(amount) * convert_area(area, area_unit, per_unit)
+
+
 def area_units() -> Iterable[str]:
     """Canonical area units, for the UI's unit selector."""
     return tuple(AREA_IN_HA)

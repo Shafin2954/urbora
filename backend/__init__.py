@@ -1,1 +1,1 @@
-"""Agrosfeer backend package (TeamFixeth_Agrosfeer)."""
+"""Urbora backend package (TeamFixeth_Agrosfeer)."""

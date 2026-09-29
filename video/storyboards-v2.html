@@ -1,0 +1,533 @@
+<title>Urbora Video Storyboards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700&family=Noto+Sans+Bengali:wght@400;500;600&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:wght@400;500;600&family=Galada&display=swap">
+<style>
+/* Layout: a storyboard binder. Paper-coloured sketch panels sit on the page ground; three versions stacked, then the copy sheet where every DRAFT line gets picked. */
+:root{
+  --ground:#FAF5EA; --ink:#11201A; --muted:#5A6A5F; --line:#DCCFB2;
+  --shyamol:#0D3B2E; --sun:#F2A231; --leaf:#1B7048; --paddy:#A8D65C; --kraft:#EBD9B4; --sepia:#6B4A1E; --terra:#B8472A;
+  --card:#FFFDF7; --chip:#EFE6D0; --draft:#B8472A; --picked:#1B7048; --sunInk:#8A5A0B;
+  --f-bn-display:'Noto Serif Bengali','Noto Sans Bengali',serif;
+  --f-bn:'Noto Sans Bengali',system-ui,sans-serif;
+  --f-display:'Fraunces',Georgia,serif;
+  --f-text:'Instrument Sans','Noto Sans Bengali',system-ui,sans-serif;
+  --f-tag:'Galada','Noto Sans Bengali',cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ground:#0F1C17; --ink:#F1EBDD; --muted:#A9B5AC; --line:#2C3D35; --card:#15261F; --chip:#1E332A;
+  --draft:#E27A5E; --picked:#A8D65C; --sunInk:#F2A231; --shyamol:#A8D65C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#0F1C17; --ink:#F1EBDD; --muted:#A9B5AC; --line:#2C3D35; --card:#15261F; --chip:#1E332A;
+  --draft:#E27A5E; --picked:#A8D65C; --sunInk:#F2A231; --shyamol:#A8D65C; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-text);font-size:15px;line-height:1.55;margin:0;padding-inline:clamp(16px,4vw,48px);padding-block:32px 80px}
+.wrap{max-width:1240px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;margin:0}
+.bn{font-family:var(--f-bn)}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+header.top{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;padding-bottom:24px;border-bottom:1px solid var(--line)}
+header.top svg{width:64px;height:64px}
+header.top h1{font-size:clamp(28px,4vw,40px);line-height:1.1}
+header.top h1 .bn{font-family:var(--f-bn-display);font-weight:700}
+header.top p{margin:6px 0 0;color:var(--muted);max-width:70ch}
+.intro{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;padding-block:24px;border-bottom:1px solid var(--line)}
+.intro h3{font-size:17px;margin-bottom:8px}
+.intro ul{margin:0;padding-left:18px}
+.intro li{margin-bottom:4px}
+.tagline{font-family:var(--f-tag);color:var(--sunInk);font-size:1.25em}
+nav.jump{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ground);display:flex;flex-wrap:wrap;gap:8px;padding-block:12px;border-bottom:1px solid var(--line)}
+nav.jump a{color:var(--ink);text-decoration:none;font-weight:600;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;min-height:40px;display:inline-flex;align-items:center}
+nav.jump a:hover,nav.jump a:focus-visible{border-color:var(--ink);outline:none}
+nav.jump .count{margin-left:auto;font-size:13px;color:var(--muted);align-self:center}
+section.version{padding-block:48px 16px;border-bottom:1px solid var(--line)}
+.vhead{display:grid;grid-template-columns:auto 1fr;gap:4px 20px;align-items:baseline}
+.vletter{font-family:var(--f-display);font-size:64px;line-height:.9;color:var(--sunInk);grid-row:span 2}
+.vname{font-size:clamp(24px,3vw,32px)}
+.vname .bn{font-family:var(--f-bn-display);font-weight:700;margin-right:10px}
+.videa{color:var(--muted);max-width:75ch;margin:0}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 28px;margin:20px 0 18px}
+.meta div{min-width:0}
+.meta b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.timeline{display:flex;height:30px;border-radius:4px;overflow:hidden;border:1px solid var(--line);margin-bottom:6px}
+.timeline span{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#FAF5EA;border-right:1px solid rgba(250,245,234,.5);min-width:0;overflow:hidden;white-space:nowrap}
+.tl-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin-bottom:22px}
+.tl-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:22px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.panel svg.sk{display:block;width:100%;height:auto;aspect-ratio:16/9;border-bottom:1px solid var(--line)}
+.pbody{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ptop{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.pid{font-weight:700;font-family:var(--f-display);font-size:18px}
+.ptime{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+.ptitle{font-weight:600}
+.pic{margin:0;font-size:14px}
+.row{font-size:13px;display:grid;grid-template-columns:64px 1fr;gap:6px;min-width:0}
+.row>b{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.row ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;min-width:0}
+.line{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap;min-width:0}
+.line .t{font-family:var(--f-bn);font-size:15px;min-width:0}
+.line .who{color:var(--muted);font-size:12px}
+.raw{color:var(--muted);font-style:italic}
+.slot{font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 6px;border-radius:3px;border:1px solid currentColor;white-space:nowrap;text-decoration:none;cursor:pointer;background:none;font-family:var(--f-text)}
+.slot.draft{color:var(--draft)}
+.slot.ok{color:var(--picked)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.chip{font-size:11.5px;padding:3px 8px;border-radius:999px;background:var(--chip);font-weight:500}
+.chip.tool{border:1px solid var(--line)}
+.chip.label{background:none;border:1px dashed var(--muted);color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tblwrap{overflow-x:auto}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td:first-child{font-weight:600;white-space:nowrap}
+section.plain{padding-block:48px 16px;border-bottom:1px solid var(--line)}
+section.plain h2{font-size:28px;margin-bottom:8px}
+section.plain>p{max-width:75ch}
+.rec{border-left:3px solid var(--sun);padding:6px 0 6px 16px;max-width:75ch;margin-top:18px}
+.sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px;margin-top:20px}
+.slotcard{border:1px solid var(--line);border-radius:6px;padding:14px;background:var(--card);min-width:0;scroll-margin-top:80px}
+.slotcard:target{outline:2px solid var(--sun)}
+.slotcard h3{font-size:16px;font-family:var(--f-text);display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.slotcard .kind{color:var(--muted);font-size:12px;font-weight:500}
+.slotcard .used{color:var(--muted);font-size:12px;margin:2px 0 8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:4px 8px;padding:8px;border-radius:5px;cursor:pointer;align-items:start;min-height:44px}
+.opt:hover{background:var(--chip)}
+.opt input{margin:6px 0 0;width:18px;height:18px;accent-color:#1B7048}
+.opt .bnl{font-family:var(--f-bn);font-size:17px;line-height:1.45}
+.opt .en{grid-column:2;font-size:13px;color:var(--muted)}
+.opt .note{grid-column:2;font-size:12px;color:var(--sunInk)}
+.own{grid-column:2;width:100%;font-family:var(--f-bn);font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:5px;background:var(--ground);color:var(--ink);min-height:40px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;align-items:center}
+button.btn{font:600 14px var(--f-text);padding:10px 16px;min-height:44px;border-radius:6px;border:1px solid var(--ink);background:var(--ink);color:var(--ground);cursor:pointer}
+button.btn.ghost{background:none;color:var(--ink)}
+button:focus-visible,.opt:focus-within{outline:2px solid var(--sun);outline-offset:2px}
+#copyout{width:100%;min-height:120px;font:13px/1.5 ui-monospace,Consolas,monospace;margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:5px;background:var(--card);color:var(--ink)}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-top:16px}
+.notes h3{font-size:17px;margin-bottom:6px}
+.notes ul,.notes ol{margin:0;padding-left:18px}
+.notes li{margin-bottom:6px}
+code{font-size:.9em;background:var(--chip);padding:1px 5px;border-radius:3px}
+@media (max-width:480px){.grid,.sheet{grid-template-columns:1fr}.row{grid-template-columns:1fr}.vletter{font-size:44px}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="1.8" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg>
+
+<div class="wrap">
+<header class="top">
+  <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#0D3B2E"/><path fill="#F2A231" d="M17 33a15 15 0 0 1 30 0z"/><path fill="#FAF5EA" d="M32 33L6.5 45.5A29 29 0 0 0 9 50.5ZM32 33L13.5 56A29 29 0 0 0 20 59.3ZM32 33L27 61A29 29 0 0 0 37 61ZM32 33L44 59.3A29 29 0 0 0 50.5 56ZM32 33L55 50.5A29 29 0 0 0 57.5 45.5Z"/><rect fill="#FAF5EA" x="3" y="32.2" width="58" height="2"/><path fill="#0D3B2E" d="M31 33V25.5a1 1 0 0 1 2 0V33z"/><path fill="#0D3B2E" d="M32 28.5C31.4 24.5 28.4 22.3 24 22.5C24.6 26.5 27.6 28.8 32 28.5Z"/><path fill="#0D3B2E" d="M32 26.5C32.6 22.2 35.8 19.8 40.5 20C39.9 24.3 36.7 26.8 32 26.5Z"/></svg>
+  <div>
+    <div class="eyebrow">Round 1 pitch video · 2:00 · storyboard draft v2 · 30 Sep 2026</div>
+    <h1><span class="bn">উর্বরা</span> Urbora: three storyboards</h1>
+    <p>Three ways to tell the same story. Pick a version, or tell me which parts to blend. Every Bangla line is a <b style="color:var(--draft)">DRAFT</b> until you pick it in the <a href="#copy">copy sheet</a>, and your picks redraw the sketches straight away.</p>
+  </div>
+</header>
+
+<div class="intro">
+  <div>
+    <h3>Already fixed (brand/BRAND-CORE.md)</h3>
+    <ul>
+      <li>Name <span class="bn">উর্বরা</span> / Urbora; tagline <span class="tagline">স্বপ্ন ফলুক</span>, lettered in Galada; the seal logo</li>
+      <li>The story: fertile soil is our gift; the same land gives less; he can't name the problem; everyone says something different; the office is far. Mobile banking put the bank in people's hands, and Urbora does the same for the agriculture expert.</li>
+      <li>Mahmud: 2 bigha of boro, dead centre shoots (stem borer, a real rule in the system)</li>
+      <li>No 16123, no drama, no pity. Warm Bangla in the style of a bKash ad.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>What you decide</h3>
+    <ul>
+      <li>Which version, or which blend</li>
+      <li>Every DRAFT line: pick an option, merge them, or write your own in the <a href="#copy">copy sheet</a></li>
+      <li>The narrator's register: plain standard spoken Bangla, or a regional (Dinajpur) flavour for the characters only</li>
+      <li>The dose, SMS and call text in the product shots are <b>not</b> written by me. They come from a real system run (shown as [real …] in the sketches).</li>
+    </ul>
+  </div>
+  <div>
+    <h3>How to read a panel</h3>
+    <ul>
+      <li><b>Tools:</b> <span class="chip tool">Higgsfield</span> AI village footage · <span class="chip tool">HyperFrames</span> motion graphics I build · <span class="chip tool">Screen rec</span> the real app</li>
+      <li><b>Labels</b> that must show on screen or in the credits: <span class="chip label">dramatization</span> <span class="chip label">simulator</span> <span class="chip label">AI-generated footage</span></li>
+      <li>Slot chips like <span class="slot draft">SELLER</span> jump to that line's options.</li>
+    </ul>
+  </div>
+</div>
+
+<nav class="jump" aria-label="Sections">
+  <a href="#vA">A · মাটির উপহার</a><a href="#vB">B · কী হয়েছে?</a><a href="#vC">C · হাতের মুঠোয়</a><a href="#compare">Compare</a><a href="#copy">Copy sheet</a><a href="#notes">Production notes</a>
+  <span class="count" id="count"></span>
+</nav>
+
+<div id="versions"></div>
+
+<section class="plain" id="compare">
+  <div class="eyebrow">Side by side</div>
+  <h2>Compare the three</h2>
+  <div class="tblwrap"><table>
+    <thead><tr><th></th><th>A · The gift (story film)</th><th>B · What's wrong? (quick ad)</th><th>C · In your hand (line art)</th></tr></thead>
+    <tbody>
+      <tr><td>Feels like</td><td>A short film, like the long-form GP ads</td><td>A bKash TV spot: quick, a little funny</td><td>A warm animated story; the brand's engraved look moving</td></tr>
+      <tr><td>Emotion</td><td><b>Highest</b>: a real family, a daughter, a harvest</td><td>Medium: light humour, then relief</td><td>High if the voice-over and music are good</td></tr>
+      <tr><td>Proof it's real</td><td>One call, SMS and rain alert</td><td><b>Highest</b>: all three channels, the same answer, the graph</td><td>Call and SMS inside a drawn phone</td></tr>
+      <tr><td>Mobile-banking idea</td><td>One scene (the wife's phone)</td><td>One line</td><td><b>The spine</b>: the road rolls up into a phone</td></tr>
+      <tr><td>Higgsfield shots</td><td>~10, same Mahmud in all → needs a character reference to stay consistent</td><td>~9, mostly different faces (easier)</td><td><b>0–2</b></td></tr>
+      <tr><td>Main risk tonight</td><td>Mahmud's face drifting between shots; Bangla lip-sync</td><td>Can feel like a feature tour after 0:46</td><td>Drawn people, where the brand prefers real light and real people; I draw a lot of animation</td></tr>
+      <tr><td>Judging criteria it serves best</td><td>Problem relevance, impact, video quality</td><td>AI integration, feasibility, responsible AI</td><td>Originality, clarity, video quality</td></tr>
+    </tbody>
+  </table></div>
+  <div class="rec">
+    <b>My pick for tonight:</b> C's spine, because the road rolling into the phone tells the mobile-banking idea in one image and I can build it without waiting on footage. Add two real-looking Higgsfield shots from A (A2, the hand on the dry shoot, and A9, the SMS at the shop) for human warmth. Add B6's three-channel split as the proof beat. That's about 4 Higgsfield shots in total. It's your call, though, and any blend works.
+  </div>
+</section>
+
+<section class="plain" id="copy">
+  <div class="eyebrow">Every line in the video</div>
+  <h2>Copy sheet</h2>
+  <p>Pick one option per slot, or write your own. The sketches above update as you pick. Your picks are saved in this browser only. When you're done, press <b>Copy my picks</b> and paste the result to me in chat. The English under each line is a gloss for the subtitles, not a translation to copy.</p>
+  <div class="actions">
+    <button class="btn" id="copybtn" type="button">Copy my picks</button>
+    <button class="btn ghost" id="resetbtn" type="button">Clear all picks</button>
+    <span id="copymsg" class="raw" role="status"></span>
+  </div>
+  <textarea id="copyout" readonly aria-label="Your picks as text" hidden></textarea>
+  <div class="sheet" id="sheet"></div>
+</section>
+
+<section class="plain" id="notes">
+  <div class="eyebrow">Before anything is generated</div>
+  <h2>Production notes</h2>
+  <div class="notes">
+    <div>
+      <h3>Honesty on screen</h3>
+      <ul>
+        <li>Mahmud is a dramatization; the credits say so, along with "AI-generated footage (Higgsfield)".</li>
+        <li>The keypad (USSD) screen carries a "simulator" label for as long as it's on screen.</li>
+        <li>"50 মণ → 30 মণ" is captioned as one farmer's words (a farmer in Dinajpur told us), never as a statistic.</li>
+        <li>The dose, the call transcript and both SMS come from a real run of Mahmud's case. I don't type any of those numbers.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Needs the app session</h3>
+      <ul>
+        <li>The live SMS still ends with the 16123 footer (<code>HOTLINE_LINE</code> in triage.py). It has to go before we record; otherwise we crop it out.</li>
+        <li>The screen recordings wait for the Urbora rename and the palette v2 redesign. Until then the animatic uses these sketches.</li>
+        <li>The final seal files are still coming from Canva; I use <code>mark-b.svg</code> until they land.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Tonight's order of work</h3>
+      <ol>
+        <li>You pick a version and the lines.</li>
+        <li>I write the shot list, the Higgsfield prompts (plus a Mahmud character reference if A or B), the voice-over script with timings, the English .srt and a music brief.</li>
+        <li>An animatic of these frames with a scratch voice-over, timed to 2:00.</li>
+        <li>Footage, motion graphics and screen recordings replace the frames one by one.</li>
+        <li>FFmpeg master: 1080p MP4, well under 300 MB.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+</div>
+
+<script>
+/* ---------- the lines (all DRAFT until picked) ---------- */
+const SLOTS = {
+  GIFT:{name:'Opening: the gift of the land',kind:'Voice-over',opts:[
+    {t:'এ দেশের মাটি উর্বর। এই মাটিই আমাদের সবচেয়ে বড় উপহার।',en:"This country's soil is fertile. This soil is our biggest gift.",note:'From BRAND-CORE §3. A little written-sounding.'},
+    {t:'এই দেশের মাটিতে সোনা ফলে।',en:'This land grows gold.',note:'An everyday saying that everyone knows.'},
+    {t:'বাপ-দাদার আমল থেকে এই মাটিই আমাদের খাওয়াইছে।',en:"Since our grandfathers' time, this soil has fed us.",note:'Spoken and warm; Mahmud could say it himself.'}]},
+  FALL:{name:'The same land gives less',kind:'Voice-over or Mahmud',opts:[
+    {t:'কিন্তু একই জমিতে এখন আর আগের মতো ধান হয় না।',en:"But the same land doesn't give like it used to."},
+    {t:'গতবার পঞ্চাশ মণ পাইছিলাম, এইবার তিরিশ। হইলো কী?',en:'Fifty maunds last time, thirty this time. What happened?',note:"The Dinajpur farmer's own figures; needs the caption \"a farmer in Dinajpur told us\"."},
+    {t:'জমি সেই একই, খরচ বাড়তেছে, কিন্তু ধান কমতেছে।',en:'Same land, costs going up, less rice.'}]},
+  QUESTION:{name:'The big question (on-screen)',kind:'On-screen text',opts:[
+    {t:'ফসলের কী হয়েছে?',en:"What's wrong with the crop?",note:'BRAND-CORE ad headline.'},
+    {t:'ধানের হইলো কী?',en:"What's up with the paddy?"},
+    {t:'ডগা শুকায় ক্যান?',en:'Why are the shoots drying?'}]},
+  NAME:{name:"He can't name the problem",kind:'Mahmud',opts:[
+    {t:'ডগাগুলা শুকায়া যাইতেছে... কী যে হইছে, বুঝায়াও বলতে পারি না।',en:"The shoots are drying… I can't even explain what's wrong."},
+    {t:'রোগ না পোকা, নাকি সার কম পড়ছে, কে জানে।',en:'Disease, pest, or not enough fertiliser, who knows.'}]},
+  SELLER:{name:'The shopkeeper',kind:'Dialogue',opts:[
+    {t:'ভাই, এইটা নিয়া যান, এইবার সবাই এইটাই নিতেছে।',en:"Brother, take this one, everyone's taking it this year."},
+    {t:'এইটা দেন, দুই দিনে ঠিক হয়া যাবে।',en:"Put this on, it'll be fine in two days."},
+    {t:'নতুন আইছে, খুব ভালো কাজ করে।',en:'Just came in, works really well.'}]},
+  NEIGH:{name:'The neighbour',kind:'Dialogue',opts:[
+    {t:'আমি তো গতবার পটাশ দিছিলাম, কাজ হইছে।',en:'I put potash last time, it worked.'},
+    {t:'ইউরিয়া একটু বেশি দেও, দেখবা সবুজ হয়া যাবে।',en:"Put a bit more urea, you'll see it go green."}]},
+  FATHER:{name:"Father's way",kind:'Memory',opts:[
+    {t:'আব্বা সবসময় এইটাই দিত।',en:'Father always used this.'},
+    {t:'আব্বা কইতো, ছাই আর গোবর দিলেই হয়।',en:'Father used to say ash and cow dung are enough.'}]},
+  OTHER:{name:'A fourth voice (B only)',kind:'Dialogue',opts:[
+    {t:'ইউটিউবে দেখলাম, এইটা দিলেই হয়।',en:'Saw it on YouTube, just use this.'},
+    {t:'আমার শালার জমিতে এইটা দিছিল, ভালো হইছে।',en:"My brother-in-law used this on his land, it went well."}]},
+  CONFUSED:{name:'Many voices',kind:'On-screen text',opts:[
+    {t:'সবাই বলে আলাদা কথা।',en:'Everyone says something different.'},
+    {t:'একেকজন একেক কথা কয়।',en:'Each one says his own thing.',note:'More spoken.'},
+    {t:'কার কথা শুনবো?',en:'Whose word do I take?'}]},
+  FAR:{name:'Help is far',kind:'Voice-over',opts:[
+    {t:'জানার জায়গা আছে, কিন্তু কৃষি অফিস অনেক দূরে।',en:'There is a place to ask, but the agriculture office is far.',note:'BRAND-CORE §3.'},
+    {t:'ঠিক পরামর্শ আছে, শুধু হাতের কাছে নাই।',en:"The right advice exists, it's just not close at hand."},
+    {t:'উপজেলা অফিসে যাইতে গেলেই পুরা দিন শেষ।',en:'A trip to the upazila office takes the whole day.'}]},
+  BANK:{name:'The mobile-banking parallel',kind:'Voice-over',opts:[
+    {t:'টাকা পাঠাইতে এখন আর ব্যাংকে যাইতে হয় না।',en:"You don't go to the bank to send money any more."},
+    {t:'মোবাইল ব্যাংকিং যেমন ব্যাংকরে হাতের মুঠায় আনছে...',en:'Just as mobile banking put the bank in your hand…'},
+    {t:'যে ফোনে টাকা পাঠান, সেই ফোনেই এখন কৃষি পরামর্শ।',en:'The phone you send money with now gives farming advice too.'}]},
+  INTRO:{name:'Urbora arrives',kind:'Voice-over / on-screen',opts:[
+    {t:'কৃষি পরামর্শ, এখন হাতের ফোনে।',en:'Farming advice, now on the phone in your hand.',note:'BRAND-CORE ad headline.'},
+    {t:'উর্বরা কৃষি বিশেষজ্ঞের পরামর্শ পৌঁছায় দেয় আপনার ফোনে।',en:"Urbora brings the agriculture expert's advice to your phone."},
+    {t:'এখন উর্বরায় একটা ফোন দিলেই হয়।',en:'Now you just give Urbora a call.'}]},
+  ASKS:{name:'It asks him, step by step',kind:'Voice-over / on-screen',opts:[
+    {t:'বুঝায়া বলতে হবে না, উর্বরা নিজেই জিজ্ঞেস করে নিবে।',en:'No need to explain; Urbora asks you itself.'},
+    {t:'একটা একটা করে জিজ্ঞেস করে, তারপর সোজা উত্তর।',en:'It asks one thing at a time, then a straight answer.'}]},
+  SHOP2:{name:'Back at the shop, with the SMS',kind:'Dialogue',opts:[
+    {t:'ও, মাজরা পোকা? তাইলে এইটা নেন, এইটুকুই লাগবে।',en:"Oh, stem borer? Then take this, that's all you need."},
+    {t:'হিসাব তো লেখাই আছে। দুই বিঘার জন্য এইটুকু।',en:"The amount's written right here. This much for two bigha."}]},
+  RELIEF:{name:'Relief',kind:'Mahmud',opts:[
+    {t:'এইবার বুঝলাম।',en:'Now I get it.'},
+    {t:'যাক, এইবার বুঝলাম কী করা লাগবে।',en:'Well, now I know what to do.'}]},
+  LATER:{name:'Time jump (on-screen)',kind:'On-screen text',opts:[
+    {t:'১০ দিন পর',en:'10 days later'},
+    {t:'দশ দিন পর',en:'Ten days later'}]},
+  RAIN:{name:'The rain alert',kind:'Voice-over',opts:[
+    {t:'শুধু বৃষ্টির খবর না, কী করবেন সেইটাও বলে দেয়।',en:"Not just \"rain is coming\"; it tells you what to do.",note:'Straight from the farmer interview.'},
+    {t:'বৃষ্টির আগেই খবর, ইউরিয়াটা বাঁচলো।',en:'Word came before the rain; the urea was saved.'}]},
+  HOW:{name:'How it works (on-screen, 3 beats)',kind:'On-screen text',opts:[
+    {t:'শোনে · হিসাব করে · উৎস দেখায়',en:'Listens · calculates · shows its source'},
+    {t:'মুখে বলেন · হিসাব হয় কোডে · না জানলে বলে',en:'You speak · code does the maths · says when it does not know'}]},
+  TRUST:{name:'Why he can trust it',kind:'Voice-over',opts:[
+    {t:'উর্বরা বানায়া কিছু বলে না। না জানলে সোজা বলে দেয়।',en:"Urbora doesn't make things up. If it doesn't know, it says so."},
+    {t:'হিসাব আসে পরীক্ষিত কোড থেকে, তথ্য আসে সরকারি গাইড থেকে।',en:'The numbers come from tested code, the facts from government guides.'},
+    {t:'কেউ টাকা দিয়া আগে আসতে পারে না। সবার জন্য একই হিসাব।',en:'Nobody pays to come first. The same numbers for everyone.'}]},
+  REACH:{name:'Any phone, everyone',kind:'Voice-over / on-screen',opts:[
+    {t:'শহরের মানুষ যে পরামর্শ ফোনে পায়, এখন সেইটা মাঠেও।',en:'The advice city people get on their phones now reaches the field.'},
+    {t:'স্মার্টফোন হোক বা বাটন ফোন, মুখে বলেন বা SMS দেন।',en:'Smartphone or button phone, speak it or send an SMS.'}]},
+  CLOSE:{name:'Just before the tagline',kind:'Voice-over',opts:[
+    {t:'মাটির যত্ন নিলে, স্বপ্ন ফলে।',en:'Care for the soil, and dreams bear fruit.',note:'From the BRAND-CORE headline.'},
+    {t:'(কোনো লাইন নয়, শুধু মিউজিক)',en:'No line: music only, straight to the tagline.'}]},
+  TAG:{name:'End card',kind:'Brand line',fixed:true,opts:[
+    {t:'উর্বরা · স্বপ্ন ফলুক',en:'Urbora · May your dreams bear fruit',note:'Approved in BRAND-CORE §2. Galada lettering.'}]}
+};
+
+/* ---------- picks (per-viewer convenience) ---------- */
+let picks={};
+try{picks=JSON.parse(localStorage.getItem('urbora-video-picks')||'{}')||{}}catch(e){picks={}}
+const save=()=>{try{localStorage.setItem('urbora-video-picks',JSON.stringify(picks))}catch(e){}};
+const isPicked=k=>SLOTS[k].fixed||(picks[k]&&(picks[k].i!=='own'||(picks[k].own||'').trim()));
+function L(k){const s=SLOTS[k],p=picks[k];if(p&&p.i==='own'&&(p.own||'').trim())return p.own.trim();const i=p&&typeof p.i==='number'?p.i:0;return s.opts[i].t}
+
+/* ---------- sketch kit ---------- */
+const C={ink:'#6B4A1E',paper:'#F4E8CC',kraft:'#EBD9B4',g:'#0D3B2E',sun:'#F2A231',leaf:'#1B7048',paddy:'#A8D65C',straw:'#FAF5EA',ter:'#B8472A',cloth:'#FBF3E1',skin:'#E6C49A',sari:'#F3CF8A',bubble:'#FFFDF6'};
+const NF='\u0001', BG='\u0002';
+const r1=n=>Math.round(n*10)/10;
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const p=(d,a='')=>`<path d="${d}" ${a}/>`;
+function tx(x,y,s,o={}){return NF+`<text x="${r1(x)}" y="${r1(y)}" font-size="${o.fs||9}" fill="${o.fill||C.ink}" text-anchor="${o.anchor||'middle'}" font-weight="${o.fw||400}" font-family="${o.ff||"'Noto Sans Bengali',sans-serif"}">${esc(s)}</text>`}
+function wrap(s,max){const w=String(s).split(' ');const out=[];let cur='';for(const x of w){const n=(cur+' '+x).trim();if(n.length>max&&cur){out.push(cur);cur=x}else cur=n}if(cur)out.push(cur);return out}
+function cap(x,y,s,o={}){const fs=o.fs||9;const lines=wrap(s,o.max||44);const w=Math.min(300,Math.max(...lines.map(l=>l.length))*fs*.5+16);const h=lines.length*fs*1.35+6;let out=NF+`<rect x="${r1(x-w/2)}" y="${r1(y-h/2)}" width="${r1(w)}" height="${r1(h)}" rx="3" fill="${o.bg||C.g}" opacity=".93"/>`;lines.forEach((l,i)=>{out+=tx(x,y-h/2+fs*1.08+3+i*fs*1.35,l,{fs,fill:o.fg||C.straw,fw:o.fw||500}).slice(1)});return out}
+function cam(s){return tx(314,11,s,{fs:7,anchor:'end',ff:"'Instrument Sans',sans-serif",fill:C.ink})}
+function bg(col){return BG+`<rect width="320" height="180" fill="${col}"/>`}
+function ground(y=92,vx=160,furrows=true){const a=[p(`M0 ${y} L320 ${y}`,'stroke-width="1"')];if(furrows)for(let i=0;i<=12;i++){a.push(p(`M${vx} ${y} L${r1(-240+i*66.7)} 180`,'stroke-width=".6" stroke-opacity=".4"'))}return a}
+function clump(x,y,s=1,o={}){const col=o.col||C.leaf;let d='';for(let k=-2;k<=2;k++){const h=(14-Math.abs(k)*2.5)*s;d+=`M${r1(x)} ${r1(y)} Q${r1(x+k*2*s)} ${r1(y-h*.6)} ${r1(x+k*4.5*s)} ${r1(y-h)} `}let out=p(d,`stroke="${col}" stroke-width="${r1(Math.max(.5,.9*s))}"`);if(o.dry)out+=p(`M${r1(x)} ${r1(y)} Q${r1(x+1*s)} ${r1(y-9*s)} ${r1(x-1*s)} ${r1(y-17*s)}`,`stroke="${C.ter}" stroke-width="${r1(1.3*s)}"`);if(o.ear)out+=p(`M${r1(x+3*s)} ${r1(y-11*s)} q${r1(5*s)} ${r1(1*s)} ${r1(7*s)} ${r1(7*s)}`,`stroke="${o.earCol||C.sun}" stroke-width="${r1(1.6*s)}"`);return out}
+function field(y0,y1,o={}){const a=[];const rows=o.rows||6;for(let r=0;r<rows;r++){const t=(r+1)/rows;const y=y0+(y1-y0)*t*t;const s=.3+t*1.1;const gap=24*s;const off=(r%2)*gap/2;for(let x=(o.x0??-gap)+off;x<(o.x1??330);x+=gap)a.push(clump(x,y,s,o))}return a}
+function sunHalf(x,y,r){const a=[p(`M${x-r} ${y} A${r} ${r} 0 0 1 ${x+r} ${y} Z`,`fill="${C.sun}" stroke="none"`)];for(let i=1;i<8;i++){const an=Math.PI*i/8;a.push(p(`M${r1(x-Math.cos(an)*(r+4))} ${r1(y-Math.sin(an)*(r+4))} L${r1(x-Math.cos(an)*(r+10))} ${r1(y-Math.sin(an)*(r+10))}`,`stroke="${C.sun}" stroke-width="1.2"`))}return a}
+function person(o){const {x,y,s=1,f=1,pose='stand',woman=false,old=false,gamcha=false,shirt=C.cloth,low=C.cloth,bag=false,item=null}=o;
+  const X=dx=>r1(x+dx*s*f),Y=dy=>r1(y+dy*s),pt=(dx,dy)=>X(dx)+' '+Y(dy);const sw=`stroke-width="${r1(Math.max(.7,1.1*s))}"`;const a=[];
+  if(pose==='crouch'){
+    a.push(p(`M${pt(-8,-12)} L${pt(-12,-1)} L${pt(-6,0)} M${pt(6,-13)} L${pt(11,-1)} L${pt(15,0)}`,sw));
+    a.push(p(`M${pt(-5,-31)} L${pt(8,-30)} L${pt(7,-13)} L${pt(-9,-11)} Z`,`fill="${shirt}" ${sw}`));
+    a.push(p(`M${pt(7,-28)} L${pt(15,-19)} L${pt(19,-10)}`,sw));
+    a.push(`<circle cx="${X(4)}" cy="${Y(-37)}" r="${r1(6*s)}" fill="${C.skin}" ${sw}/>`);
+    if(gamcha)a.push(p(`M${pt(-3,-31)} L${pt(6,-22)}`,`stroke="${C.ter}" stroke-width="${r1(2*s)}"`));
+    return a}
+  if(pose==='sit'||pose==='sitphone'){
+    a.push(p(`M${pt(-6,-20)} L${pt(10,-20)} L${pt(12,-2)} M${pt(-2,-19)} L${pt(14,-17)} L${pt(15,-1)}`,sw));
+    a.push(p(`M${pt(-7,-42)} L${pt(7,-42)} L${pt(7,-19)} L${pt(-7,-19)} Z`,`fill="${shirt}" ${sw}`));
+    if(pose==='sitphone'){a.push(p(`M${pt(-6,-40)} L${pt(-9,-26)} M${pt(6,-40)} L${pt(11,-32)} L${pt(5,-47)}`,sw));a.push(`<rect x="${Math.min(X(3),X(6))}" y="${Y(-53)}" width="${r1(3*s)}" height="${r1(7*s)}" fill="${C.g}" stroke="none"/>`)}
+    else a.push(p(`M${pt(-6,-40)} L${pt(-9,-26)} M${pt(6,-40)} L${pt(12,-28)}`,sw));
+    a.push(`<circle cx="${X(0)}" cy="${Y(-49)}" r="${r1(6.5*s)}" fill="${C.skin}" ${sw}/>`);
+    if(gamcha)a.push(p(`M${pt(5,-42)} L${pt(9,-30)}`,`stroke="${C.ter}" stroke-width="${r1(2*s)}"`));
+    return a}
+  const walk=pose==='walk';
+  if(bag)a.push(`<rect x="${Math.min(X(-12),X(-6))}" y="${Y(-45)}" width="${r1(6*s)}" height="${r1(14*s)}" rx="1.5" fill="${C.sun}" ${sw}/>`);
+  if(walk)a.push(p(`M${pt(-3,-16)} L${pt(-9,0)} M${pt(3,-16)} L${pt(8,0)}`,sw));else a.push(p(`M${pt(-4,-6)} L${pt(-5,0)} M${pt(4,-6)} L${pt(5,0)}`,sw));
+  if(woman)a.push(p(`M${pt(-8,-27)} L${pt(8,-27)} L${pt(11,0)} L${pt(-11,0)} Z`,`fill="${C.sari}" ${sw}`));
+  else a.push(p(`M${pt(-8,-27)} L${pt(8,-27)} L${pt(9,walk?-14:-5)} L${pt(-9,walk?-14:-5)} Z`,`fill="${low}" ${sw}`),p(`M${pt(-2,-27)} L${pt(-3,walk?-14:-5)}`,'stroke-width=".5"'));
+  a.push(p(`M${pt(-7,-46)} L${pt(7,-46)} L${pt(8,-26)} L${pt(-8,-26)} Z`,`fill="${woman?C.sari:shirt}" ${sw}`));
+  if(woman)a.push(p(`M${pt(6,-46)} L${pt(-8,-28)}`,`stroke="${C.ter}" stroke-width="${r1(1.6*s)}"`));
+  const arms={stand:`M${pt(-7,-44)} L${pt(-10,-28)} M${pt(7,-44)} L${pt(10,-28)}`,
+    phone:`M${pt(-7,-44)} L${pt(-10,-28)} M${pt(7,-44)} L${pt(11,-35)} L${pt(5,-51)}`,
+    hold:`M${pt(-7,-44)} L${pt(-10,-28)} M${pt(7,-44)} L${pt(13,-34)} L${pt(17,-38)}`,
+    offer:`M${pt(-7,-44)} L${pt(-10,-28)} M${pt(7,-44)} L${pt(16,-40)} L${pt(24,-42)}`,
+    shrug:`M${pt(-7,-44)} L${pt(-14,-40)} L${pt(-17,-48)} M${pt(7,-44)} L${pt(14,-40)} L${pt(17,-48)}`,
+    walk:`M${pt(-7,-44)} L${pt(-12,-31)} M${pt(7,-44)} L${pt(11,-30)}`};
+  a.push(p(arms[pose]||arms.stand,sw));
+  if(pose==='phone')a.push(`<rect x="${Math.min(X(3),X(6))}" y="${Y(-58)}" width="${r1(3*s)}" height="${r1(7*s)}" fill="${C.g}" stroke="none"/>`);
+  if(pose==='hold')a.push(`<rect x="${Math.min(X(15),X(20))}" y="${Y(-45)}" width="${r1(5*s)}" height="${r1(8*s)}" rx="1" fill="${C.g}" stroke="none"/>`);
+  if(item==='bottle')a.push(bottle(X(24),Y(-38),1.1*s));
+  a.push(`<circle cx="${X(0)}" cy="${Y(-53)}" r="${r1(6.5*s)}" fill="${C.skin}" ${sw}/>`);
+  a.push(p(`M${pt(6,-54)} L${pt(8,-52)}`,'stroke-width=".7"'));
+  if(woman)a.push(`<circle cx="${X(-5)}" cy="${Y(-57)}" r="${r1(2.6*s)}" fill="${C.ink}" stroke="none"/>`);
+  if(old)a.push(p(`M${pt(-3,-49)} Q${pt(1,-43)} ${pt(5,-49)}`,`fill="${C.straw}" stroke-width=".7"`));
+  if(gamcha)a.push(p(`M${pt(5,-46)} L${pt(9,-34)}`,`stroke="${C.ter}" stroke-width="${r1(2*s)}"`));
+  return a}
+function bottle(x,y,s=1,fill=C.leaf){return p(`M${r1(x-3*s)} ${r1(y)} V${r1(y-8*s)} Q${r1(x-3*s)} ${r1(y-10*s)} ${r1(x-1.2*s)} ${r1(y-11*s)} V${r1(y-13*s)} H${r1(x+1.2*s)} V${r1(y-11*s)} Q${r1(x+3*s)} ${r1(y-10*s)} ${r1(x+3*s)} ${r1(y-8*s)} V${r1(y)} Z`,`fill="${fill}" fill-opacity=".55" stroke-width=".7"`)}
+function shop(x,y,w,h){const a=[p(`M${x} ${y} H${x+w} V${y+h} H${x} Z`,`fill="${C.paper}"`),p(`M${x-5} ${y} H${x+w+5} L${x+w} ${y+13} H${x} Z`,`fill="${C.sun}" fill-opacity=".55"`)];for(let i=1;i<8;i++)a.push(p(`M${r1(x-5+i*(w+10)/8)} ${y} L${r1(x+i*w/8)} ${y+13}`,'stroke-width=".6"'));for(let sI=0;sI<3;sI++){const sy=r1(y+32+sI*((h-52)/3));a.push(p(`M${x+6} ${sy} H${x+w-6}`));for(let b=0;b<6;b++)a.push(bottle(r1(x+15+b*((w-26)/6)),sy,.75,b%2?C.leaf:C.ter))}a.push(p(`M${x-6} ${y+h-24} H${x+w+6} V${y+h} H${x-6} Z`,`fill="${C.kraft}"`));return a}
+function sack(x,y,s=1,label=''){const a=[p(`M${r1(x-10*s)} ${y} Q${r1(x-13*s)} ${r1(y-17*s)} ${r1(x-6*s)} ${r1(y-24*s)} L${r1(x+6*s)} ${r1(y-24*s)} Q${r1(x+13*s)} ${r1(y-17*s)} ${r1(x+10*s)} ${y} Z`,`fill="${C.cloth}"`),p(`M${r1(x-5*s)} ${r1(y-24*s)} L${r1(x-3*s)} ${r1(y-28*s)} L${r1(x+3*s)} ${r1(y-28*s)} L${r1(x+5*s)} ${r1(y-24*s)}`)];if(label)a.push(tx(x,y-9*s,label,{fs:6*s,ff:"'Instrument Sans',sans-serif",fw:600}));return a}
+function cloud(x,y,s=1){return p(`M${x} ${y} A${r1(8*s)} ${r1(8*s)} 0 0 1 ${r1(x+10*s)} ${r1(y-8*s)} A${r1(10*s)} ${r1(10*s)} 0 0 1 ${r1(x+28*s)} ${r1(y-6*s)} A${r1(7*s)} ${r1(7*s)} 0 0 1 ${r1(x+34*s)} ${y} Z`,`fill="${C.paper}"`)}
+function rain(x0,x1,y0,y1){let d='';for(let yy=y0;yy<y1;yy+=11)for(let xx=x0+((yy/11)%2)*5;xx<x1;xx+=10)d+=`M${r1(xx)} ${yy} l-3 7 `;return p(d,'stroke-width=".7" stroke-opacity=".7"')}
+function road(d){return[p(d,`stroke="${C.ink}" stroke-width="9"`),p(d,`stroke="${C.paper}" stroke-width="7"`),p(d,'stroke-width=".6" stroke-dasharray="3 3"')]}
+function building(x,y,s=1,mark=''){const a=[p(`M${r1(x-14*s)} ${y} V${r1(y-18*s)} H${r1(x+14*s)} V${y} Z`,`fill="${C.cloth}"`),p(`M${r1(x-17*s)} ${r1(y-18*s)} L${x} ${r1(y-27*s)} L${r1(x+17*s)} ${r1(y-18*s)} Z`,`fill="${C.kraft}"`),p(`M${r1(x-3*s)} ${y} V${r1(y-9*s)} H${r1(x+3*s)} V${y}`)];for(const dx of [-9,6])a.push(p(`M${r1(x+dx*s)} ${r1(y-14*s)} h${r1(4*s)} v${r1(4*s)} h${r1(-4*s)} Z`,'stroke-width=".6"'));if(mark)a.push(tx(x,y-19*s,mark,{fs:8*s,fw:700}));return a}
+function wave(x,y,w,h,col=C.leaf){let d='';const n=Math.floor(w/3.2);for(let i=0;i<n;i++){const hh=h*(.2+.8*Math.abs(Math.sin(i*1.7)*Math.cos(i*.45)));d+=`M${r1(x+i*3.2)} ${r1(y-hh/2)} V${r1(y+hh/2)} `}return p(d,`stroke="${col}" stroke-width="1.6"`)}
+function phoneDev(x,y,w,h,o={}){const a=[`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${o.kind==='button'?5:6}" fill="${C.g}" stroke="${C.ink}" stroke-width="1"/>`];
+  if(o.kind==='button'){const sh=h*.4;a.push(NF+`<rect x="${x+4}" y="${y+5}" width="${w-8}" height="${r1(sh)}" rx="1.5" fill="${C.straw}"/>`);for(let r=0;r<4;r++)for(let c=0;c<3;c++)a.push(`<circle cx="${r1(x+w*(.27+c*.23))}" cy="${r1(y+sh+11+r*((h-sh-16)/4))}" r="${r1(w*.06)}" fill="${C.paddy}" stroke="none"/>`);(o.lines||[]).forEach((l,i)=>a.push(tx(x+w/2,y+13+i*(o.fs||6)*1.35,l,{fs:o.fs||6,fill:C.g,ff:"'Instrument Sans',sans-serif"})))}
+  else{a.push(NF+`<rect x="${x+3}" y="${y+7}" width="${w-6}" height="${h-14}" rx="2" fill="${C.straw}"/>`);(o.lines||[]).forEach((l,i)=>a.push(tx(x+w/2,y+18+i*(o.fs||6.5)*1.4,l,{fs:o.fs||6.5,fill:C.g,ff:"'Instrument Sans',sans-serif"})));if(o.wave)a.push(NF+wave(x+8,y+h*.62,w-16,h*.18))}
+  return a}
+function bubble(x,y,w,text,tx0,ty0,o={}){const fs=o.fs||7.5;const lines=wrap(text,Math.floor(w/(fs*.47)));const h=lines.length*fs*1.35+8;const bx=Math.min(Math.max(tx0,x+10),x+w-10);
+  const a=[p(`M${x+6} ${y} H${x+w-6} Q${x+w} ${y} ${x+w} ${y+6} V${r1(y+h-6)} Q${x+w} ${r1(y+h)} ${x+w-6} ${r1(y+h)} H${r1(bx+5)} L${tx0} ${ty0} L${r1(bx-5)} ${r1(y+h)} H${x+6} Q${x} ${r1(y+h)} ${x} ${r1(y+h-6)} V${y+6} Q${x} ${y} ${x+6} ${y} Z`,`fill="${o.fill||C.bubble}" ${o.faint?'stroke-opacity=".45"':''}`)];
+  lines.forEach((l,i)=>a.push(tx(x+w/2,y+4+fs*1.05+i*fs*1.35,l,{fs,fill:o.tc||C.ink})));return a}
+function arrow(x1,y1,x2,y2,col=C.ink){const an=Math.atan2(y2-y1,x2-x1),h=5;return p(`M${x1} ${y1} L${x2} ${y2} M${r1(x2-h*Math.cos(an-.5))} ${r1(y2-h*Math.sin(an-.5))} L${x2} ${y2} L${r1(x2-h*Math.cos(an+.5))} ${r1(y2-h*Math.sin(an+.5))}`,`stroke="${col}" stroke-width="1.1"`)}
+function stalk(x,y,h,lean=1,col=C.ink){const a=[];const ex=x+lean*h*.45,ey=y-h;a.push(p(`M${x} ${y} Q${r1(x)} ${r1(y-h*.75)} ${r1(ex)} ${r1(ey)}`,`stroke="${col}" stroke-width="1"`));for(let i=0;i<8;i++){const t=.5+i*.065;const gx=x+(ex-x)*t*t,gy=y-h*t;const cx=r1(gx+lean*3.5*(i%2?1:-.4)),cy=r1(gy+2);a.push(`<ellipse cx="${cx}" cy="${cy}" rx="1.5" ry="3.4" transform="rotate(${lean*(i%2?40:-20)} ${cx} ${cy})" fill="${C.kraft}" stroke="${col}" stroke-width=".7"/>`)}a.push(p(`M${r1(x-6*lean)} ${r1(y-h*.3)} Q${r1(x-2*lean)} ${r1(y-h*.55)} ${r1(x-12*lean)} ${r1(y-h*.7)}`,`stroke="${col}" stroke-width=".8"`));return a}
+function stalks(y,n,h,col=C.ink,x0=6,x1=314){const a=[];for(let i=0;i<n;i++){const x=x0+(x1-x0)*(i+.5)/n;a.push(stalk(r1(x),y,h*(.8+.4*Math.abs(Math.sin(i*2.3))),i%2?1:-1,col))}return a}
+function seal(cx,cy,r){const k=(r/29).toFixed(3);return NF+`<g transform="translate(${r1(cx-32*k)} ${r1(cy-32*k)}) scale(${k})"><circle cx="32" cy="32" r="29" fill="${C.g}"/><path fill="${C.sun}" d="M17 33a15 15 0 0 1 30 0z"/><path fill="${C.straw}" d="M32 33L6.5 45.5A29 29 0 0 0 9 50.5ZM32 33L13.5 56A29 29 0 0 0 20 59.3ZM32 33L27 61A29 29 0 0 0 37 61ZM32 33L44 59.3A29 29 0 0 0 50.5 56ZM32 33L55 50.5A29 29 0 0 0 57.5 45.5Z"/><rect fill="${C.straw}" x="3" y="32.2" width="58" height="2"/><path fill="${C.g}" d="M31 33V25.5a1 1 0 0 1 2 0V33z"/><path fill="${C.g}" d="M32 28.5C31.4 24.5 28.4 22.3 24 22.5C24.6 26.5 27.6 28.8 32 28.5Z"/><path fill="${C.g}" d="M32 26.5C32.6 22.2 35.8 19.8 40.5 20C39.9 24.3 36.7 26.8 32 26.5Z"/></g>`}
+function endcard(x0=0){const cx=x0+(320-x0)/2;return[NF+`<rect x="${x0}" y="0" width="${320-x0}" height="180" fill="${C.g}"/>`,seal(cx,62,28),tx(cx,118,'উর্বরা',{fs:22,fill:C.straw,fw:700,ff:"'Noto Serif Bengali',serif"}),tx(cx,146,L('TAG').split('·')[1].trim(),{fs:17,fill:C.sun,ff:"'Galada',cursive"})]}
+function house(x,y,s=1){return[p(`M${r1(x-30*s)} ${y} V${r1(y-26*s)} H${r1(x+30*s)} V${y} Z`,`fill="${C.paper}"`),p(`M${r1(x-38*s)} ${r1(y-24*s)} L${r1(x-22*s)} ${r1(y-46*s)} H${r1(x+22*s)} L${r1(x+38*s)} ${r1(y-24*s)} Z`,`fill="${C.kraft}"`),p(`M${r1(x-6*s)} ${y} V${r1(y-17*s)} H${r1(x+6*s)} V${y}`)]}
+function hand(){return[p('M320 104 L268 118 Q254 122 252 130 Q256 137 268 133 L286 128 Q280 136 290 138 L320 132 Z',`fill="${C.skin}"`),p('M268 118 Q258 112 246 116 M270 124 Q256 122 244 125 M268 133 Q256 134 248 137','stroke-width=".9"')]}
+function inset(x,y,w,h,label){return[NF+`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${C.straw}" stroke="${C.g}" stroke-width="1.5"/>`,tx(x+w/2,y+h/2+3,label,{fs:7,fill:C.g,ff:"'Instrument Sans',sans-serif",fw:600}),NF+`<circle cx="${x+8}" cy="${y+8}" r="2.5" fill="${C.ter}"/>`]}
+function iconEar(x,y){return[p(`M${x-6} ${y+4} Q${x-8} ${y-10} ${x+2} ${y-10} Q${x+10} ${y-8} ${x+6} ${y+2} Q${x+2} ${y+6} ${x+2} ${y+10}`,'stroke-width="1.4"'),NF+wave(x+10,y,14,12,C.leaf)]}
+function iconCalc(x,y){const a=[p(`M${x-9} ${y-11} h18 v22 h-18 Z`,`fill="${C.cloth}"`),p(`M${x-6} ${y-8} h12 v5 h-12 Z`,`fill="${C.paddy}"`)];for(let r=0;r<3;r++)for(let c=0;c<3;c++)a.push(`<circle cx="${x-5+c*5}" cy="${y+1+r*4}" r="1.1" fill="${C.ink}" stroke="none"/>`);return a}
+function iconBook(x,y){return[p(`M${x} ${y-8} Q${x-8} ${y-12} ${x-14} ${y-9} V${y+9} Q${x-8} ${y+6} ${x} ${y+10} Q${x+8} ${y+6} ${x+14} ${y+9} V${y-9} Q${x+8} ${y-12} ${x} ${y-8} V${y+10}`,`fill="${C.cloth}"`),p(`M${x-11} ${y-4} h7 M${x-11} ${y} h7 M${x+4} ${y-4} h7 M${x+4} ${y} h7`,'stroke-width=".6"')]}
+function channels(cx,y){return[phoneDev(cx-52,y-12,14,24,{}),NF+wave(cx-49,y+1,8,6),phoneDev(cx-7,y-12,14,24,{kind:'button'}),phoneDev(cx+38,y-12,14,24,{}),p(`M${cx+41} ${y-5} h8 v5 h-5 l-2 2 v-2 h-1 Z`,`fill="${C.paddy}" stroke-width=".5"`)]}
+function howDiagram(y,col){const a=[];const xs=[62,160,258];a.push(iconEar(xs[0],y),iconCalc(xs[1],y),iconBook(xs[2],y),arrow(88,y,132,y,col),arrow(186,y,230,y,col));return a}
+
+/* ---------- versions ---------- */
+const V=[
+{id:'A',bn:'মাটির উপহার',en:'The gift of the land',kind:'A short story film',
+ idea:"One family, one season. The land that fed his grandfathers gives less; everyone gives Mahmud a different answer; the office is far. The same phone his wife gets money on brings him the expert. It ends on his daughter running through ripe paddy: the dream bearing fruit.",
+ feels:'The long-form GP and bKash ads: real people, real light, calm music',strong:'Emotion, problem relevance, impact',risk:"About 10 Higgsfield shots of the same Mahmud. His face can drift between shots unless we lock a character reference first.",load:'Heavy on footage, light on motion graphics',
+ panels:[
+  {t:'0:00–0:08',title:'Dawn over the boro',tools:['HF'],labels:['AI-generated footage'],pic:"Sunrise over green boro. Mahmud walks the আইল (the ridge) with a gamcha on his shoulder. Warm, real light; nobody is sad.",sound:[{raw:'Birds; a soft flute comes in'},{slot:'GIFT',who:'VO'}],
+   draw:()=>[sunHalf(210,92,18),ground(92,200),field(96,180,{rows:5}),p('M10 180 Q110 132 200 94','stroke-width="1.3"'),person({x:118,y:134,s:.75,pose:'walk',gamcha:true}),p('M60 40 q4 -4 8 0 q4 -4 8 0 M84 30 q3 -3 6 0 q3 -3 6 0','stroke-width=".9"'),cam('slow push-in')]},
+  {t:'0:08–0:18',title:'Something is off',tools:['HF'],labels:['AI-generated footage'],pic:"Close-up: his hand parts the plants. A few centre shoots are dry and brown (deadheart, from stem borer). He frowns, puzzled rather than upset.",sound:[{slot:'FALL',who:'Mahmud'}],screen:[{raw:'If FALL b is picked: a small caption "a farmer in Dinajpur told us"'}],
+   draw:()=>[bg(C.paper),clump(40,190,6),clump(120,195,6.5,{dry:true}),clump(205,192,5.5),clump(290,195,6,{dry:true}),hand(),cam('macro, shallow focus')]},
+  {t:'0:18–0:24',title:'The shopkeeper',tools:['HF'],labels:['AI-generated footage','dramatization'],pic:"The input shop. The seller reaches a bottle off the shelf, friendly, the way he does every day. He is a normal shopkeeper, not a villain.",sound:[{slot:'SELLER',who:'Seller'}],
+   draw:()=>[shop(160,34,150,126),person({x:236,y:138,s:1,f:-1,pose:'offer',item:'bottle'}),person({x:92,y:172,s:1.15,pose:'stand',gamcha:true}),bubble(14,14,150,L('SELLER'),200,82),cam('over-the-shoulder')]},
+  {t:'0:24–0:29',title:'The tea stall',tools:['HF'],labels:['AI-generated footage','dramatization'],pic:"Tea stall. A neighbour on the bench, cup in hand, gives his own advice, sure of himself.",sound:[{slot:'NEIGH',who:'Neighbour'}],
+   draw:()=>[p('M40 142 H230 M52 142 V162 M218 142 V162','stroke-width="1.6"'),person({x:110,y:142,s:1.1,pose:'sit',old:false}),p('M126 112 h6 v7 h-6 Z',`fill="${C.cloth}"`),person({x:250,y:170,s:1.15,f:-1,pose:'stand',gamcha:true}),p('M20 60 L20 142 M20 60 Q60 40 110 60','stroke-width=".8"'),bubble(150,20,150,L('NEIGH'),120,76),cam('two-shot')]},
+  {t:'0:29–0:34',title:"Father's way",tools:['HF'],labels:['AI-generated footage','dramatization'],pic:"A memory in a sepia tint: his father in the same field years ago, with a sack. Mahmud remembers what father always used.",sound:[{slot:'FATHER',who:'Mahmud (or father, in memory)'}],
+   draw:()=>[ground(96,160),field(100,180,{rows:4,col:C.ink}),person({x:120,y:160,s:1.2,pose:'stand',old:true}),sack(160,162,1.1),NF+`<rect width="320" height="180" fill="${C.ink}" opacity=".13"/>`,bubble(170,24,140,L('FATHER'),130,70),cam('soft vignette, sepia')]},
+  {t:'0:34–0:42',title:'Too many answers, the office far',tools:['HF','HYP'],labels:['AI-generated footage'],pic:"Back on the ridge. The three answers hang in the air and don't agree. The road to the upazila office runs off to the horizon: a whole day's trip.",sound:[{slot:'NAME',who:'Mahmud'},{slot:'FAR',who:'VO'}],
+   draw:()=>[ground(70,250,false),road('M110 180 Q200 150 170 120 Q140 96 230 84 Q262 78 268 72'),building(270,72,.8),field(74,180,{rows:4,x0:-10,x1:90}),person({x:62,y:170,s:1.25,pose:'stand',gamcha:true}),bubble(10,14,70,'…',60,70,{faint:true}),bubble(90,8,60,'…',72,66,{faint:true}),bubble(40,40,40,'?',64,74,{faint:true}),cam('wide, hold')]},
+  {t:'0:42–0:50',title:'Money comes by phone',tools:['HF'],labels:['AI-generated footage'],pic:"The courtyard. His wife gets money from their son on her phone and smiles. Nobody went to a bank. (A generic mobile-banking screen with no brand.)",sound:[{slot:'BANK',who:'VO'}],
+   draw:()=>[house(90,120,1.3),p('M0 150 H320','stroke-width=".8"'),person({x:188,y:168,s:1.3,pose:'hold',woman:true}),inset(228,22,72,50,'৳ received'),p('M250 22 Q200 -6 150 30','stroke-width=".8" stroke-dasharray="3 3"'),cam('medium, warm')]},
+  {t:'0:50–1:14',title:'He asks Urbora',tools:['HF','REC'],labels:['AI-generated footage','real system output'],pic:"Mahmud sits on the ridge and calls Urbora. Inset: the real call from the #/phone page, with its real transcript as subtitles. It asks the days since planting and which part is hit, then names stem borer and gives the dose for his 2 bigha.",sound:[{slot:'INTRO',who:'VO, at the start'},{raw:'Real call audio (Urbora voice + Mahmud)'}],screen:[{raw:'[real transcript as subtitles]'}],
+   draw:()=>[ground(88,160),field(92,180,{rows:4}),person({x:86,y:170,s:1.35,pose:'sitphone',gamcha:true}),phoneDev(196,16,96,150,{lines:['[real call on','#/phone page]'],wave:true}),cap(118,20,L('INTRO'),{fs:8,max:30}),cam('cut between')]},
+  {t:'1:14–1:24',title:'The SMS at the shop',tools:['HF','REC'],labels:['AI-generated footage','real system output'],pic:"Next day at the shop, his son shows the SMS. The seller reads it, takes the right bottle and measures the right amount. Mahmud nods: relief.",sound:[{slot:'SHOP2',who:'Seller'},{slot:'RELIEF',who:'Mahmud'}],screen:[{raw:'[real SMS text, cropped above the footer]'}],
+   draw:()=>[shop(186,34,124,126),person({x:250,y:138,s:1,f:-1,pose:'stand'}),person({x:168,y:170,s:.95,pose:'hold',bag:false}),person({x:104,y:172,s:1.15,pose:'stand',gamcha:true}),inset(12,14,92,46,'[real SMS]'),bubble(112,14,110,L('SHOP2'),230,82,{fs:6.8}),cam('medium')]},
+  {t:'1:24–1:33',title:'Before the rain',tools:['HF','REC'],labels:['AI-generated footage','real system output'],pic:"Ten days later. The rain-alert SMS buzzes on the button phone. Mahmud sets the urea sack back down and glances at the clouds.",sound:[{slot:'RAIN',who:'VO'}],screen:[{slot:'LATER'},{raw:'[real rain-alert SMS]'}],
+   draw:()=>[cloud(150,40,1.4),cloud(220,34,1.8),cloud(40,50,1.2),rain(160,310,46,90),ground(92,160),field(96,180,{rows:3}),person({x:150,y:170,s:1.3,pose:'crouch',gamcha:true}),sack(190,172,1.2,'UREA'),phoneDev(20,90,34,62,{kind:'button',lines:['[rain SMS]']}),cap(80,16,L('LATER'),{fs:9}),cam('medium-wide')]},
+  {t:'1:33–1:46',title:'Why it can be trusted',tools:['HYP'],labels:[],pic:"A motion graphic on kraft in the engraved style: how the answer is made and why it can be trusted. A row of channel icons: call, keypad, SMS.",sound:[{slot:'TRUST',who:'VO'},{slot:'REACH',who:'VO'}],screen:[{slot:'HOW'}],
+   draw:()=>[bg(C.kraft),stalks(180,9,48,C.ink),howDiagram(58,C.ink),cap(160,100,L('HOW'),{fs:9,max:50}),channels(160,140),cam('animated line art')]},
+  {t:'1:46–1:58',title:'স্বপ্ন ফলুক',tools:['HF','HYP'],labels:['AI-generated footage'],pic:"Golden paddy. His daughter runs along the ridge with her school bag. Cut to the end card: the seal, উর্বরা, স্বপ্ন ফলুক. Credits line with the disclosures.",sound:[{slot:'CLOSE',who:'VO'},{raw:'Music swells gently, then settles'}],screen:[{slot:'TAG'}],
+   draw:()=>[ground(80,90),field(84,180,{rows:5,x1:170,ear:true}),p('M10 180 Q70 130 150 84','stroke-width="1.2"'),person({x:80,y:142,s:.95,pose:'walk',woman:true,bag:true}),endcard(170)]}
+ ]},
+{id:'B',bn:'কী হয়েছে?',en:"What's wrong?",kind:'A quick, light ad',
+ idea:"Built on one question, asked on the beat. Four people answer it four different ways, fast and a little funny. Then the phone turns the question around and asks him, step by step. The proof comes next: the same answer through call, keypad and SMS, and other farmers asking about other crops.",
+ feels:'A bKash TV spot: quick cuts, a musical beat, light humour, then calm',strong:'AI integration, feasibility, responsible AI',risk:'After 0:46 it can feel like a feature tour. The three-phone split and the shop moment have to carry the warmth.',load:'Medium footage (different faces, easier), most screen recording',
+ panels:[
+  {t:'0:00–0:05',title:'The question',tools:['HF','HYP'],labels:['AI-generated footage'],pic:"Extreme close-up of the dry centre shoot. The question lands in big type, on the beat.",sound:[{raw:'One sharp beat of music'}],screen:[{slot:'QUESTION'}],
+   draw:()=>[bg(C.paper),clump(90,200,7,{dry:true}),clump(230,200,6),cap(160,88,L('QUESTION'),{fs:18,fw:700}),cam('snap zoom')]},
+  {t:'0:05–0:20',title:'Four faces, four answers',tools:['HF'],labels:['AI-generated footage','dramatization'],pic:"Four quick faces, each straight to camera, each with a different answer. One beat of music per face. Light and a little funny.",sound:[{slot:'SELLER',who:'Seller'},{slot:'NEIGH',who:'Neighbour'},{slot:'OTHER',who:'Cousin, on video call'},{slot:'FATHER',who:'Father (memory)'}],
+   draw:()=>{const q=[[0,0,'SELLER',{}],[160,0,'NEIGH',{}],[0,90,'OTHER',{}],[160,90,'FATHER',{old:true}]];const a=[p('M160 0 V180 M0 90 H320','stroke-width="1.4"')];q.forEach(([x,y,k,o])=>{a.push(person({x:x+34,y:y+128,s:1.35,pose:'stand',...o}));a.push(bubble(x+62,y+8,92,L(k),x+44,y+56,{fs:6.4}))});a.push(NF+`<rect x="160" y="90" width="160" height="90" fill="${C.ink}" opacity=".12"/>`);return a}},
+  {t:'0:20–0:28',title:'Buried in bubbles',tools:['HF','HYP'],labels:['AI-generated footage','dramatization'],pic:"Mahmud faces the camera and shrugs, buried in speech bubbles. Everyone is confused, him included. No sadness.",sound:[{slot:'NAME',who:'Mahmud'}],screen:[{slot:'CONFUSED'}],
+   draw:()=>[person({x:160,y:176,s:1.9,pose:'shrug',gamcha:true}),bubble(20,14,60,'…',110,60,{faint:true}),bubble(240,10,60,'…',200,58,{faint:true}),bubble(30,70,50,'…',120,100,{faint:true}),bubble(240,72,56,'…',196,104,{faint:true}),bubble(120,4,80,'…',150,40,{faint:true}),cap(160,160,L('CONFUSED'),{fs:11,fw:700})]},
+  {t:'0:28–0:40',title:'Less from the same land; help is far',tools:['HYP'],labels:[],pic:"A motion graphic on kraft: the same land gives less (the Dinajpur farmer's own figures, captioned as his words), and the office is far down the road.",sound:[{slot:'FALL',who:'VO'},{slot:'FAR',who:'VO'}],screen:[{raw:'৫০ মণ → ৩০ মণ, with "a farmer in Dinajpur told us"'}],
+   draw:()=>[bg(C.kraft),sack(40,120,1.4),sack(66,120,1.4),sack(53,94,1.4),tx(54,140,'৫০ মণ',{fs:10,fw:700}),sack(128,120,1.4),sack(140,96,1.1),tx(134,140,'৩০ মণ',{fs:10,fw:700}),arrow(84,110,110,110),tx(90,160,'"a farmer in Dinajpur told us"',{fs:6.5,ff:"'Instrument Sans',sans-serif"}),road('M190 170 Q260 150 230 120 Q205 96 280 70'),building(284,68,.8),cam('animated line art')]},
+  {t:'0:40–0:46',title:'The phone asks back',tools:['HYP','HF'],labels:[],pic:"The turn: the phone asks him instead. Question marks travel from the phone to Mahmud.",sound:[{slot:'ASKS',who:'VO'}],screen:[{slot:'INTRO'}],
+   draw:()=>[person({x:70,y:176,s:1.8,pose:'stand',gamcha:true}),phoneDev(190,20,70,130,{lines:['?']}),seal(225,70,16),bubble(120,40,26,'?',100,70),bubble(140,80,26,'?',110,96),cap(210,164,L('INTRO'),{fs:8.5,max:34})]},
+  {t:'0:46–1:10',title:'Three ways in, one answer',tools:['REC','HYP'],labels:['real system output','simulator'],pic:"Three real recordings side by side: the voice call, the keypad menu (labelled simulator) and SMS. Each walks through the same questions and ends on the same diagnosis and the same gram figure.",sound:[{raw:'Real call audio, keypad beeps, SMS tone'}],screen:[{raw:'[real screens]; "simulator" tag on the keypad phone'}],
+   draw:()=>[phoneDev(28,14,72,140,{lines:['[call]'],wave:true}),phoneDev(126,24,68,130,{kind:'button',lines:['[USSD menu]']}),phoneDev(220,14,72,140,{lines:['[SMS in]','[SMS out]']}),tx(160,172,'simulator',{fs:8,ff:"'Instrument Sans',sans-serif",fw:600,fill:C.ter}),cam('split screen')]},
+  {t:'1:10–1:18',title:'Shown at the shop',tools:['HF','REC'],labels:['AI-generated footage','real system output'],pic:"The answer SMS, big and readable. At the shop the seller reads it and nods.",sound:[{slot:'SHOP2',who:'Seller'}],
+   draw:()=>[phoneDev(20,16,88,150,{lines:['[real SMS:','diagnosis +','dose for 2 bigha]']}),shop(170,34,140,126),person({x:240,y:138,s:1,f:-1,pose:'stand'}),bubble(120,10,110,L('SHOP2'),220,80,{fs:6.8})]},
+  {t:'1:18–1:26',title:'The rain alert',tools:['REC','HYP'],labels:['real system output'],pic:"The rain alert tells him what to do, not just the news. The urea waits for the dry day.",sound:[{slot:'RAIN',who:'VO'}],
+   draw:()=>[cloud(40,40,1.5),cloud(190,36,2),rain(40,300,44,92),ground(96,160),field(100,180,{rows:3}),phoneDev(120,20,70,130,{kind:'button',lines:['[rain SMS]']}),sack(260,170,1.3,'UREA')]},
+  {t:'1:26–1:40',title:'Other fields, other farmers',tools:['HF'],labels:['AI-generated footage','dramatization'],pic:"Other fields, other farmers: a woman in a potato field, a mustard field, an older man with a button phone. Each one asks and gets an answer. We only show crops the system really covers.",sound:[{slot:'REACH',who:'VO'},{slot:'BANK',who:'VO (option c fits here)'}],
+   draw:()=>{const a=[p('M106 0 V180 M213 0 V180','stroke-width="1.4"')];a.push(ground(110,53,false));for(let i=0;i<5;i++)a.push(p(`M${6+i*20} 150 q10 -10 20 0`,'stroke-width=".8"'));a.push(person({x:52,y:160,s:1.2,pose:'hold',woman:true}));a.push(p('M106 110 H213','stroke-width=".8"'));for(let i=0;i<14;i++)a.push(`<circle cx="${112+(i*37)%96}" cy="${118+(i*23)%50}" r="2.4" fill="${C.sun}" stroke="none"/>`);a.push(person({x:160,y:162,s:1.2,pose:'phone'}));a.push(p('M213 110 H320','stroke-width=".8"'));a.push(person({x:266,y:162,s:1.2,pose:'hold',old:true}));return a}},
+  {t:'1:40–1:50',title:'Behind the answer',tools:['REC'],labels:['real system output'],pic:"A glimpse behind the answer: the provenance graph from the real app. Tools light up; the numbers come from code, and every number has a source.",sound:[{slot:'TRUST',who:'VO'}],
+   draw:()=>{const a=[NF+`<rect x="14" y="12" width="292" height="156" rx="5" fill="${C.straw}" stroke="${C.g}" stroke-width="1.2"/>`,NF+`<rect x="14" y="12" width="292" height="12" rx="5" fill="${C.g}"/>`];const n=[[60,70],[130,50],[130,110],[210,80],[270,60],[270,120]];[[0,1],[0,2],[1,3],[2,3],[3,4],[3,5]].forEach(([i,j])=>a.push(p(`M${n[i][0]} ${n[i][1]} L${n[j][0]} ${n[j][1]}`,'stroke-width=".9"')));n.forEach(([x,y],i)=>a.push(`<circle cx="${x}" cy="${y}" r="${i===3?10:7}" fill="${i===3?C.sun:C.paddy}"/>`));a.push(tx(160,158,'[real provenance graph recording]',{fs:7,ff:"'Instrument Sans',sans-serif"}));return a}},
+  {t:'1:50–1:58',title:'End card',tools:['HYP'],labels:[],pic:"Mahmud's line of relief over the last shot, then the end card: seal, wordmark and tagline. Credits line with the disclosures.",sound:[{slot:'RELIEF',who:'Mahmud'}],screen:[{slot:'TAG'}],
+   draw:()=>[endcard(0)]}
+ ]},
+{id:'C',bn:'হাতের মুঠোয়',en:'In your hand',kind:'An animated line-art story',
+ idea:"The brand's engraved paddy art comes alive on kraft. One image carries the argument: the long road to the office rolls up into a phone, the way the road to the bank once did. The real product plays inside a drawn phone frame. Warm voice-over and music carry the feeling.",
+ feels:'An illustrated brand film: calm, crafted, unmistakably ours',strong:'Originality, clarity, video quality; the mobile-banking idea is the spine',risk:"The people are drawn rather than filmed; the brand prefers real light and real people. Two or three live-action shots can fix that.",load:'Almost no footage; the most motion graphics (I build these)',
+ panels:[
+  {t:'0:00–0:10',title:'The gift',tools:['HYP'],labels:[],pic:"Engraved line art on kraft comes alive: paddy stalks rise and the sun comes up over the delta.",sound:[{raw:'Soft music'},{slot:'GIFT',who:'VO'}],
+   draw:()=>[bg(C.kraft),sunHalf(160,100,26),p('M0 100 H320','stroke-width="1"'),stalks(178,11,70),cam('stalks grow in')]},
+  {t:'0:10–0:22',title:'Less from the same land',tools:['HYP'],labels:[],pic:"The same field drawn twice. The second one is thinner and the sacks are fewer. The figures are the Dinajpur farmer's own, captioned as his words.",sound:[{slot:'FALL',who:'VO'}],screen:[{raw:'৫০ মণ → ৩০ মণ, "a farmer in Dinajpur told us"'}],
+   draw:()=>[bg(C.kraft),p('M160 10 V170','stroke-width=".8" stroke-dasharray="3 3"'),stalks(120,6,60,C.ink,10,150),stalks(120,3,44,C.ink,170,310),sack(50,160,1.1),sack(72,160,1.1),sack(94,160,1.1),tx(72,176,'৫০ মণ',{fs:8,fw:700}),sack(220,160,1.1),sack(242,160,1.1),tx(232,176,'৩০ মণ',{fs:8,fw:700}),cam('crossfade left → right')]},
+  {t:'0:22–0:34',title:'Every voice different',tools:['HYP'],labels:[],pic:"A small farmer figure; speech bubbles swirl round him and overlap until nothing is readable.",sound:[{slot:'SELLER',who:'Seller (voice only)'},{slot:'NEIGH',who:'Neighbour'},{slot:'FATHER',who:'Memory'},{slot:'NAME',who:'Mahmud'}],
+   draw:()=>[bg(C.kraft),stalks(178,8,30),person({x:160,y:150,s:1.4,pose:'shrug',gamcha:true}),bubble(10,12,110,L('SELLER'),130,70,{fs:6.3}),bubble(200,16,110,L('NEIGH'),185,72,{fs:6.3}),bubble(18,88,96,L('FATHER'),135,110,{fs:6.3})]},
+  {t:'0:34–0:44',title:'The long road',tools:['HYP'],labels:[],pic:"A long road winds from his field to the upazila office. The sun crosses the sky while a tiny figure walks: a whole day for one answer.",sound:[{slot:'FAR',who:'VO'}],
+   draw:()=>[bg(C.kraft),p('M40 40 Q160 -10 280 40','stroke-width=".7" stroke-dasharray="2 4"'),`<circle cx="60" cy="34" r="6" fill="${C.sun}" stroke="none" opacity=".45"/>`,`<circle cx="160" cy="15" r="7" fill="${C.sun}" stroke="none"/>`,`<circle cx="260" cy="34" r="6" fill="${C.sun}" stroke="none" opacity=".45"/>`,road('M20 178 Q120 160 90 130 Q60 100 170 96 Q260 92 240 72 Q224 58 280 52'),building(284,52,.7),stalks(178,3,34,C.ink,4,70),person({x:118,y:140,s:.6,pose:'walk'}),cam('sun arcs across')]},
+  {t:'0:44–0:54',title:'The road to the bank rolled up',tools:['HYP'],labels:[],pic:"The parallel: the road to the bank was once just as long. It rolls up into a phone, and ৳ flies home.",sound:[{slot:'BANK',who:'VO'}],
+   draw:()=>[bg(C.kraft),road('M10 150 Q70 120 120 128 Q170 136 200 110'),building(60,110,.9,'৳'),phoneDev(216,40,56,100,{lines:['৳'],fs:18}),arrow(200,110,214,96),p('M246 30 Q280 0 300 40','stroke-width=".8" stroke-dasharray="3 3"'),tx(300,54,'৳',{fs:12,fw:700}),cam('road rolls up')]},
+  {t:'0:54–1:00',title:"The field's road rolls up too",tools:['HYP'],labels:[],pic:"The road from the field rolls up into a phone as well. The seal appears on its screen.",sound:[{slot:'INTRO',who:'VO'}],screen:[{slot:'INTRO'}],
+   draw:()=>[bg(C.kraft),stalks(178,4,40,C.ink,4,110),road('M20 150 Q90 130 140 132 Q180 134 200 110'),phoneDev(212,26,64,118,{}),seal(244,78,18),arrow(200,110,210,100),cap(120,24,L('INTRO'),{fs:9,max:30})]},
+  {t:'1:00–1:24',title:'Inside the phone: the real thing',tools:['REC','HYP'],labels:['real system output'],pic:"Real recordings inside a drawn phone frame: the call, the step-by-step questions, the answer and the dose for 2 bigha. A drawn Mahmud listens beside it.",sound:[{slot:'ASKS',who:'VO'},{raw:'Real call audio'}],screen:[{raw:'[real transcript as subtitles]'}],
+   draw:()=>[bg(C.kraft),stalks(178,5,30,C.ink,4,110),person({x:70,y:160,s:1.5,pose:'phone',gamcha:true}),phoneDev(150,8,110,164,{lines:['[real call recording','+ transcript]'],wave:true}),cam('recording composited in')]},
+  {t:'1:24–1:32',title:'Before the rain',tools:['HYP','REC'],labels:['real system output'],pic:"Clouds gather over the line-art field; the real rain SMS pops in; the drawn urea sack stays tied shut.",sound:[{slot:'RAIN',who:'VO'}],
+   draw:()=>[bg(C.kraft),cloud(30,46,1.6),cloud(170,40,2.1),rain(30,300,48,96),stalks(178,7,44),phoneDev(126,54,58,100,{kind:'button',lines:['[rain SMS]']}),sack(260,176,1.3,'UREA')]},
+  {t:'1:32–1:46',title:'Why it can be trusted',tools:['HYP'],labels:[],pic:"An engraved diagram: how the answer is made, and why it can be trusted. A row of channel icons: call, keypad, SMS.",sound:[{slot:'TRUST',who:'VO'},{slot:'REACH',who:'VO'}],screen:[{slot:'HOW'}],
+   draw:()=>[bg(C.kraft),howDiagram(50,C.ink),cap(160,94,L('HOW'),{fs:9,max:50}),channels(160,138),stalks(180,2,40,C.ink,4,316)]},
+  {t:'1:46–1:58',title:'স্বপ্ন ফলুক',tools:['HYP'],labels:[],pic:"The stalks fill out and turn gold; the sun rises and becomes the seal. উর্বরা · স্বপ্ন ফলুক. Credits line with the disclosures.",sound:[{slot:'CLOSE',who:'VO'}],screen:[{slot:'TAG'}],
+   draw:()=>[bg(C.kraft),stalks(180,12,62,C.sun),seal(160,58,30),tx(160,112,'উর্বরা',{fs:20,fill:C.g,fw:700,ff:"'Noto Serif Bengali',serif"}),tx(160,136,L('TAG').split('·')[1].trim(),{fs:15,fill:'#8A5A0B',ff:"'Galada',cursive"})]}
+ ]}
+];
+
+const TOOLS={HF:['Higgsfield','#1B7048'],HYP:['HyperFrames','#B7791F'],REC:['Screen rec','#0D3B2E']};
+const secs=s=>{const [m,x]=s.split(':').map(Number);return m*60+x};
+
+/* ---------- render ---------- */
+function flat(a,out=[]){for(const x of a){if(Array.isArray(x))flat(x,out);else if(x)out.push(x)}return out}
+function sketch(fn){const parts=flat(fn());const back=[],rough=[],crisp=[];for(const s of parts){if(s.includes(BG))back.push(s.split(BG).join(''));else if(s.includes(NF))crisp.push(s.split(NF).join(''));else rough.push(s)}
+  return `<svg class="sk" viewBox="0 0 320 180" role="img" aria-hidden="true"><rect width="320" height="180" fill="${C.paper}"/>${back.join('')}<g filter="url(#rough)" fill="none" stroke="${C.ink}" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">${rough.join('')}</g><g>${crisp.join('')}</g></svg>`}
+function lineHTML(it){if(it.raw)return `<li class="line"><span class="raw">${esc(it.raw)}</span></li>`;const ok=isPicked(it.slot);return `<li class="line"><a class="slot ${ok?'ok':'draft'}" href="#slot-${it.slot}" title="${ok?'Picked':'Draft: pick in the copy sheet'}">${it.slot}${ok?' ✓':' · DRAFT'}</a><span class="t">${esc(L(it.slot))}</span>${it.who?`<span class="who">${esc(it.who)}</span>`:''}</li>`}
+function render(){
+  const root=document.getElementById('versions');
+  root.innerHTML=V.map(v=>{
+    const total=secs(v.panels[v.panels.length-1].t.split('–')[1]);
+    const tl=v.panels.map(pn=>{const [a,b]=pn.t.split('–').map(secs);const col=TOOLS[pn.tools[0]][1];return `<span style="flex:${b-a};background:${col}" title="${v.id}${v.panels.indexOf(pn)+1} ${esc(pn.title)} · ${b-a}s">${v.id}${v.panels.indexOf(pn)+1}</span>`}).join('');
+    return `<section class="version" id="v${v.id}">
+      <div class="vhead"><div class="vletter">${v.id}</div><h2 class="vname"><span class="bn">${v.bn}</span>${esc(v.en)}</h2><p class="videa">${esc(v.kind)}. ${esc(v.idea)}</p></div>
+      <div class="meta"><div><b>Feels like</b>${esc(v.feels)}</div><div><b>Strong on</b>${esc(v.strong)}</div><div><b>Main risk</b>${esc(v.risk)}</div><div><b>Tonight's load</b>${esc(v.load)}</div></div>
+      <div class="timeline" aria-label="Timeline, ${total} seconds">${tl}</div>
+      <div class="tl-legend"><span>Runs ${Math.floor(total/60)}:${String(total%60).padStart(2,'0')} of 2:00</span>${Object.values(TOOLS).map(([n,c])=>`<span><i style="background:${c}"></i>${n} (lead tool)</span>`).join('')}</div>
+      <div class="grid">${v.panels.map((pn,i)=>{const [a,b]=pn.t.split('–').map(secs);return `<article class="panel">${sketch(pn.draw)}<div class="pbody">
+        <div class="ptop"><span class="pid">${v.id}${i+1}</span><span class="ptime">${pn.t} · ${b-a}s</span><span class="ptitle">${esc(pn.title)}</span></div>
+        <p class="pic">${esc(pn.pic)}</p>
+        ${pn.sound&&pn.sound.length?`<div class="row"><b>Sound</b><ul>${pn.sound.map(lineHTML).join('')}</ul></div>`:''}
+        ${pn.screen&&pn.screen.length?`<div class="row"><b>On screen</b><ul>${pn.screen.map(lineHTML).join('')}</ul></div>`:''}
+        <div class="chips">${pn.tools.map(t=>`<span class="chip tool">${TOOLS[t][0]}</span>`).join('')}${pn.labels.map(l=>`<span class="chip label">${esc(l)}</span>`).join('')}</div>
+      </div></article>`}).join('')}</div></section>`}).join('');
+  const keys=Object.keys(SLOTS).filter(k=>!SLOTS[k].fixed);const n=keys.filter(isPicked).length;
+  document.getElementById('count').textContent=`${n} of ${keys.length} lines picked`;
+}
+function usedIn(k){const out=[];V.forEach(v=>v.panels.forEach((pn,i)=>{if([...(pn.sound||[]),...(pn.screen||[])].some(x=>x.slot===k))out.push(v.id+(i+1))}));return out}
+function renderSheet(){
+  const letters='abc';
+  document.getElementById('sheet').innerHTML=Object.entries(SLOTS).map(([k,s])=>{const pk=picks[k]||{};const u=usedIn(k);
+    return `<div class="slotcard" id="slot-${k}"><h3><span class="slot ${isPicked(k)?'ok':'draft'}">${k}</span>${esc(s.name)} <span class="kind">${esc(s.kind)}</span></h3><div class="used">Used in ${u.join(', ')||'none'}</div>
+      ${s.opts.map((o,i)=>`<label class="opt"><input type="radio" name="p-${k}" id="p-${k}-${i}" value="${i}" ${s.fixed||pk.i===i?'checked':''} ${s.fixed?'disabled':''}><span class="bnl">${letters[i]}. ${esc(o.t)}</span><span class="en">${esc(o.en)}</span>${o.note?`<span class="note">${esc(o.note)}</span>`:''}</label>`).join('')}
+      ${s.fixed?'':`<label class="opt"><input type="radio" name="p-${k}" id="p-${k}-own" value="own" ${pk.i==='own'?'checked':''}><span class="bnl" style="font-size:14px">Write my own</span><input class="own" type="text" id="own-${k}" data-k="${k}" value="${esc(pk.own||'')}" placeholder="নিজের লাইন লিখুন…"></label>`}
+    </div>`}).join('');
+}
+document.getElementById('sheet').addEventListener('change',e=>{const m=e.target.name&&e.target.name.match(/^p-(.+)$/);if(!m)return;const k=m[1];const v=e.target.value;picks[k]={...(picks[k]||{}),i:v==='own'?'own':Number(v)};save();render();refreshChips(k)});
+document.getElementById('sheet').addEventListener('input',e=>{if(!e.target.classList.contains('own'))return;const k=e.target.dataset.k;picks[k]={i:'own',own:e.target.value};const r=document.getElementById(`p-${k}-own`);if(r)r.checked=true;save();render();refreshChips(k)});
+function refreshChips(k){const c=document.querySelector(`#slot-${k} h3 .slot`);if(c)c.className='slot '+(isPicked(k)?'ok':'draft')}
+document.getElementById('copybtn').addEventListener('click',()=>{const letters='abc';const lines=Object.entries(SLOTS).filter(([k,s])=>!s.fixed).map(([k,s])=>{const pk=picks[k];if(!isPicked(k))return `${k}: (not picked)`;if(pk.i==='own')return `${k}: own — ${pk.own.trim()}`;return `${k}: ${letters[pk.i]} — ${s.opts[pk.i].t}`});const text='Urbora video line picks\n'+lines.join('\n');const out=document.getElementById('copyout');out.hidden=false;out.value=text;const msg=document.getElementById('copymsg');
+  const done=()=>{msg.textContent='Copied. Paste it to Claude in chat.'};const fail=()=>{out.focus();out.select();msg.textContent='Select the text below and copy it.'};
+  try{navigator.clipboard.writeText(text).then(done,fail)}catch(e){fail()}});
+document.getElementById('resetbtn').addEventListener('click',()=>{picks={};save();renderSheet();render();document.getElementById('copymsg').textContent='All picks cleared.'});
+render();renderSheet();
+</script>

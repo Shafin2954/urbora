@@ -21,16 +21,20 @@ import asyncio
 import json
 import logging
 import os
+import re
+import time
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
 from backend.channels import flows, sms
-from backend.channels.identity import InvalidMsisdnError, farm_id_for, normalise
+from backend.channels.identity import InvalidMsisdnError, farm_id_for, mask, normalise
 from backend.memory import store
 
 router = APIRouter(prefix="/api/channels", tags=["channels"])
 log = logging.getLogger("channels")
+_background: set[asyncio.Task] = set()  # fire-and-forget sends, kept alive until done
 
 
 def emulator_enabled() -> bool:
@@ -64,25 +68,65 @@ async def status() -> dict:
     }
 
 
+SIGNATURE_WINDOW_S = 300      # SMSGate docs: reject timestamps more than ±5 min off
+STALE_SMS_S = 15 * 60         # a retried SMS older than this gets no answer
+
+
+def _received_age_s(received_at: str | None) -> float | None:
+    if not received_at:
+        return None
+    try:
+        when = datetime.fromisoformat(received_at.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if when.tzinfo is None:
+        return None
+    return (datetime.now(timezone.utc) - when).total_seconds()
+
+
 @router.post("/sms/smsgate")
 async def smsgate_webhook(request: Request, background: BackgroundTasks) -> dict:
+    """SMSGate webhook (docs.sms-gate.app/features/webhooks). It retries a failed
+    delivery for ~2 days, so every event id is handled once and a stale SMS is
+    recorded but not answered (a reply two days late is worse than none)."""
     raw = await request.body()
     key = os.environ.get("SMSGATE_SIGNING_KEY", "")
-    if key and not sms.verify_smsgate_signature(
-        raw, request.headers.get("X-Timestamp", ""), request.headers.get("X-Signature", ""), key
-    ):
-        raise HTTPException(401, "bad signature")
+    if key:
+        ts = request.headers.get("X-Timestamp", "")
+        sig = request.headers.get("X-Signature", "")
+        if not sms.verify_smsgate_signature(raw, ts, sig, key):
+            # Say why (never the key): the usual cause is SMSGATE_SIGNING_KEY not matching
+            # the app's Settings -> Webhooks -> Signing key.
+            log.warning("SMSGate webhook refused: bad signature (timestamp %s, signature %s, key length %d)",
+                        "present" if ts else "MISSING", f"{len(sig)} chars" if sig else "MISSING", len(key))
+            raise HTTPException(401, "bad signature")
+        if not ts.isdigit() or abs(time.time() - int(ts)) > SIGNATURE_WINDOW_S:
+            log.warning("SMSGate webhook refused: timestamp off by %s s (phone/laptop clock?)",
+                        int(time.time() - int(ts)) if ts.isdigit() else "?")
+            raise HTTPException(401, "stale signature")
     try:
         body = json.loads(raw or b"{}")
     except ValueError:
         raise HTTPException(400, "not JSON")
     event = body.get("event")
     payload = body.get("payload") or {}
+    if body.get("id") and not store.mark_webhook_seen(f"smsgate:{body['id']}"):
+        return {"ok": True, "duplicate": True}
     if event == "sms:received":
         sender, text = payload.get("sender") or payload.get("phoneNumber"), payload.get("message", "")
-        if sender:
-            background.add_task(_answer_sms, sender, text, "smsgate", payload.get("messageId"))
-    elif event in ("sms:sent", "sms:delivered", "sms:failed"):
+        if not sender:
+            return {"ok": True}
+        age = _received_age_s(payload.get("receivedAt"))
+        if age is not None and age > STALE_SMS_S:
+            log.warning("SMS from %s is %.0f min old (webhook retry); recorded, not answered",
+                        mask(sender), age / 60)
+            try:
+                sms.record_inbound(farm_id_for(sender), text, "smsgate", payload.get("messageId"))
+            except InvalidMsisdnError:
+                pass
+            return {"ok": True, "stale": True}
+        background.add_task(_answer_sms, sender, text, "smsgate", payload.get("messageId"))
+    elif event in ("sms:sent", "sms:delivered", "sms:failed", "sms:cancelled"):
         ref = payload.get("messageId") or body.get("id")
         if ref:
             store.update_sms_status(ref, event.split(":", 1)[1])
@@ -239,8 +283,15 @@ async def bdapps_ussd(request: Request) -> dict:
         screen = await ussd_request(session_id, address.removeprefix("tel:"), body.get("message"), is_init)
     except InvalidMsisdnError:
         return {"statusCode": "E1325", "statusDetail": "unusable address"}
-    sent = await asyncio.to_thread(_bdapps_ussd_send, session_id, address, screen.text, screen.end)
-    return {"statusCode": "S1000", "statusDetail": "Success", "reply": sent}
+    if os.environ.get("BDAPPS_MODE", "simulator").strip().lower() != "live":
+        sent = _bdapps_ussd_send(session_id, address, screen.text, screen.end)  # local; nothing leaves
+        return {"statusCode": "S1000", "statusDetail": "Success", "reply": sent}
+    # Live: acknowledge the MO at once and send the screen separately, so the
+    # gateway's request never waits on our outbound call (CHANNELS_RESEARCH.md §1).
+    task = asyncio.create_task(asyncio.to_thread(_bdapps_ussd_send, session_id, address, screen.text, screen.end))
+    _background.add(task)
+    task.add_done_callback(_background.discard)
+    return {"statusCode": "S1000", "statusDetail": "Success"}
 
 
 # --- voice ---------------------------------------------------------------------
@@ -333,3 +384,49 @@ async def bridge_voice_say(payload: Say, request: Request) -> dict:
         raise HTTPException(502, str(exc))
     return {"audio_b64": base64.b64encode(audio.data).decode("ascii"), "audio_type": audio.content_type,
             "tts": used}
+
+
+# --- keypad menu on a call (backend/channels/voice/ivr.py) ------------------------
+
+
+class Keys(BaseModel):
+    msisdn: str
+    call_id: str
+    keys: str                     # one key, or digits ended by '#'
+
+
+_KEYS = re.compile(r"^[0-9*#]{1,12}$")
+
+
+async def _ivr(payload: Keys, wav: bool) -> dict:
+    import base64
+
+    from backend.channels.voice import ivr, speech
+    if not _KEYS.match(payload.keys):
+        raise HTTPException(422, "keys must be 0-9, * or #")
+    try:
+        out = await ivr.keys(payload.msisdn, payload.call_id, payload.keys)
+    except InvalidMsisdnError as exc:
+        raise HTTPException(422, str(exc))
+    out.update(audio_b64=None, audio_type=None)
+    try:
+        audio, used = await asyncio.to_thread(speech.synthesize, out["text"], None, wav)
+        out.update(audio_b64=base64.b64encode(audio.data).decode("ascii"), audio_type=audio.content_type,
+                   tts=used)
+    except speech.SpeechError as exc:
+        out["tts_error"] = str(exc)  # the text still shows; say why there is no audio
+    return out
+
+
+@router.post("/emulator/voice/keys")
+async def emulator_voice_keys(payload: Keys) -> dict:
+    """Keypad presses during the browser phone's call."""
+    _require_emulator()
+    return await _ivr(payload, wav=False)
+
+
+@router.post("/bridge/voice/keys")
+async def bridge_voice_keys(payload: Keys, request: Request) -> dict:
+    """Keypad tones detected in a real call's audio by the Phone Link bridge."""
+    _require_bridge_token(request)
+    return await _ivr(payload, wav=True)

@@ -57,6 +57,15 @@ DISTRICT_BN: dict[str, str] = {
 }
 
 
+# Internal instruction to the model, never farmer text. Phone channels scrub it
+# from replies if the model copies it (adapter.scrub_internal; LOG4 2026-09-29).
+ASK_NOTE = (
+    "The question is now on the farmer's screen with a widget. End your "
+    "turn here — say nothing further and do not assume an answer. The "
+    "farmer's reply arrives as the next user message."
+)
+
+
 def district_options() -> list[dict[str, str]]:
     """All 64 districts, Bangla-labelled. The UI's dropdown filters as you type."""
     return [
@@ -132,9 +141,5 @@ def ask_farmer(
         },
         # The model must stop after asking. Without this it tends to answer its
         # own question and carry on, which defeats the entire point of asking.
-        "note": (
-            "The question is now on the farmer's screen with a widget. End your "
-            "turn here — say nothing further and do not assume an answer. The "
-            "farmer's reply arrives as the next user message."
-        ),
+        "note": ASK_NOTE,
     }
