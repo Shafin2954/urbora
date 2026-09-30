@@ -385,3 +385,11 @@
 .result-dose .prov .mono { font: 700 1.5rem/1.2 var(--display); }
 .result-dose .prov-unit { font-size: 1.1rem; color: var(--gold); }
 .result-dose .prov-body { color: var(--ink); font: 400 .85rem/1.5 var(--sans); }
+
+/* --- home uses the shared SiteNav; a primary "ask" button sits at its end --- */
+.home .site-nav { padding-inline: max(24px, calc((100% - 1180px) / 2 + 24px)); }
+.nav-cta { white-space: nowrap; }
+.foot-links { margin-top: 6px; }
+.foot-links a { color: var(--bg); text-decoration: underline; text-underline-offset: 3px; }
+.foot-links a:hover { color: var(--gold); }
+@media (max-width: 560px) { .home .nav-cta { display: none; } }

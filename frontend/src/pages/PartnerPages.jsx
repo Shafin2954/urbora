@@ -3,7 +3,7 @@ import {
   buyerHome, dealerHome, fetchCatalog, fetchDistricts, makeOffer, registerBuyer, registerDealer,
   remember, saveProduct, setOrderStatus,
 } from '../api/market.js'
-import { BRAND_NAME } from '../branding.js'
+import SiteNav from '../components/SiteNav.jsx'
 
 const NEXT = { placed: ['confirmed', 'cancelled'], confirmed: ['ready', 'cancelled'], ready: ['collected', 'delivered'] }
 const STATUS_BN = { confirmed: 'নিশ্চিত', cancelled: 'বাতিল', ready: 'প্রস্তুত', collected: 'সংগ্রহ হয়েছে', delivered: 'পৌঁছে দেওয়া' }
@@ -90,14 +90,22 @@ function Shell({ title, storeKey, kind, children }) {
   const [token, setToken] = useState(() => remember(storeKey))
   const use = (t) => { setToken(t); remember(storeKey, t) }
   return (
-    <main className="market-page">
-      <header className="phone-page-head">
-        <a href="#/" className="back-link">← {BRAND_NAME}</a>
-        <h1>{title}</h1>
+    <div className="page-shell">
+      <SiteNav>
         {token && <button className="secondary" onClick={() => use('')}>বের হন</button>}
+      </SiteNav>
+      <header className="mk-hero">
+        <div className="mk-hero-inner">
+          <div>
+            <p className="mk-eyebrow">{kind === 'dealer' ? 'দোকানদারদের জন্য' : 'ক্রেতাদের জন্য'}</p>
+            <h1>{title}</h1>
+          </div>
+        </div>
       </header>
-      {token ? children(token, () => use('')) : <Join kind={kind} onToken={use} />}
-    </main>
+      <main className="market-page partner-page">
+        {token ? children(token, () => use('')) : <Join kind={kind} onToken={use} />}
+      </main>
+    </div>
   )
 }
 
@@ -255,7 +263,7 @@ function BuyerHome({ token, onBadToken }) {
 
 export function DealerPage() {
   return (
-    <Shell title="দোকান" storeKey="market.dealerToken" kind="dealer">
+    <Shell title="দোকানের পাতা: দাম, মজুদ আর অর্ডার" storeKey="market.dealerToken" kind="dealer">
       {(token, out) => <DealerHome token={token} onBadToken={out} />}
     </Shell>
   )
@@ -263,7 +271,7 @@ export function DealerPage() {
 
 export function BuyerPage() {
   return (
-    <Shell title="ক্রেতা" storeKey="market.buyerToken" kind="buyer">
+    <Shell title="ক্রেতার পাতা: কাছের ফসল আর দাম" storeKey="market.buyerToken" kind="buyer">
       {(token, out) => <BuyerHome token={token} onBadToken={out} />}
     </Shell>
   )

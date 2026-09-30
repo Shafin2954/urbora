@@ -64,9 +64,11 @@ And two marketplaces that turn advice into action:
 | **Input marketplace** — the agent's `find_inputs` tool ranks nearby dealers (price 40, distance 30, stock 15, trust 15; no paid placement); order on the web, USSD menu 5 or SMS; the dealer confirms by SMS; commission paid by the dealer | **Working, with demo dealers** (labelled ডেমো everywhere) | `backend/market/inputs.py`, `ranking.py`; `#/market`, `#/dealer` |
 | **Produce marketplace** — the farmer lists the harvest (`বিক্রি আলু 500 কেজি 22 টাকা`), sees a cited price guide, buyers offer, the farmer accepts with one SMS reply; the platform fee is paid by the buyer | **Working, with demo buyers** | `backend/market/produce.py`; `#/market`, `#/buyer` |
 
-Try it: `#/phone` is a button-phone emulator (dial `*3700#`, SMS, missed call, call),
-`#/monitor` replays every phone conversation into the provenance graph, `#/market` is
-the farmer's marketplace. Everything simulated is labelled **সিমুলেটর** or **ডেমো**.
+Try it: `#/app` is the web advisor (sign in, or continue as a guest; previous chats in the
+sidebar), `#/monitor` replays every phone conversation into the provenance graph, `#/market`
+is the farmer's marketplace. The browser button-phone emulator (`#/phone`) was removed from
+the site on 2026-09-30; the emulator API routes remain for tests and scripts. Everything
+simulated is labelled **সিমুলেটর** or **ডেমো**.
 
 ### What never changed
 
@@ -168,7 +170,7 @@ competitive submission — Tier 1 above it is where this build differentiates.
 | **Marketplace dealers and buyers** | `python -m backend.market.seed_demo` | **DEMO.** 5 dealers and 3 buyers, every row `is_demo`, named ডেমো, labelled in the UI, SMS and agent narration. Their phone numbers are made up and a live SMS gateway never texts them. Demo fertiliser listings use the cited government-notified price (Urea/TSP ৳27/kg, MoP ৳20/kg; 2023-04-11 notice in `data/prices.md`); spray prices are invented. Real dealers and buyers self-register at `#/dealer` / `#/buyer` and show as "যাচাই হয়নি" until verified |
 | Produce price guide | `data/prices.md` farm-gate row + `market_price` (BBS wholesale pattern) | **Real, cited.** Labelled a historical pattern, not a forecast, and wholesale, not farm-gate |
 | Commission and platform-fee rates | `MARKET_COMMISSION_PCT` (5), `PRODUCE_FEE_PCT` (2) | **Pilot parameters, not data.** The dealer pays the commission; the buyer pays the fee |
-| SMS, USSD and voice in the emulator | `#/phone` | **SIMULATED transport, real flows.** The emulator calls the same backend flows a gateway would; `SMS_PROVIDER=simulator` sends nothing |
+| SMS, USSD and voice in the emulator | `/api/channels/emulator/*` (browser page removed) | **SIMULATED transport, real flows.** The emulator calls the same backend flows a gateway would; `SMS_PROVIDER=simulator` sends nothing |
 | Bangla speech on the voice line | Sarvam / OpenAI / Azure | **Real APIs, quality not yet verified** for this line |
 
 ### Voice disclosure — why dictation is not browser-native
@@ -408,9 +410,9 @@ Supabase session and works normally.
 python -m backend.market.seed_demo      # demo dealers + buyers (once; --reset removes them)
 ```
 
-Then open `http://localhost:5173/#/phone` (button-phone emulator), `#/monitor`
-(live phone conversations) and `#/market`. With the default `SMS_PROVIDER=simulator`
-nothing leaves the machine and the emulator's inbox shows every SMS.
+Then open `http://localhost:5000/#/monitor` (live phone conversations) and `#/market`.
+With the default `SMS_PROVIDER=simulator` nothing leaves the machine; the emulator API
+(`/api/channels/emulator/*`) still takes SMS/USSD/voice turns from scripts and tests.
 
 **Real SMS through an Android phone** (pilot, USB only — no Wi-Fi needed):
 
