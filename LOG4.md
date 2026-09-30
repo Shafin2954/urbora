@@ -536,3 +536,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** Two different rain figures for the same day on screen would read as made up.
 **Rejected:** The N10 kinetic caption during the keypad demo (collided with the question column; the dose callout says the same thing).
 **Impacts:** Build on Windows: `video/build/.venv` (pinned: numpy 2.2.6, scipy 1.15.3, librosa 0.11.0, soundfile 0.13.1, noisereduce 3.0.3, openai 2.8.1, pillow 12.3.0), `PYTHONUTF8=1`, then `python audio.py → qa_mix.py → final.py base → final.py frames` → mux.
+
+## [17:40] v5 cut rendered and muxed
+**Did:** `audio.py` → `qa_mix.py` → `final.py base` → `final.py frames` → mux. Output `video/build/out/urbora_final_v5.mp4` (1080p) and `video/urbora_v5_preview_720p.mp4`; neither is in git.
+**Decision:** v5 runs 1:54.4 (cap 2:00), integrated loudness −13.4 LUFS.
+**Why:** PLAN_v5 build order, step 4.
+**Rejected:** none.
+**Impacts:** Not yet done: Jawat's listen test of the character voices (PLAN_v5 §5.4). The spare 5.6 s under the cap can go to a longer beat after a question if the team wants one.
