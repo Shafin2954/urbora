@@ -1,0 +1,17 @@
+# Netlify hosts the static frontend only; FastAPI stays on the Replit
+# deployment. The browser calls Replit directly (VITE_API_BASE, read by
+# frontend/src/api/client.js) instead of through a Netlify proxy, because a
+# proxy can buffer or time out the chat's SSE stream. Replit must list this
+# site in its CORS_ORIGINS env var (backend/api/config.py).
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  VITE_API_BASE = "https://team-fixeth-agri-sense--Shafin54.replit.app"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

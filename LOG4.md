@@ -543,3 +543,17 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** PLAN_v5 build order, step 4.
 **Rejected:** none.
 **Impacts:** Not yet done: Jawat's listen test of the character voices (PLAN_v5 §5.4). The spare 5.6 s under the cap can go to a longer beat after a question if the team wants one.
+
+## [22:05] Frontend hosted on Netlify at urbora-team-uplift.netlify.app; API stays on Replit
+**Did:** Added `netlify.toml` (build `frontend/`, publish `dist`, `VITE_API_BASE` = the Replit deployment, fallback to `index.html`). Built on Termux and deployed with `netlify deploy --prod --no-build --dir frontend/dist` to Netlify project `urbora-team-uplift` (team Shafin54).
+**Decision:** The Netlify page calls the Replit API directly (cross-origin) rather than through a Netlify `/api/*` proxy. Replit needs `CORS_ORIGINS=https://urbora-team-uplift.netlify.app` in its deployment secrets.
+**Why:** The team wanted a new free link; Replit charges to change its subdomain. Netlify can't run FastAPI, and a Netlify proxy can buffer or time out the chat's SSE stream.
+**Rejected:** Netlify proxy for `/api/*` (SSE risk, see above); moving the backend off Replit (no need, it is live and merged).
+**Impacts:** Until Replit's CORS_ORIGINS includes the Netlify origin, every API call from the Netlify page fails (preflight answers "400 Disallowed CORS origin"). New Netlify sites on this team start with visitor access protection (401 login redirect); turn it off in the Netlify UI for public access. Supabase VITE_ keys are baked in from the builder's `.env.local`; a Netlify-side git build would need them as Netlify env vars.
+
+## [22:20] Netlify chat said "Failed to fetch": .replit overrode the CORS secret
+**Did:** Added `https://urbora-team-uplift.netlify.app` to `CORS_ORIGINS` in `.replit` `[userenv.shared]`.
+**Decision:** The Netlify origin lives in `.replit`, next to the localhost origins, not only in a Replit secret.
+**Why:** `.replit` sets `CORS_ORIGINS` to the two localhost origins as a shared env var, which overrode the deployment secret, so Replit kept answering the Netlify preflight with "400 Disallowed CORS origin".
+**Rejected:** Leaving it in the Replit secrets UI only (the shared var shadowed it).
+**Impacts:** The Repl must pull `master` and redeploy for this to take effect.

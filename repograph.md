@@ -14,6 +14,8 @@ Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
   `uv.lock` (**the Repl's own dependency list — separate from `backend/requirements.txt`**), `replit.md`,
   stub `main.py`, `package.json`. `backend/api/main.py` serves `frontend/dist` + an SPA fallback when dist exists.
   Vite dev port is **5000** since the merge (was 5173).
+- `netlify.toml` — Netlify hosting of the static frontend only (https://urbora-team-uplift.netlify.app); it calls the
+  Replit API via `VITE_API_BASE`, so Replit's `CORS_ORIGINS` must list the Netlify origin (LOG4 2026-09-30 [22:05]).
 - `backend/agent/intake_guard.py` — refuses planning tools on district/soil/water/season the farmer never stated.
 - `backend/channels/voice/audio.py` (pure audio helpers + VAD segmenter + ADB call-state parser) and
   `voice/phonelink.py` (real calls via Windows Phone Link + Voicemeeter; optional deps in
