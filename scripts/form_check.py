@@ -11,6 +11,8 @@ judgement:
    bold lead-ins, triplet lists, and flat sentence rhythm.
 
 Usage:  python scripts/form_check.py [path]   (exit code 1 on any hard failure)
+        python scripts/form_check.py --paste [path]   writes ROUND1_PASTE.txt: every answer
+        with each paragraph on one line, ready to paste into the form boxes.
 Only the text under "## <answer> (max N words)" headings is checked; Part 0 and
 the team notes are ours, not the form's.
 """
@@ -46,6 +48,9 @@ AI_WORDS = [
 ]
 NOT_BUT = re.compile(r"\bnot (?:just |only |merely )?[^.;:]{1,40}?,? but\b|\bisn't just\b|"
                      r"\bit's not about\b", re.I)
+CONTRAST = re.compile(r"instead of|rather than|, not (?:a|an|the|from|by|just)|"
+                      r"doesn't [a-z]+[^.]{0,40}\. It", re.I)
+LABEL = re.compile(r"(?m)(?:^|(?<=\. ))(?:\d+\.\s+)?[A-Z][a-z]+(?: [a-z]+){0,3}[.:] (?=[A-Z])")
 TRIPLET = re.compile(r"\b[\w'-]+(?: [\w'-]+){0,2}, [\w'-]+(?: [\w'-]+){0,2},? (?:and|or) "
                      r"[\w'-]+", re.I)
 
@@ -90,12 +95,15 @@ def tells(body: str) -> dict:
         "triplets_per_100w": round(100 * len(TRIPLET.findall(body)) / n, 1),
         "colons_per_100w": round(100 * body.count(":") / n, 1),
         "sentence_cv": round(cv, 2),
+        "contrast_per_100w": round(100 * len(CONTRAST.findall(body)) / n, 1),
+        "label_leadins": len(LABEL.findall(body)),
     }
     # Index: 0 is clean. Each tell adds points; a flat rhythm (cv < 0.4) adds too.
     idx = (3 * t["em_dash"] + 4 * len(hits) + 4 * t["not_but"] + 1 * t["bold_leadins"]
            + max(0.0, t["triplets_per_100w"] - 1.5) * 3
            + max(0.0, t["colons_per_100w"] - 1.5) * 2
-           + (max(0.0, 0.4 - cv) * 20 if lengths else 0))
+           + (max(0.0, 0.4 - cv) * 20 if lengths else 0)
+           + max(0.0, t["contrast_per_100w"] - 1.0) * 2 + 2 * t["label_leadins"])
     t["ai_tell_index"] = round(idx, 1)
     return t
 
@@ -126,6 +134,10 @@ def main(path: str = "ROUND1_FORM.md") -> int:
             notes.append(f"bold lead-ins x{t['bold_leadins']}")
         if t["sentence_cv"] < 0.4:
             notes.append(f"flat rhythm (cv {t['sentence_cv']})")
+        if t["contrast_per_100w"] > 1.0:
+            notes.append(f"contrast frames {t['contrast_per_100w']}/100w")
+        if t["label_leadins"]:
+            notes.append(f"label lead-ins x{t['label_leadins']}")
         if t["triplets_per_100w"] > 1.5:
             notes.append(f"triplets {t['triplets_per_100w']}/100w")
         flag = "OVER" if over else "ok"
@@ -147,5 +159,22 @@ def main(path: str = "ROUND1_FORM.md") -> int:
     return 0
 
 
+def paste(path: str = "ROUND1_FORM.md", out: str = "ROUND1_PASTE.txt") -> int:
+    """Unwrap each answer's paragraphs so the form boxes get no stray line breaks."""
+    text = Path(path).read_text(encoding="utf-8")
+    title = re.search(r"^## Idea title\s*\n+(.+?)\n", text, flags=re.M)
+    parts = [f"IDEA TITLE\n\n{title.group(1).strip()}"] if title else []
+    for name, limit, body in sections(text):
+        paras = [" ".join(line.strip() for line in p.splitlines())
+                 for p in re.split(r"\n\s*\n", body) if p.strip()]
+        parts.append(f"{name.upper()} ({words(body)}/{limit} words)\n\n" + "\n\n".join(paras))
+    Path(out).write_text("\n\n\n".join(parts) + "\n", encoding="utf-8")
+    print(f"wrote {out}")
+    return 0
+
+
 if __name__ == "__main__":
+    if "--paste" in sys.argv:
+        args = [a for a in sys.argv[1:] if a != "--paste"]
+        sys.exit(paste(*args[:1]))
     sys.exit(main(*sys.argv[1:2]))

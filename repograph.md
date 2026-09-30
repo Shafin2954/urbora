@@ -50,7 +50,9 @@ Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
 - `PROFILE_PLAN.md` — plan (not built) for farmer profiles + return-visit personalization.
 - `FUTUREMAKERS_BRIEF.md` — competition Round 1 requirements, judging criteria, IP terms.
 - `VIDEO_STORYBOARDS.md` — Round 1 video: three storyboards around Mahmud (stem borer on boro), comparison, honesty labels, open team decisions. Drawn panels: private artifact linked in LOG4 [13:10].
-- `ROUND1_FORM.md` — Round 1 form answers v4 (name Sudin; built on the Dinajpur farmer interview; Part 0 maps his pains to features; no 16123; smartphone + button phone equal; word-counted), plus team notes for Q&A. `ROUND1_FORM_v3.md` = superseded v3.
+- `ROUND1_FORM.md` — Round 1 form answers v5 (Urbora; soil-gift story; nobody blamed; no 16123; claims audited against the code), Part 0 farmer insights, team notes (live vs planned, decisions, product gaps). `ROUND1_PASTE.txt` = paste-ready export. `ROUND1_FORM_v4.md` / `_v3.md` = superseded.
+- `ROUND1_REVIEW.md` — scores per review round (two simulated judges, human-voice editor, fact auditor), what the audit caught, rejected suggestions, what still holds the score down.
+- `scripts/form_check.py` — the form gate: word limits, banned names/hotline/blame, prior-work disclosure, AI-writing tells; `--paste` writes ROUND1_PASTE.txt. `scripts/form_review_prompts.md` — the four reviewer prompts.
 - `backend/market/` — `db.py` (market tables in the same SQLite file), `catalog.py`
   (generic inputs), `ranking.py` (price/distance/stock/trust), `inputs.py`
   (`find_inputs` tool, orders + state machine, dealers, SMS), `produce.py`

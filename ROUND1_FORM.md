@@ -4,7 +4,7 @@ Category: Digital Inclusion & Education
 Team: Team Uplift · University of Dhaka
 Name: উর্বরা / Urbora · tagline স্বপ্ন ফলুক ("May your dreams bear fruit"). Story: `brand/BRAND-CORE.md` §3.
 
-v5 (2026-09-30). Rebuilt on the Urbora story: fertile soil is Bangladesh's gift and it is wearing
+v5 (2026-09-30, after three review rounds). Rebuilt on the Urbora story: fertile soil is Bangladesh's gift and it is wearing
 thin; the farmer can't tell a pest from a soil problem; everyone tells him something different;
 expert help is far away. Nobody is blamed (BRAND-CORE framing rules). Earlier versions:
 `ROUND1_FORM_v4.md`, `ROUND1_FORM_v3.md`. Review scores and the loop that produced this
@@ -42,197 +42,197 @@ statistic.
 
 ## Idea title
 
-Urbora (উর্বরা): an agriculture expert on every farmer's phone, smartphone or button phone
+Urbora (উর্বরা): Bangla crop advice for each farmer's own land, even on a button phone
 
 ---
 
 ## Problem Statement (max 300 words)
 
-Bangladesh's biggest gift is its fertile soil, and that soil is wearing thin. The Soil
-Resource Development Institute's map puts 78% of the country's land below 1% organic matter
-(Prothom Alo, July 2026). A farmer in Dinajpur told us: 50 maund of paddy last year, 30 this
-year, and fertiliser costs keep rising.
+Fertile soil is Bangladesh's biggest gift, but it is wearing thin. A farmer in Dinajpur told
+us his harvest fell from 50 maund last year to 30 this year, while fertiliser kept getting
+dearer.
 
-He works hard. What he lacks is a clear answer. When the crop falls sick, he can't tell
-whether it is a pest, a disease or the soil running short, and he struggles to describe it. So he asks around. The shopkeeper suggests one thing, a neighbour another, and
-his father always used something else. In a survey of 120 rice farmers, 69% got their pest
-advice at the input shop (Rahaman et al., 2018), where the answer can only be as good as the
-farmer's description.
+He has plenty of advice, but no answer he can trust. When the crop falls sick, a pest, a
+disease and a soil shortage can look alike, and the signs are hard to put into words. So he
+asks around. The shopkeeper suggests one thing, a neighbour another, and his father always
+used something else. The answers differ, and he has no way to check which one is right. In a
+survey of 120 rice farmers, 69% got their pesticide advice from dealers (Rahaman et al.,
+2018).
 
-Guessing is expensive. A World Bank report this year found that 95% of Bangladeshi farmers
-use fertiliser in the wrong balance, and nine in ten give too little sulphur. Getting the
-balance right could lift boro yields by a third (World Bank, 2026). He has lost harvests that
-way, mostly in boro.
+Nationwide, the soil is under strain. The Soil Resource Development Institute's map puts 78%
+of the land below 1% organic matter (Prothom Alo, July 2026). A World Bank report this year
+found that 95% of farmers use fertiliser in the wrong balance, and nine in ten give too
+little sulphur. Getting the balance right could lift boro yields by a third (World Bank,
+2026). Our farmer says wrong amounts and timing have cost him most in boro.
 
-The knowledge exists, in government guides and with agronomists, but for him the upazila
-agriculture office is far away. He has been once in his life. People in cities now look up
-questions like his on their phones, but that help rarely reaches the village. Farming apps
-expect reading, typing and mobile data. Only 26% of rural adults own a smartphone (GSMA,
-2024), and about 28% of rural people aged seven and over cannot read (Census 2022).
-
-Farming employs 45% of the country's workers (Labour Force Survey 2022). The farmers
-furthest from good advice are the ones who can least afford a wrong guess.
+The knowledge exists, in guides and with agriculture officers, but for him the upazila
+office is far away. He has been there once in his life. Farming apps could help, but they
+expect reading, typing and mobile data. Only 26% of rural people use a smartphone (GSMA,
+2024), and about 28% of rural people aged seven and over are not literate (Census 2022).
+Farming still employs 45% of the country's workers (Labour Force Survey 2022).
 
 ---
 
 ## Proposed Solution (max 500 words)
 
-Mobile banking brought the bank to people's hands. Urbora (উর্বরা) does the same for farm
-advice: it puts an agriculture expert on the farmer's phone, whichever phone that is. On a
-smartphone the farmer can talk, type or send a photo of the plant. On a button phone they can
-call and speak Bangla, press keys, or send an SMS. The answer also comes as an SMS, so it can
-be kept, shown at the shop, or read out by a son or daughter.
+Urbora (উর্বরা) brings expert crop advice to farmers on any phone, the way mobile banking
+brought the bank to people's hands. On a smartphone the farmer can talk, type or send a
+photo. Button phone users can call and speak Bangla, press keys, or text. Every answer also
+comes as an SMS to keep and show at the shop. A son or daughter can read it out.
 
-Urbora helps with three questions farmers ask all season.
+It helps with three questions.
 
 1. What is wrong with my crop, and what do I do? Urbora doesn't expect the farmer to name
 the problem. It asks, one step at a time: which crop, how many days since planting, which
-part of the plant, what it looks like. From the
-answers it separates pests and diseases from soil shortages, such as sulphur or zinc in boro.
-Then it gives the treatment from government crop guides, with the amount worked out for the
-farmer's own land in bigha and grams. If the case is unclear or serious, Urbora says so and
-passes it to a human agronomist, with the details already collected.
+part of the plant, what it looks like, and how much of the field is hit. It then works out
+the likely cause: a pest, a disease, or a soil shortage such as sulphur or zinc in boro. The
+treatment comes from cited sources, with the amount worked out for the farmer's land in
+bigha and grams. It gives a dose only when one cause clearly fits, and every spray answer
+says to wear a mask and gloves. If the case is unclear or widespread, it tells the farmer to
+see the local agriculture officer, with the details in the SMS.
 
-2. What should I do this week? Urbora remembers the farm: crop, sowing date, land size. From the sowing date it knows the crop's stage and what is due next. When the
-forecast changes the plan, it messages the farmer with what to do:
-"Heavy rain on Thursday. Hold the urea and put it on the next dry day."
+2. What should I do this week? Urbora remembers the farm: crop, sowing date, land size. So it
+knows the crop's stage and what is due next. When the forecast clashes with the plan, it
+says what to do: "Rain is forecast on your urea day. Put it on the next dry day."
 
 3. What should I grow, and will it pay? Before a season, it ranks the crops that suit the
-land and local weather, and shows the cost, expected yield and profit for the farmer's own
-plot, with a dated plan and the right fertiliser at each stage.
+land and weather, and shows the cost, yield and profit for the farmer's plot, with a dated
+plan and the right fertiliser for each stage.
 
-Mahmud grows boro on two bigha. The centre shoots of some plants are drying. The shopkeeper
-suggests one spray; a neighbour thinks the soil needs potash. Mahmud calls Urbora from his
-button phone and answers a few questions in Bangla. Urbora tells him it looks like stem
-borer, not a soil problem, and how much insecticide to use: 20 grams for his two
-bigha. The same answer arrives by SMS, and he shows it at the shop. Ten days later
-another SMS tells him heavy rain is coming, so he holds his urea until the next dry day.
+Say Mahmud grows two bigha of boro. The centre shoots of some plants are
+drying. The shopkeeper suggests one spray; a neighbour thinks the soil needs potash. Mahmud
+calls Urbora from his button phone and answers a few questions. Urbora tells him it looks
+like stem borer, not a soil problem, and gives the dose for his land: 20 grams of the
+insecticide it names. He shows the SMS at the shop. Ten days later another SMS warns that
+rain is due on his urea day, so he waits for a dry one.
 
-Every answer says briefly why, so farmers learn to recognise problems themselves, and the SMS history becomes the family's farm notebook.
+For inputs, Urbora lists nearby dealers by price, distance and stock; none can pay to rank
+higher. Farmers can also list their harvest for buyers. A small fee on sales, the same for
+every dealer and product, aims to keep the advice free.
 
-For inputs, Urbora lists nearby dealers by price, distance and stock; no dealer can pay to
-rank higher. After harvest, farmers can list their crop and compare offers. Small fees on these sales keep the advice free.
-
-Why trust it? Urbora has nothing to sell. Its numbers come from named
-sources: weather forecasts, government yield records, price statistics and crop guides. When
-the data isn't there, it says "তথ্য যথেষ্ট নয়" (not enough information) rather than guess.
+The fee can't change the advice. The diagnosis and dose come from fixed rules before any
+shop is mentioned, and the fee is the same whatever the farmer buys. Other numbers come from
+named sources such as weather forecasts and price statistics. When the data isn't there,
+Urbora says "তথ্য যথেষ্ট নয়" (not enough information) rather than guess.
 
 ---
 
 ## How does AI enable your solution? (max 300 words)
 
-A fixed menu can't listen, and most farm advice today has to be read. AI changes that in
-four places.
+Without AI, a button-phone user would face long keypad menus; with it, they can just say
+what they see. AI does four jobs.
 
-1. Listening and speaking. AI turns spoken Bangla on an ordinary phone call into text and
-reads the answer back in a natural voice, so a farmer who can't read can still use Urbora.
-We use a speech model built for Bangla. On a public Bangla test it made about a quarter of
-the errors of a leading general-purpose model.
+1. On a phone call, AI turns spoken Bangla into text and reads the answer back in a natural
+voice, so a farmer who can't read can still use Urbora. We use Sarvam's speech model; on a
+public Bangla test it made about a quarter as many errors as a leading general model. We test
+it next on farmers' calls.
 
-2. Understanding everyday words. A farmer might say "এক বিঘা জমি, পানি জমে থাকে" (one bigha,
-water stands in it). AI turns that into farm details and asks only for what is missing.
+2. A farmer might say "এক বিঘা জমি, পানি জমে থাকে" (one bigha, water stands in it). A
+language model (OpenAI's GPT-4o) turns everyday words like these into farm details and asks
+only for what is missing.
 
-3. Looking at a photo. On a smartphone, AI suggests likely problems from a picture of the
-plant. The step-by-step questions then confirm or rule them out.
+3. On a smartphone, a photo model suggests likely problems from a leaf picture. It only knows
+potato well so far, so the questions always check its guess.
 
-4. Explaining. AI finds the right passages in government guides and explains the answer in
-plain Bangla, saying where it came from.
+4. AI finds the right passages in our sources and explains the answer in plain Bangla,
+saying where it came from.
 
-We keep AI away from the numbers and the final call. Crop ranking, doses, costs and dates
-come from tested calculations on cited data, and every number the farmer hears comes from
-those calculations. A number without a source is never shown.
+AI doesn't set the numbers or make the final call. The likely cause is matched by fixed rules
+built on cited sources. Crop ranking, doses, costs and dates come from tested calculations,
+and every number shown has a source.
 
-Limits and safeguards. Speech recognition can mishear a dialect, so key facts are read back
-for the farmer to confirm, and the keypad is always there instead of speaking. A photo can't
-show everything, which is why the questions decide. Phone numbers are stored in a form that
-can't be read back, and any pest counts we share carry no one's identity. When Urbora is
-unsure, it says so and hands the case to a human agronomist. No seller or company can pay to
-be recommended.
+Speech recognition can mishear a dialect, so key facts are read back for the farmer to
+confirm, and the keypad is always there instead of speaking. When no single cause clearly
+fits, Urbora gives no dose and tells the farmer to see the local agriculture officer. Farm
+details are saved only with the farmer's agreement, and farmers are told that outside AI
+services process their voice. Phone numbers sit in one table, used only to send replies;
+identity uses a salted hash, and logs show just the last three digits.
 
 ---
 
 ## Impact Potential (max 300 words)
 
 Urbora is built for smallholder farmers, including the ones a smartphone app would miss:
-people with basic phones, people who read with difficulty, and older farmers who would
-rather talk than type. Literacy, language and device are exactly the barriers this category
-names.
+people with basic phones, people who read with difficulty, older farmers who would rather
+talk than type, and women farmers who can ask from home. That covers the language, literacy
+and access barriers this category names.
 
-For a farmer the change is practical. They buy the treatment the crop needs, in the amount
-their land needs. Fertiliser goes on at the right stage, not the day before heavy rain. The
-right dose instead of "a bit extra to be safe" means less chemical in the soil, the water and
-the lungs of whoever sprays. Before switching crops they see the likely cost and profit. And
-they walk into the shop with one clear answer instead of three opinions.
+A farmer buys the treatment the crop needs, in the amount worked out for their land.
+Fertiliser goes on at the right stage, on a dry day. The right dose instead of "a bit extra
+to be safe" means less chemical in the soil and water, and whoever sprays breathes in less.
+Before switching crops they see the likely cost and profit. They reach the shop with one
+clear answer instead of three opinions.
 
-The soil gains too, because balanced fertiliser is how fertile land stays fertile.
+Because answers name the cause, farmers can learn to spot problems themselves, and the SMS
+history becomes the family's farm notebook.
 
 Phone advice does change behaviour. A review in Science (Fabregas, Kremer and Schilbach,
 2019) found that mobile agricultural information raised yields by 4% and the odds of
-adopting recommended inputs by 22%, including advice sent as text and voice messages to basic
-phones.
+adopting recommended inputs by 22%, and that even cheap text and voice messages can change
+what farmers do.
 
-Every crop-problem report is also counted by district and crop, with no identity attached.
-With enough farmers, those counts become an early warning of pest outbreaks for agricultural
-authorities and researchers.
+Crop-problem reports are also counted by district and crop, with no identity attached. With
+enough farmers, those counts can warn agricultural authorities and researchers of pest
+outbreaks early.
 
-Voice, SMS and keypad menus work on every handset. Bangladesh has 189.8 million mobile
-connections (BTRC, June 2026) and 16.9 million farm holdings (Agriculture Census 2019). One
-system can answer many farmers at once, so reach doesn't depend on hiring a person for every
-call.
+Every handset can make a call, send an SMS and open a USSD menu. Bangladesh has 189.8 million
+mobile connections (BTRC, June 2026) and 16.9 million farm holdings (Agriculture Census
+2019). One system answers many farmers at once, without a person per call.
 
-We will measure repeat use, alerts acted on, reported spending on sprays and fertiliser, and
-yield and price at harvest. An agronomist will review a sample of answers every month.
+In the pilot of about 500 farmers, we will compare spending, yield and harvest price with
+villages chosen at random to join later, and an agronomist will check a sample of diagnoses
+every month.
 
 ---
 
 ## Feasibility (Execution plan, 2–3 years) (max 300 words)
 
-We are not starting from a blank page. We built the first version at the IUT 12th ICT Fest
-bdapps Agentic AI Hackathon in July 2026 and have kept working on it since. The prototype
-covers five crops (aman and boro rice, potato, mustard and lentil) with cited data. Farmers
-can reach it by SMS on real SIM cards, by voice call, and through a keypad menu that we test
-on a bdapps-format simulator.
+We built the first version at the IUT 12th ICT Fest Agentic AI Hackathon in July 2026 and
+have kept working on it since. The prototype covers five crops: aman and boro rice, potato,
+mustard and lentil. SMS works on real SIM cards. Voice calls and the USSD keypad menu run on
+our simulator, and real calls are in testing.
 
-Year 1, late 2026 to 2027: pilot. We will record farmers from several regions so Urbora
-understands local Bangla better, have an agronomist review every crop-problem answer and
-season plan, and set up handover of hard cases to partner agronomists. Then we pilot in one
-or two upazilas through a mobile operator's voice line, USSD short code and SMS, recruit
-farmers through a local NGO or farmer group, and sign up verified input dealers nearby.
+Year 1, late 2026 to 2027: pilot. We will record consenting farmers in several regions so
+Urbora learns local Bangla. An agronomist will review every crop-problem rule and
+season plan, and we will base each dose on BRRI and DAE guides where they exist. Then about
+500 farmers in two upazilas, recruited through a local NGO or farmer group, use it for one
+boro season on Grameenphone's voice line, USSD short code and SMS, with verified input
+dealers nearby.
 
-Year 2, 2027 to 2028: more crops and vegetables, with cited seed and pesticide prices, and
+Year 2, 2027 to 2028: more crops and vegetables, cited seed and pesticide prices, and
 more agronomist-reviewed guidance. Harvest selling opens to verified buyers, with fees set
-from the pilot's real cost per conversation.
+from the pilot's real costs.
 
 Year 3, 2028 to 2029: expand district by district and offer the service to agribusinesses,
-cooperatives and development programmes. The same phone layer can carry other advice for
-people without smartphones, such as livestock care.
+cooperatives and development programmes. We move ahead only when farmers keep coming back,
+agronomists rate the answers safe, and the fees cover costs.
 
-What we need: operator access for a voice line, USSD short code and SMS; cloud and AI
-credits; agronomist time; and a field partner for the pilot.
+What we need: a voice line, USSD code and SMS that are free for farmers; cloud and AI
+credits; agronomist time; a field partner; and the upazila agriculture office's support.
 
-The main risks, and our answers. Dialects: regional recordings, read-backs, and the keypad
-as a fallback. Wrong advice: cited numbers only, gaps said out loud, and hard cases passed
-to a person. Slow uptake: we use phone habits farmers already have and recruit through
-people they already trust.
+Dialects are the first risk, so we record regional voices, read key facts back and keep the
+keypad. Wrong advice is the worst: no dose when Urbora is unsure, every answer logged, and
+farmers texted if a mistake is fixed. For slow uptake, we use phone habits farmers already have and recruit through
+people they trust.
 
 ---
 
 ## Differentiation (max 200 words)
 
-Asking the shopkeeper or a neighbour is free and close, and they want to help. But each of
-them is guessing from the farmer's description, and each guesses differently. Urbora asks
-the questions that pin the problem down, and its answer fits this farmer's crop, its stage,
-the size of the land and this week's weather. It has nothing to sell, and no one can pay to
-be recommended.
+Asking the shopkeeper or a neighbour is free and close, and they want to help. But their
+answers differ, and the farmer can't tell which is right. Instead of one more opinion, Urbora
+gives a sourced answer based on this farmer's crop, its stage, the size of the land and this
+week's weather. Nobody can pay it to recommend anything.
 
-Farming apps and AI chatbots need a smartphone, data and typing, and a general chatbot can
-state a wrong dose with total confidence. Urbora works by voice, keypad and SMS on any
-phone, and every amount comes from a cited source through a calculation, not from the model.
+Most farm apps need a smartphone and data. Photo apps judge from a picture, yet pests,
+diseases and soil shortages can look alike, and a general chatbot can state a wrong dose with
+total confidence. Urbora works on any phone. Its questions help tell those causes apart, and
+every amount is calculated from published data, not made up by the model. Cases it can't
+settle are referred to the local agriculture officer, with the details written down.
 
-What is new is the combination: one advisor for smartphones and button phones alike;
-questions that help a farmer describe what they see; a diagnosis that tells pests and
-disease apart from soil shortages; the exact amount for their own land; weather warnings
-that say what to do; and a rule that no number reaches the farmer without a source.
+What is new: on a button phone, even a farmer who can't read is guided by voice or keypad to
+a likely cause. Then they get an exact dose for their land with its source, or none when
+unsure, an SMS to show at the shop, and weather warnings that say what to do.
 
 ---
 
@@ -248,48 +248,83 @@ their voices, only a voiceover or music. It shows that Urbora works on both.
 
 **What changed from v4**
 
-- Name: Urbora (উর্বরা), and the story follows BRAND-CORE §3: the soil's gift wearing thin,
-  pest or soil shortage, many voices, help far away, mobile banking as the comparison.
-- **Nobody is blamed.** v4 said the seller "earns from what he sells" and "pushes" products;
-  BRAND-CORE forbids blaming shops. The shop now appears as one of many well-meaning voices,
-  and the dealer survey is phrased neutrally ("the answer can only be as good as the farmer's
-  description").
-- **The agriculture office is back, as distance only** ("far away; he has been once in his
-  life"), because BRAND-CORE's story uses it. It is never described as failing. 16123 is still
-  out. Remove the office line if the team prefers v4's rule.
+- Name: Urbora (উর্বরা). The story follows BRAND-CORE §3: the soil's gift wearing thin, "pest
+  or soil shortage?", many voices, help far away, mobile banking as the comparison.
+- **Nobody is blamed.** v4 said the seller "earns from what he sells" and "pushes" products,
+  which BRAND-CORE forbids. The shop is now one of several well-meaning voices.
+- **The agriculture office appears only as distance** ("far away; he has been there once") and
+  as the place unclear cases are referred to, which is what the live SMS already does (SAAO
+  line in `triage.py`). It is never described as failing. 16123 is still out. Judges in the
+  review loop asked "why not the government helpline?"; we answer it without naming it: one
+  cited answer, any phone, no one on duty needed, officers for hard cases.
+- **Honesty fixes found by the fact audit (they were also wrong in v3/v4):**
+  - Phone numbers are *not* hashed at rest. `contacts.msisdn` keeps the raw number because
+    replies and alerts need it. Only the farm id is a salted hash, and logs show 3 digits.
+  - Most pest doses are *not* from government guides. Boro stem borer (Mahmud's 20 g) comes
+    from BioProtection Portal, lentil pod borer from ApniKheti, mustard aphid from a 2002 trial.
+    Only the sulphur/zinc doses are BAMIS (DAE). The form now says "cited sources", and Year 1
+    moves every dose onto BRRI/DAE guides.
+  - No real voice call has completed a turn yet (README, LOG4 [16:40] and [01:05]). The form
+    says voice runs on the simulator, with real calls in testing.
+  - GSMA 2024 says 26% of rural people *use* a smartphone; "adults own" was not the source's
+    wording. Census 2022: 28% are "not literate", not "cannot read".
 - New evidence: the World Bank report (June 2026) on unbalanced fertiliser, and the SRDI
-  organic-matter map (reported by Prothom Alo, July 2026).
-- Answers are plain text for the form boxes: no bold, fewer bullets.
-- Education angle added: every answer says why, and the SMS history becomes a farm notebook.
+  organic-matter map (Prothom Alo, 21 July 2026).
+- New from the judges: the fee never shapes advice; pesticide safety (mask and gloves, no dose
+  unless one cause fits); consent before saving farm details and before recording voices; a
+  500-farmer, one-season pilot on GP's network; a comparison with villages that join later;
+  success gates before each expansion; texting farmers when a wrong answer is corrected.
+- Answers are plain text for the form boxes: no bold and few bullets.
+
+**Decisions the team must confirm (proposals in the text)**
+
+- **Pilot size and design:** about 500 farmers, two upazilas, one boro season, comparison
+  villages picked at random to join later. Change the numbers if you have a better plan.
+- **Naming Grameenphone** as the pilot network (Feasibility). Remove if you'd rather stay
+  operator-neutral.
+- **Hackathon name:** the form says "IUT 12th ICT Fest Agentic AI Hackathon"; the full name is
+  "IUT 12th ICT Fest Bdapps Agentic AI Hackathon" (bdapps is Robi's platform). If it won any
+  prize, the FAQ requires disclosing the award too.
+
+**Product gaps the form promises (build them or keep them in the plan)**
+
+- Consent step before saving a farm profile and before recording voices.
+- A spray-threshold question (how many dead shoots per square metre) before giving a pesticide
+  dose. Today triage only asks how much of the field is hit.
+- `dose_allowed()` still gives a dose when one strong cause sits next to a weaker one (boro
+  stunted: zinc + BPH virus). The form says "only when one cause clearly fits".
+- The voice agent says "সরকারি তথ্য অনুযায়ী" for every cited source (`backend/agent/loop.py`),
+  including non-government ones. Fix before any demo call.
+- Photo check (`backend/tools/leaf_diagnosis.py`) is not in the phone flows yet.
+- Texting farmers when a wrong answer is corrected: the traces exist, but no job does this yet.
+- The live SMS still ends with the 16123 line (`HOTLINE_LINE`, triage.py).
 
 **Checks before submitting**
 
-- **Prior work must be disclosed** (FAQ rule, disqualification risk). The July hackathon is
-  named in Feasibility. Keep that sentence.
-- **What's live vs idea (Q&A honesty):** SMS runs on real SIM cards; the keypad (USSD) menu
-  runs on the bdapps-format simulator; voice answers real calls through an Android bridge;
-  the photo check (`backend/tools/leaf_diagnosis.py`) is not in the phone flows yet; farmer
-  profiles are partly built (`PROFILE_PLAN.md`); no partner agronomist is signed up yet, and
-  the live SMS still ends with the 16123 line (`HOTLINE_LINE`, triage.py); marketplace rows
-  are demo data.
+- **Prior work must be disclosed** (FAQ rule, disqualification risk). Keep the hackathon
+  sentence in Feasibility.
+- **Third-party contributions:** Sarvam (speech) and OpenAI GPT-4o (language) are named in the
+  AI answer. District yield history comes from a supplied dataset whose citation is "pending
+  verification" (README, AGRIBASE_CLEANING.md); be ready to say so if asked.
 - **"20 grams for his two bigha"** is the system's real output for boro stem borer (75 g/ha ×
   0.2676 ha). Re-run the case before the video shows it.
 - **"About a quarter of the errors"**: 6.9% vs 28.7% character error rate on 1,001 clips in a
-  public Bangla benchmark (Sept 2026, LOG4). Sarvam is trained mostly on Indian Bengali, so
-  test it on our own sentences before quoting it in Q&A as proven for Bangladeshi dialects.
-- **World Bank 2026**: "Repurposing Agricultural Public Spending for Quality Growth and Jobs
-  in Bangladesh's Agrifood System", launched 15 June 2026, reported by The Daily Star on 27
-  June 2026. The 33% boro figure is the report's estimate for correcting imbalances, not ours.
-- **SRDI 78% figure**: from Prothom Alo (21 July 2026), quoting the SRDI organic-matter map.
-  An older SRDI line says "most soils below 1.5%". If a judge asks, cite SRDI and the article.
-- **Smartphone figure.** GSMA 26% is rural *adults owning* one. BBS reports much higher
-  *household* access. Keep "adults own" word for word.
-- **Rahaman et al. 2018** is a small sample (120 farmers, three districts).
-- **The 50 → 30 maund figures** are the farmer's own, and land size was not stated. Keep them
-  as his words, not a statistic.
+  public Bangla benchmark (Sept 2026, LOG4). Sarvam is trained mostly on Indian Bengali.
+- **World Bank 2026**: "Repurposing Agricultural Public Spending for Quality Growth and Jobs in
+  Bangladesh's Agrifood System", launched 15 June 2026, reported by The Daily Star on 27 June
+  2026. The 33% boro figure is the report's estimate, not ours.
+- **SRDI 78% figure**: Prothom Alo, 21 July 2026, quoting the SRDI organic-matter map. A Dec
+  2023 Prothom Alo piece gives about 79% (2020 data).
+- **GSMA**: "The State of Mobile Internet Connectivity 2024" (October 2024): 26% of rural and
+  41% of urban residents use smartphones.
+- **Rahaman et al. 2018** is a small sample (120 farmers, three districts), and it measured
+  pesticide advice specifically.
+- **The 50 → 30 maund figures** are the farmer's own, and neither the crop nor the land size was
+  stated. Keep them as his words.
+- **Mahmud is an example farmer**, not a user. The form says so.
 - **Competitors to know for Q&A:** iFarmer's Folon already has an AI voice agent, and DAE's
-  BAMIS has AI disease detection. Our answer: any phone including button phones, diagnosis
-  that separates pests from soil shortages, advice tied to one farm's stage and land, weather
+  BAMIS has AI disease detection. Our answer: any phone including button phones, questions
+  that separate pests from soil shortages, advice tied to one farm's stage and land, weather
   warnings that say what to do, and cited, calculated numbers.
 - **Name collision:** a Dhaka agri-fintech is listed as "Urbor" on Crunchbase. Always write
   "Urbora" in full and show the Bangla wordmark.

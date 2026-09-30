@@ -437,3 +437,27 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** BRAND-CORE §5 bans gradients and asks for kraft + engraved paddy behind heroes and on section breaks.
 **Rejected:** background-removed phones (finger remnants, looked cut out); a gradient scrim over a full-bleed photo hero (brand rule).
 **Impacts:** Screenshots were taken with the real brand fonts (fontsource copies routed into the test browser; Google Fonts is blocked in the build container). Build passes, lint clean.
+
+## [08:40] Round 1 form v5 (Urbora) through a four-reviewer loop; the audit found false claims
+**Did:**
+- Rewrote `ROUND1_FORM.md` as v5 on the BRAND-CORE story. v4 is kept as `ROUND1_FORM_v4.md`.
+- Added `scripts/form_check.py`, a gate that checks word limits, old names, the hotline, blame phrases, the prior-work disclosure and AI-writing tells. `--paste` writes `ROUND1_PASTE.txt` with one line per paragraph.
+- Ran review rounds with two simulated judges (telecom, agri-development), a human-voice editor and a fact auditor. Prompts are in `scripts/form_review_prompts.md`; scores are in `ROUND1_REVIEW.md`.
+
+**Decision:**
+- The shop is no longer blamed (BRAND-CORE rule). The office appears only as distance and as the referral for unclear cases.
+- New evidence: World Bank June 2026 (95% of farmers use unbalanced fertiliser; balancing could lift boro yields by 33%) and SRDI via Prothom Alo 21 July 2026 (78% of land below 1% organic matter).
+- The plan proposes a 500-farmer, one-boro-season pilot on GP's network, compared with villages that join later. The team must confirm this.
+
+**Why:** The team asked for a farmer-first, human-sounding form, scored and revised in a loop.
+
+**Rejected:**
+- Naming 16123 to answer judges (team rule).
+- Claiming a spray threshold (triage doesn't check one).
+- "Fees on harvest sales only" (the build charges dealers a commission).
+- Reviewer rounds 1 and 3 were partly cut off by the session rate limit, costing about 40 minutes. Round 4 was self-audited instead.
+
+**Impacts:**
+- The audit found claims that were false in v3 and v4 as well: phone numbers are stored raw in `contacts` (only the farm id is hashed); pest doses are not from government guides (stem borer comes from BioProtection Portal, lentil from ApniKheti, mustard from a 2002 trial; only sulphur/zinc are BAMIS); no real voice call has completed a turn; the photo model only knows potato. The form now says all of this truthfully.
+- Product gaps the form promises are listed in its team notes: consent step, spray threshold, `dose_allowed` still giving a dose next to a second candidate, a voice-agent line that calls every source "সরকারি", texting farmers after a correction.
+- Scores: Judge A 7.2 → 7.4 (advance 38% → 55%); Judge B 6.8 → 7.1 (27% → 40%); human-voice 65 → 70 ("looks AI" 60% → 45%).
