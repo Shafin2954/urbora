@@ -562,3 +562,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Did:** `netlify.toml` sets `Content-Type: application/manifest+json` for `/manifest.webmanifest`; redeployed.
 **Decision:** none. **Why:** Netlify served it as octet-stream. **Rejected:** none.
 **Impacts:** Supabase email confirmation is on and sign-up passes no redirect, so the Supabase Auth Site URL must be the Netlify URL for confirm links to land on the site.
+
+## [23:15] Warmer palette: no pure white on straw, cream text on Deep Shyamol
+**Did:** `frontend/src/index.css` tokens: `--bg` #f5eee0, `--surface` #fcf8f0 (was #ffffff), new `--on-brand` #f5eedc, `--surface-sunk` #efe6d3, `--ink-faint` #5a6960, warmer tints (`--brand-tint`, `--sky-tint`, `--paddy-tint`, `--gold-tint`) and `--border` #ddd1b9. Every `color: #fff` in the CSS and the trace graph's farm node now uses `--on-brand`; hardcoded white surfaces use `--surface`. Manifest `background_color` follows `--bg`. Deployed to Netlify.
+**Decision:** Cards stay a step lighter than the page (same 1.09:1 step as before) but warm, not white.
+**Why:** Team feedback: white was too contrasting against the straw background and on the green buttons.
+**Rejected:** Dropping text-on-brand contrast further (kept 10.8:1 for sunlight). The old `--ink-faint` fell to 4.2:1 on the deeper straw, so it was darkened to stay AA (5.0:1).
+**Impacts:** Use `var(--on-brand)` for text on `--brand`, never `#fff`. On `futuremakers` only; Replit (master) keeps the old palette until merged.

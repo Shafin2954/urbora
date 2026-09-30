@@ -34,7 +34,7 @@
   background: transparent; color: var(--ink); border: 0; font: 600 1.02rem/1 var(--sans);
 }
 .mk-tab:hover:not(:disabled) { background: var(--surface); color: var(--brand); }
-.mk-tab.is-on, .mk-tab.is-on:hover:not(:disabled) { background: var(--brand); color: #fff; }
+.mk-tab.is-on, .mk-tab.is-on:hover:not(:disabled) { background: var(--brand); color: var(--on-brand); }
 
 .mk-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px; }
 .mk-field { display: grid; gap: 6px; font-weight: 600; font-size: .95rem; color: var(--ink-soft); }
@@ -52,7 +52,7 @@
   border: 1.5px solid var(--border); font: 600 .98rem/1 var(--sans);
 }
 .mk-product:hover:not(:disabled) { border-color: var(--brand); background: var(--bg); color: var(--brand); }
-.mk-product.is-on, .mk-product.is-on:hover:not(:disabled) { background: var(--brand); border-color: var(--brand); color: #fff; }
+.mk-product.is-on, .mk-product.is-on:hover:not(:disabled) { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
 .mk-results { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .mk-results-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .mk-results-head h2 { font-size: 1.6rem; color: var(--brand); }
@@ -135,7 +135,7 @@
 .mk-status { font-size: .82rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
 .mk-status-wait { background: var(--gold-tint); color: var(--gold-deep); }
 .mk-status-go { background: var(--brand-tint); color: var(--brand); }
-.mk-status-done { background: var(--brand); color: #fff; }
+.mk-status-done { background: var(--brand); color: var(--on-brand); }
 .mk-status-off { background: #f6e3dc; color: var(--clay); }
 .mk-bid { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding-top: 10px; border-top: 1px dashed var(--border); line-height: 1.6; }
 .mk-bid-actions { display: flex; gap: 8px; align-items: center; }

@@ -51,7 +51,7 @@ export default defineConfig({
         orientation: 'portrait',
         // Earthy, not SaaS — CLAUDE.md frontend rules. This green is the
         // single source of the brand colour; index.html and CSS read from it.
-        background_color: '#faf5ea',
+        background_color: '#f5eee0',
         theme_color: '#0d3b2e',
         icons: [
           {

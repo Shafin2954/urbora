@@ -11,32 +11,33 @@
  * retired), --gold = Turmeric Sun, --paddy* = Leaf/Young Paddy (crop facts, healthy states).
  */
 :root {
-  --bg: #faf5ea; /* Straw */
-  --surface: #ffffff;
-  --surface-sunk: #f1eadb;
+  --bg: #f5eee0; /* Straw */
+  --surface: #fcf8f0; /* warm paper, not pure white: white glared on straw */
+  --on-brand: #f5eedc; /* cream text on Deep Shyamol, 10.8:1 */
+  --surface-sunk: #efe6d3;
   --kraft: #ebd9b4; /* pattern ground */
   --sepia: #6b4a1e; /* engraved line on kraft */
 
   --ink: #11201a; /* Soil Ink; 15.5:1 on --bg */
   --ink-soft: #3f4f46;
-  --ink-faint: #66766c;
+  --ink-faint: #5a6960; /* 5.0:1 on --bg, 4.7:1 on --surface-sunk */
 
-  --brand: #0d3b2e; /* Deep Shyamol; 12.5:1 with white; PWA theme_color */
+  --brand: #0d3b2e; /* Deep Shyamol; 10.8:1 with --on-brand; PWA theme_color */
   --brand-dark: #082a20;
-  --brand-tint: #e6efe8;
-  --sky: #1b7048; /* Leaf: links and phone moments, 6.1:1 on white */
-  --sky-tint: #e5f1e9;
+  --brand-tint: #e4ebdc;
+  --sky: #1b7048; /* Leaf: links and phone moments, 5.7:1 on --surface */
+  --sky-tint: #e2ecdc;
   --gold: #f2a231; /* Turmeric Sun: <=8% of a screen, ink text on it (8:1) */
   --gold-deep: #9a5a06; /* turmeric for text on straw (5:1) */
-  --gold-tint: #fcf1dc;
+  --gold-tint: #f8ebd0;
 
   --paddy: #1b7048;
   --paddy-dark: #0d3b2e;
-  --paddy-tint: #e5f1e9;
+  --paddy-tint: #e2ecdc;
   --leaf: #a8d65c; /* Young Paddy: highlights on dark only */
   --soil: #8a6a4a;
   --clay: #b8472a; /* Terracotta: real warnings only */
-  --border: #e2d9c6;
+  --border: #ddd1b9;
 
   /* Noto Serif Bengali for display (textbook/newspaper forms read as trustworthy), Noto Sans
    * Bengali for reading (ships on most Android phones), Instrument Sans and Fraunces for Latin,
@@ -108,7 +109,7 @@ button {
   border: 1px solid transparent;
   border-radius: 10px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   font-weight: 600;
   cursor: pointer;
 }

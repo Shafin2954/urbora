@@ -19,7 +19,7 @@
   transition: background .18s ease-out, color .18s ease-out;
 }
 .nav-pill:hover { background: var(--surface); color: var(--brand); }
-.nav-pill.is-active { background: var(--brand); color: #fff; }
+.nav-pill.is-active { background: var(--brand); color: var(--on-brand); }
 .nav-pill.is-active .nav-icon { color: var(--gold); }
 .nav-pill:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 .nav-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; color: var(--sky); flex: none; }

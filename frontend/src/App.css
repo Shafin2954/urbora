@@ -44,7 +44,7 @@
   display: grid;
   gap: 18px;
   padding: 20px;
-  background: var(--surface, #fff);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
 }
@@ -65,7 +65,7 @@
   border: 1px solid var(--border); border-radius: 10px;
 }
 .segment.is-on {
-  background: var(--brand); color: #fff; border-color: var(--brand);
+  background: var(--brand); color: var(--on-brand); border-color: var(--brand);
 }
 .segment.is-on:hover:not(:disabled) { background: var(--brand-dark); }
 
@@ -106,7 +106,7 @@
   /* Account row, pinned to the bottom by margin-top:auto — the same job the old
      lone sign-out button did, now carrying identity and settings with it. */
   .sidebar-account { margin-top: auto; display: flex; align-items: center; gap: 6px; padding-top: 10px; border-top: 1px solid var(--border); }
-  .avatar { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--brand); color: #fff; font-weight: 700; font-size: .82rem; }
+  .avatar { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--brand); color: var(--on-brand); font-weight: 700; font-size: .82rem; }
   .account-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .8rem; color: var(--ink-soft); }
   .sidebar-toggle { display: none; }
   .app-main { padding-left: 20px; }
@@ -304,7 +304,7 @@
 .msg-user {
   align-self: flex-end;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   border-bottom-right-radius: 4px;
 }
 
@@ -386,7 +386,7 @@
   align-items: center;
   gap: 4px;
   padding: 4px 6px 4px 14px;
-  background: var(--surface, #fff);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 999px;
 }
@@ -418,9 +418,9 @@
 }
 .composer-mic { background: transparent; color: var(--ink-soft); border: 1px solid transparent; }
 .composer-mic:hover:not(:disabled) { background: var(--brand-tint); color: var(--brand-dark); }
-.composer-mic.is-on { background: var(--brand); color: #fff; }
+.composer-mic.is-on { background: var(--brand); color: var(--on-brand); }
 
-.composer-send { background: var(--brand); color: #fff; }
+.composer-send { background: var(--brand); color: var(--on-brand); }
 .composer-send:disabled { background: var(--border); color: var(--ink-faint); }
 
 /* Read-aloud button, tucked at the reply's trailing edge. */
