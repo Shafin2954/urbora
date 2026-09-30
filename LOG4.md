@@ -477,3 +477,34 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** Team review: the web advisor was hard to find and looked empty, the nav was plain text links, the market looked bare, and the simulator was not wanted on the public site.
 **Rejected:** one farm_id per account (needs a Supabase migration dropping the unique constraint); keeping the emulator page behind a hidden link.
 **Impacts:** The end-to-end AI run could not be done in the build container: no `OPENAI_API_KEY` and no Supabase keys there. The harness ran in guest mode and recorded the honest failure; the real run needs `npm run dev` with the keys, then `E2E_EMAIL=… E2E_PASSWORD=… npm run e2e`.
+# 2026-09-29
+
+## [23:10] Final 2:00 video storyboard (combines storyboards A, B and C)
+**Did:** New `video/storyboard/shots.js` (18 shots, 1:59: timecodes, hooks, picture, camera, lines, labels, Higgsfield prompts, motion-graphics notes, app-screen replicas R1–R6, the cast), `video/storyboard/build_md.js` and its output `video/FINAL_STORYBOARD.md`. The visual version with sketch panels is the "Urbora Final Cut" artifact.
+**Decision:** Five acts: the question (0:00) → the turn, road rolls up into a phone (0:29) → proof with real app screens (0:44) → trust and reach (1:27) → the daughter in gold paddy and the tagline (1:49). 13 hooks, longest gap 16 s. A gives the family and cast, B the pace and the three-phone proof, C the line art that the footage turns into and out of.
+**Why:** Each earlier storyboard ran about 2:00 alone and each was strong on one thing only; the team asked for one engaging cut that holds judges to the end.
+**Rejected:** Keeping one storyboard and trimming (loses either the warmth or the proof); 16123 framing (brand rule: no blaming the hotline).
+**Impacts:** Name in the video is উর্বরা (Urbora) pending team confirmation; the code still says Agrosfeer. Every on-screen number must come from one real run of Mahmud's case (2 bigha boro, dead centre shoots); blanks like "__ গ্রাম" stay blank until then. S16 crops (potato, mustard) must be checked against crop.db before generating.
+
+## [23:55] Video storyboard v2: dawn intro, shorter turn, C9 trust shot
+**Did:** Edited `video/storyboard/shots.js` (and regenerated `video/FINAL_STORYBOARD.md`) on team feedback. Now 17 shots, still 1:59.
+**Decision:** Opens on A1/A2 (dawn over the boro, "এ দেশের মাটি উর্বর…", then "কিন্তু একই জমিতে এখন আর আগের মতো ধান হয় না"), then the question slam. The office line no longer says the advice exists; it only says reaching the upazila office takes a whole day. Mobile banking is a 3 s passing reference ("মোবাইল ব্যাংকিং যেমন…", flowing into "তেমনি কৃষি পরামর্শও এখন হাতের ফোনে"). Cut: the "money comes home" shot, the "50 → 30 মণ" shot and the dealer-list shot. The trust shot is storyboard C9 (engraved diagram + channel icons) instead of the recorded tool graph.
+**Why:** Team feedback: the emotional land intro is stronger, the bank was taking too much time, and the dealer-list wording was not right.
+**Rejected:** none.
+**Impacts:** App recordings drop to R1–R4; the provenance graph (old R5) and dealer list (old R6) are no longer filmed. The tool graph is no longer shown anywhere in the video.
+
+## [00:40] Video storyboard v3: natural flow, far fewer people, silent S11
+**Did:** Edited `video/storyboard/shots.js` and `build_md.js`; regenerated `video/FINAL_STORYBOARD.md`. Still 17 shots, 1:59; Higgsfield clips down to 16.
+**Decision:** S03 no longer slams "ধানের হইলো কী?"; the S02 push-in carries on and the narrator says "কেন হয় না? প্রশ্ন একটাই, উত্তর অনেক।", which leads into the four answers. People appear only small, from behind or as hands, and never face the lens: the four answers are off-screen voices over four places (shop counter, tea glass, a phone video, father's old sack); the shrug shot is now an empty field where the voices blur out; the call, shop, rain and "other fields" shots are hands only; the close mirrors S01 with his daughter small on the same ridge. Shop dialogue removed. S11 has no voice-over or captions, only the three phones and their own sounds (the simulator tag stays). Cast cut to Mahmud (hands/ring) and Tumpa.
+**Why:** Team feedback: S02 → S03 felt abrupt, the acting felt overdone, and S11 should speak for itself.
+**Rejected:** none.
+**Impacts:** Anyone generating footage: prompts now forbid faces to camera and big expressions; keep that when writing retakes.
+
+# 2026-09-30
+
+## [05:30] v4 cut: clearer voice, cold bed from the team's tracks, more line art, kinetic captions
+**Did:** `video/PLAN_v4.md` (every review note → measured cause → fix; sequence; new scenes; music map; voice and mix loops). New `video/build/timeline.py` (one timing source for picture and sound), `video/build/qa_mix.py` (transcribes every line out of the finished mix). Rewrote `audio.py` (voice clarity chain, cold bed from the five supplied tracks, effects clipped to their shots, per-line voice-over-bed check), edited `final.py` (v4 edit, dissolve plates, kinetic Bangla captions), `mg.html` (new line-art scenes S03, S05, S13a, S15a; S08 and S17 re-timed), `make_vo.py` / `vo_lines.json` (livelier cast, v4 script). New paddy shot P1 from Jawat's reference photo (gpt_image_2_5 keyframe + Kling 3.0 pro). Output `video/build/out/urbora_final_v4.mp4` (1:44.5, not in git).
+**Decision:** Back to the storyboard order after the hook; L02 ("বাপ-দাদার") removed; the narrator carries "এ দেশের মাটি উর্বর…", "কিন্তু একই জমিতে…" and "প্রশ্ন একটাই। উত্তর অনেক।". Shorter live shots (Tumpa 3.6 s, rain 4 s, storm cut, dry shoot 3.4 s) and five line-art scenes in their place. Music: emotional piano (land, problem, and the closing bookend with its last chord after "স্বপ্ন ফলুক"), tape echo (the road), acoustic (the product), The_Mountain (the lift); each is held about 19 dB under the voice and cut in the 1–4 kHz band while anyone speaks. "উর্বরা।" and "স্বপ্ন ফলুক।" are separate, slower takes.
+**Why:** Team review of v3: voice unclear and flat, tagline inaudible, "তেমনি" lost, playful music, long shots, a rain noise that ran past its shot, the order drifted from the storyboard, and the grain shot looked like white rice.
+**Rejected:** alex-morgan "motivational rise" (bright and busy in the speech band, fights the Bangla voice); synthetic rain (read as noise); judging clarity from one speech-to-text pass (the transcriber is noisy on short clips, so each line is scored three times and the median kept).
+**Impacts:** Root causes worth remembering: the v3 mix put the roll-up whoosh on "তেমনি", and the silence trim clipped the soft "-ক" of "ফলুক". Rebuild: `python3 audio.py <vo_dir> <music_dir>` → `python3 qa_mix.py` → `python3 final.py base` → `python3 final.py frames` → mux. Higgsfield credits left ≈239.
