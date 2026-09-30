@@ -136,12 +136,13 @@ S12q:{dur:2.2,draw(t){
    <g transform="translate(1290 330) scale(${Math.max(.01,st)}) rotate(-8)" opacity="${cl(st*2)}"><circle r="92" fill="${C.terra||'#B8472A'}"/>${text(0,52,'?',{size:150,font:'NSerifB',weight:700,fill:C.straw})}</g>
    </svg>`;
 }},
-/* S14b · 7 s · why it can be trusted (v5): government data → verified source → says so when it doesn't know. */
+/* S14b · 7 s · why it can be trusted (v5): government data → verified source → says so when it doesn't know.
+   Labels land on N13's words: সরকারি 1.2 s, যাচাই 2.35 s, না জানলে 4.3 s. */
 S14b:{dur:7,draw(t){
-  const ic=[.3,1.8,3.3].map(a=>e(p(t,a,a+.9)));
+  const ic=[.5,1.7,3.5].map(a=>e(p(t,a,a+.8)));
   const bld=`<path d="M-110 70 V-50 H110 V70 Z" ${dash(ic[0])}/><path d="M-130 -50 L0 -120 L130 -50 Z" ${dash(ic[0])}/><path d="M-70 70 V-30 M-25 70 V-30 M25 70 V-30 M70 70 V-30" ${dash(ic[0])}/>`
    +`<g transform="translate(90 40)"><rect x="-10" y="-10" width="120" height="96" rx="6" fill="${C.straw}" ${dash(ic[0])}/><path d="M-10 22 H110 M-10 54 H110 M30 -10 V86" stroke-width="3" ${dash(ic[0])}/></g>`;
-  const book=`<path d="M0 -60 Q-60 -90 -120 -65 V85 Q-60 60 0 90 Q60 60 120 85 V-65 Q60 -90 0 -60 V90" ${dash(ic[1])}/><path d="M30 0 l26 28 l52 -62" stroke="${C.shyamol}" stroke-width="12" ${dash(e(p(t,2.5,2.9)))}/>`;
+  const book=`<path d="M0 -60 Q-60 -90 -120 -65 V85 Q-60 60 0 90 Q60 60 120 85 V-65 Q60 -90 0 -60 V90" ${dash(ic[1])}/><path d="M30 0 l26 28 l52 -62" stroke="${C.shyamol}" stroke-width="12" ${dash(e(p(t,2.4,2.8)))}/>`;
   const bub=`<path d="M-120 -70 h240 a20 20 0 0 1 20 20 v100 a20 20 0 0 1 -20 20 h-150 l-40 36 v-36 h-50 a20 20 0 0 1 -20 -20 v-100 a20 20 0 0 1 20 -20z" ${dash(ic[2])}/>`;
   const arr=(x,q)=>`<path d="M${x} 420 h120 m-18 -14 l18 14 l-18 14" fill="none" stroke="${C.sepia}" stroke-width="5" stroke-linecap="round" ${dash(q)}/>`;
   const words=['সরকারি তথ্য','যাচাই করা উৎস','না জানলে সোজা বলে'],wx=[500,960,1420],band=eo(p(t,.5,1.1));
@@ -149,10 +150,10 @@ S14b:{dur:7,draw(t){
    ${stalks('sweep-l.svg',-60,560,560,e(p(t,0,1.2)),.9)}<g transform="translate(1920 0) scale(-1 1)">${stalks('sweep-l.svg',-60,560,560,e(p(t,0,1.2)),.9)}</g>
    <g fill="none" stroke="${C.sepia}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#rough)">
      <g transform="translate(470 420)">${bld}</g><g transform="translate(960 410)">${book}</g><g transform="translate(1430 410)">${bub}</g></g>
-   ${text(1430,428,'জানি না',{size:52,weight:600,fill:C.shyamol,o:eo(p(t,4.0,4.4))})}
-   ${arr(660,e(p(t,1.3,1.7)))}${arr(1130,e(p(t,2.8,3.2)))}
+   ${text(1430,428,'জানি না',{size:52,weight:600,fill:C.shyamol,o:eo(p(t,4.4,4.8))})}
+   ${arr(660,e(p(t,1.3,1.7)))}${arr(1130,e(p(t,3.0,3.4)))}
    <rect x="${960-700*band}" y="600" width="${1400*band}" height="96" rx="10" fill="${C.shyamol}"/>
-   ${words.map((w,i)=>{const f=fadeUp(t,.8+i*1.5);return text(wx[i],666,w,{size:50,fill:C.straw,o:f.o*band,dy:f.dy*.4})}).join('')}
+   ${words.map((w,i)=>{const f=fadeUp(t,[1.2,2.35,4.3][i]);return text(wx[i],666,w,{size:50,fill:C.straw,o:f.o*band,dy:f.dy*.4})}).join('')}
    </svg>`;
 }},
 /* S16h · 3 s · in everyone's hands: along a drawn field horizon, hands holding phones rise one after another. */
@@ -202,7 +203,7 @@ S03:{dur:3,draw(t){
 /* S05 · 2.6 s · whose word? The four answers arrive as speech bubbles from the four edges, pile up in the middle and
    tangle into one scribbled knot; the knot shrinks to the bottom-left, where the S06 road begins. */
 S05:{dur:2.6,draw(t){
-  const Qs=['"এইটা নিয়া যান"','"পটাশ দিছিলাম"','"এইটা দিলেই হয়"','"আব্বা এইটাই দিত"'];
+  const Qs=['"এটা নিয়ে যান"','"পটাশ দিয়েছিলাম"','"এটা দিলেই হবে"','"আব্বা এটাই দিত"'];
   const from=[[-300,260],[2220,300],[-300,760],[2220,720]],to=[[820,400],[1110,450],[830,590],[1090,640]];
   const tb=bq=>1-e(p(t,1.25,1.8));
   const bub=Qs.map((q,i)=>{const k=e(p(t,i*.12,.9+i*.12)),x=from[i][0]+(to[i][0]-from[i][0])*k,y=from[i][1]+(to[i][1]-from[i][1])*k,o=tb();
@@ -282,20 +283,26 @@ S07:{dur:3,draw(t){
    ${phone(1500,560,ph*1.05,{kind:'smart',o:cl(ph*3),screen:text(0,30,'৳',{size:120,font:'NSerifB',weight:700,fill:C.shyamol,o:eo(p(t,2.1,2.5))})})}
    </svg>`;
 }},
-/* S08 · 6 s · the field's road rolls up the same way into a button phone; the seal stamps on its screen; the name and the promise. */
-S08:{dur:6,draw(t){
+/* S08 · 4.8 s · v5, timed to the voice (timeline.py): "যায়।" lands on the word (0.1 s) while the field's road rolls up into a
+   button phone; the promise "কৃষি পরামর্শ, এখন হাতের ফোনে" writes itself on as it is spoken (0.85-2.5 s); the seal stamps on
+   the phone's screen on Tunetank's hit (3.05 s); "উর্বরা" lands with the spoken name (3.55 s). */
+S08:{dur:4.8,draw(t){
   const R='M300 900 C 560 820, 700 900, 900 780 S 1180 620, 1320 640';
-  const roll=e(p(t,.3,1.9)),ph=back(p(t,1.0,2.0));
-  const st=p(t,3.4,4.0),sealS=st<=0?0:1.35-0.35*back(st);
-  const nm=fadeUp(t,3.8),ln=fadeUp(t,4.4);
+  const roll=e(p(t,.1,1.3)),ph=back(p(t,.5,1.3));
+  const st=p(t,3.05,3.45),sealS=st<=0?0:1.35-0.35*back(st);
+  const jk=p(t,.1,.3),jo=1-e(p(t,.75,.95));
+  const wq=p(t,.85,2.5),nm=fadeUp(t,3.55);
   return `<svg viewBox="0 0 1920 1080">${DEFS}${PAPER}
-   ${stalks('field-sepia.svg',-60,640,1300,1,1-0.75*e(p(t,1.6,2.6)))}
+   <defs><clipPath id="promise"><rect x="170" y="480" width="${1100*wq}" height="140"/></clipPath></defs>
+   ${stalks('field-sepia.svg',-60,640,1300,1,1-0.75*e(p(t,1.2,2.2)))}
    <g fill="none" stroke-linecap="round" filter="url(#rough)">
      <path d="${R}" stroke="${C.sepia}" stroke-width="46" pathLength="1" stroke-dasharray="${(1-roll).toFixed(4)} 2" stroke-dashoffset="${(-roll).toFixed(4)}"/>
      <path d="${R}" stroke="${C.kraft}" stroke-width="39" pathLength="1" stroke-dasharray="${(1-roll).toFixed(4)} 2" stroke-dashoffset="${(-roll).toFixed(4)}"/></g>
    ${phone(1380,520,ph*1.35,{kind:'button',o:cl(ph*3),screen:seal(0,-61,106,st>0?1:0,sealS)})}
+   ${jk>0?`<g transform="translate(180 470) scale(${1.25-.25*eo(jk)})" opacity="${eo(jk)*jo}">${text(0,0,'যায়।',{size:170,font:'NSerifB',weight:700,anchor:'start',fill:C.terra})}</g>`:''}
    ${text(180,470,'উর্বরা',{size:150,font:'NSerifB',weight:700,anchor:'start',o:nm.o,dy:nm.dy})}
-   ${text(184,570,'কৃষি পরামর্শ, এখন হাতের ফোনে',{size:58,anchor:'start',fill:C.ink,o:ln.o,dy:ln.dy})}
+   <g clip-path="url(#promise)">${text(184,570,'কৃষি পরামর্শ, এখন হাতের ফোনে',{size:66,anchor:'start',fill:C.ink})}</g>
+   ${wq>0&&wq<1?`<path d="M${190+1100*wq} 520 l0 70" stroke="${C.sepia}" stroke-width="5" stroke-linecap="round"/>`:''}
    </svg>`;
 }},
 /* S14 · 12 s · why it can be trusted: ear → calculator → book, one word each; then the three ways in. */
@@ -343,7 +350,7 @@ S17:{dur:8.5,draw(t){
    ${text(960,830,'Team Uplift',{size:44,font:'ISans',weight:500,fill:C.shyamol,o:tm.o,dy:tm.dy})}
    <rect x="0" y="1000" width="1920" height="80" fill="${C.kraft}" opacity="${.85*cr}"/>
    ${text(960,1034,'Dramatization · AI-generated footage (Higgsfield) · Keypad shown in a simulator · Real system output on screen',{size:22,font:'ISans',fill:C.sepia,o:cr})}
-   ${text(960,1064,'Music: royalty-free library tracks (nastelbom, andriig, The_Mountain, Tape Echo) · Voices: Sarvam Bulbul (AI)',{size:22,font:'ISans',fill:C.sepia,o:cr})}
+   ${text(960,1064,'Music (Pixabay): PaulYudin, AtlasAudio, Tunetank, leberch · Voices: Jawat, all roles (shopkeeper and neighbour converted with Higgsfield)',{size:22,font:'ISans',fill:C.sepia,o:cr})}
    </svg><img src="assets/kf15.png" style="width:1920px;height:1080px;object-fit:cover;opacity:${photo};filter:sepia(${1-photo})">`;
 }},
 };

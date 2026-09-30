@@ -1,9 +1,9 @@
 // Renders mg.html scenes to MP4: every frame is render(id, t), screenshotted and piped to ffmpeg.
 const { chromium } = require('playwright'); const { spawn } = require('child_process');
-const FF = require('child_process').execSync('python3 -c "import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())"').toString().trim();
+const FF = process.env.FF || 'ffmpeg';
 (async () => {
   const ids = process.argv.slice(2), fps = 30;
-  const b = await chromium.launch(); const pg = await b.newPage({ viewport: { width: 1920, height: 1080 } });
+  const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {}); const pg = await b.newPage({ viewport: { width: 1920, height: 1080 } });
   await pg.goto('http://127.0.0.1:8765/mg.html'); await pg.evaluate(() => window.ready);
   for (const id of ids) {
     const dur = await pg.evaluate(id => window.SCENES[id], id), n = Math.round(dur * fps);

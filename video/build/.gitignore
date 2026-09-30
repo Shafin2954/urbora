@@ -10,3 +10,6 @@ seg3/
 assets/paddy_ref.*
 web/
 assets/smart*.png
+vo5/raw/
+vo5/**/*.wav
+vo5/sts/*.mp4

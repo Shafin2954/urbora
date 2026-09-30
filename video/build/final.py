@@ -1,4 +1,4 @@
-"""Urbora Round 1 video, v4: base plates -> frame compositor -> final MP4 (audio muxed by audio.py).
+"""Urbora Round 1 video, v5: base plates -> frame compositor -> final MP4 (audio muxed by audio.py).
 
 Run from video/build:
   python3 final.py base      # cut every plate to 1920x1080@30 and join them into out/base.mp4
@@ -15,6 +15,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import imageio_ffmpeg
 import timeline as T
+import smart
 
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 W, H, FPS = 1920, 1080, 30
@@ -26,7 +27,7 @@ FONT = {
     'sansb': FS + 'noto-sans-bengali/files/noto-sans-bengali-bengali-700-normal.woff2',
     'galada': FS + 'galada/files/galada-bengali-400-normal.woff2',
     'latin': FS + 'instrument-sans/files/instrument-sans-latin-500-normal.woff2',
-    'sym': '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+    'sym': 'C:/Windows/Fonts/seguisym.ttf' if os.name == 'nt' else '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
     'serif_l': FS + 'noto-serif-bengali/files/noto-serif-bengali-latin-700-normal.woff2',
     'sans_l': FS + 'noto-sans-bengali/files/noto-sans-bengali-latin-600-normal.woff2',
     'sansb_l': FS + 'noto-sans-bengali/files/noto-sans-bengali-latin-700-normal.woff2',
@@ -53,11 +54,11 @@ def build_base():
     parts = []
     for i, (t0, dur, src, sin, speed) in enumerate(EDL):
         out = f'seg3/{i:02d}.mp4'; n = round(dur * FPS)
-        if src in ('phone', 'web'):
+        if src in ('phone', 'smart'):
             run(['-f', 'lavfi', '-i', f'color=c=0xEBD9B4:s=1920x1080:r=30', '-frames:v', str(n), *ENC, out])
         elif src.startswith('mg:'):
-            vf = CONFORM + (f',setpts=PTS/{speed},fps=30' if speed != 1 else '')
-            run(['-i', f'out/{src[3:]}.mp4', '-vf', vf, '-frames:v', str(n), *ENC, out])
+            vf = CONFORM + (f',setpts=PTS/{speed},fps=30' if speed != 1 else '') + f',tpad=stop_mode=clone:stop_duration={dur}'
+            run(['-ss', str(sin), '-i', f'out/{src[3:]}.mp4', '-vf', vf, '-frames:v', str(n), *ENC, out])   # plates hold their last frame
         elif src.startswith('xf:'):
             (ca, ia), (cb, ib) = [x.split('@') for x in src[3:].split('>')]
             la = T.XF_AT + T.XF_LEN; lb = dur - T.XF_AT
@@ -193,7 +194,8 @@ MENUS = {
 SMS_DIAG = ('বোরো ধান (কুশি), কাণ্ড/খোল: ডগা শুকানো।\nহতে পারে: মাজরা পোকা।\nআক্রমণ দেখা দিলে কীটনাশক দিন।\n'
             'মাত্রা: ভিরতাকো 40WG, হেক্টরে 75 গ্রাম (আপনার 2 বিঘায় মোট 20 গ্রাম)।\n'
             'স্প্রের আগে স্থানীয় কৃষি অফিসার (SAAO)-কে দেখান।\nস্প্রের সময় মাস্ক-দস্তানা পরুন।')
-SMS_ALERT = ("উর্বরা সতর্কতা: 9/10 তারিখে 6 মিমি বৃষ্টির পূর্বাভাস (Open-Meteo)।\n"
+# v5: regenerated with alerts_job.alert_sms_text from the same Open-Meteo forecast the web chat shows (10.2 mm on 2026-10-09)
+SMS_ALERT = ("উর্বরা সতর্কতা: 9/10 তারিখে 10.2 মিমি বৃষ্টির পূর্বাভাস (Open-Meteo)।\n"
              "'ইউরিয়া উপরি-প্রয়োগ' কাজটি পরের শুকনো দিনে করুন। জমির পানি নিকাশ দেখুন।")
 
 
@@ -332,10 +334,47 @@ def phone_scene(t):
         paste(ov, sprite('আপনার 2 বিঘায়', 'sans', 52, C['straw']), xr + 10, 470, 'lm', alpha=k3)
         paste(ov, sprite('মোট 20 গ্রাম', 'serif', 104, C['sun']), xr + 10, 570, 'lm', alpha=k3, scale=0.8 + 0.2 * back(k3))
         k4 = prog(t, CALLOUT + 1.3, CALLOUT + 1.8)
-        paste(ov, sprite('হিসাব: পরীক্ষিত কোড (units.scale_rate)', 'sans', 32, C['ink']), xr - 10, 700, 'lm', alpha=k4)
-        paste(ov, sprite('উৎস: BioProtection Portal, ধানের পোকা দমন', 'sans', 32, C['ink']), xr - 10, 750, 'lm', alpha=k4)
+        paste(ov, sprite('হেক্টরের মাত্রা থেকে, আপনার জমির মাপে', 'sans', 34, C['ink']), xr - 10, 700, 'lm', alpha=k4)
+        paste(ov, sprite('উৎস: BioProtection Portal, ধানের পোকা দমন', 'sans', 34, C['ink']), xr - 10, 752, 'lm', alpha=k4)
     frame.alpha_composite(ov)
     return frame
+
+
+def card(ov, x, y, w, h, k, top, big, sub=None):
+    rounded(ov, (x - 30, y, x - 30 + w, y + h), 26, C['shyamol'] + (int(245 * k),))
+    paste(ov, sprite(top, 'sans', 48, C['straw']), x + 4, y + 62, 'lm', alpha=k)
+    paste(ov, sprite(big, 'serif', 96, C['sun']), x + 4, y + 158, 'lm', alpha=k, scale=0.8 + 0.2 * back(min(1, k)))
+    if sub: paste(ov, sprite(sub, 'sans', 36, C['straw']), x + 4, y + h - 44, 'lm', alpha=k)
+
+
+def smart_scene(t):
+    """PLAN_v5 scene 14: whip-pan to the smartphone; the real website's crop check ends on the 20 গ্রাম card, then the
+    real AI chat answers the rain/urea question with the Open-Meteo forecast. Large callouts beside the phone."""
+    r = t - T.S0
+    fr, kind = smart.smart_scene(t, T.S0)
+    ov = Image.new('RGBA', (W, H), (0, 0, 0, 0)); x = 1000; G = smart.SEG
+    a = prog(r, 0.3, 0.6)
+    rounded(ov, (1540, 36, 1880, 100), 30, C['straw'] + (int(230 * a),))
+    paste(ov, sprite('আসল ওয়েবসাইট', 'sansb', 34, C['terra']), 1710, 68, alpha=a)
+    if r < G['result'] + 0.1:
+        k = prog(r, 0.35, 0.7) * (1 - prog(r, G['result'] - 0.1, G['result'] + 0.1))
+        paste(ov, sprite('স্মার্টফোনে', 'serif', 92, C['shyamol']), x, 330, 'lm', alpha=k)
+        paste(ov, sprite('একই প্রশ্ন, আঙুলের ছোঁয়ায়', 'sans', 58, C['sepia']), x, 450, 'lm', alpha=k)
+    elif r < G['chat0']:
+        k = prog(r, G['result'], G['result'] + 0.3) * (1 - prog(r, G['chat0'] - 0.15, G['chat0']))
+        paste(ov, sprite('সম্ভবত: মাজরা পোকা', 'serif', 72, C['shyamol']), x, 250, 'lm', alpha=k)
+        card(ov, x, 330, 860, 300, prog(r, G['result'] + 0.2, G['result'] + 0.5), 'আপনার জমিতে মোট', '20 গ্রাম', 'ভিরতাকো 40WG · হেক্টরে 75 গ্রাম')
+        paste(ov, sprite('উৎস: BioProtection Portal', 'sans', 36, C['ink']), x - 10, 690, 'lm', alpha=k)
+    else:
+        k = prog(r, G['chat0'], G['chat0'] + 0.3) * (1 - prog(r, G['end'] - 0.15, G['end']))
+        paste(ov, sprite('লিখে বা বলে জিজ্ঞেস করুন', 'serif', 70, C['shyamol']), x, 250, 'lm', alpha=k)
+        paste(ov, sprite('"দিনাজপুরে বৃষ্টি হবে? ইউরিয়া দেব?"', 'sans', 46, C['sepia']), x, 345, 'lm', alpha=k)
+        k2 = prog(r, 3.35, 3.7) * (1 - prog(r, G['end'] - 0.15, G['end']))
+        card(ov, x, 420, 860, 300, k2, '9 অক্টোবর, দিনাজপুর', 'প্রায় 10.2 মিমি', 'বৃষ্টির পূর্বাভাস · Open-Meteo')
+        k3 = prog(r, 4.0, 4.3) * (1 - prog(r, G['end'] - 0.15, G['end']))
+        paste(ov, sprite('ইউরিয়া: বৃষ্টির পরে, মাটি শুকালে', 'sansb', 50, C['shyamol']), x - 10, 790, 'lm', alpha=k3)
+    fr.alpha_composite(ov)
+    return fr
 
 
 def web_scene(t):
@@ -362,7 +401,7 @@ def alert_phone(frame, t):
 
 
 # ---------------------------------------------------------------- kinetic type and subtitles
-VO = json.load(open('vo_place.json')) if os.path.exists('vo_place.json') else []
+VO = json.load(open('vo_place.json', encoding='utf8')) if os.path.exists('vo_place.json') else []
 
 
 def slam(ov, t, t0, t1, text, x, y, size=150, fill=None, fname='serif', anchor='mm', shadow=True):
@@ -384,6 +423,7 @@ def chip(ov, t, t0, t1, text, x, y, size=46, bg=None, fg=None, anchor='lm'):
 
 
 KSTYLE = {'foot': dict(fill=C['straw'], emph=C['sun'], stroke=4, line=C['sun']),
+          'mixed': dict(fill=C['straw'], emph=C['sun'], stroke=5, line=C['sun']),
           'paper': dict(fill=C['shyamol'], emph=C['terra'], stroke=0, line=C['terra'])}
 
 
@@ -421,7 +461,7 @@ def kinetic(ov, t):
                         u = eo(prog(t, wt + 0.12, wt + 0.4)); uw = (w - 24) * u
                         if uw > 2:
                             d = ImageDraw.Draw(ov); yy = ly + size * 0.62
-                            if style == 'foot': d.line([(cx + 12, yy + 2), (cx + 12 + uw, yy + 2)], fill=(20, 20, 16, int(160 * (1 - out))), width=9)
+                            if style != 'paper': d.line([(cx + 12, yy + 2), (cx + 12 + uw, yy + 2)], fill=(20, 20, 16, int(160 * (1 - out))), width=9)
                             d.line([(cx + 12, yy), (cx + 12 + uw, yy)], fill=st['line'] + (int(255 * (1 - out)),), width=7)
                 cx += w + gap
 
@@ -429,15 +469,15 @@ def kinetic(ov, t):
 def overlays(frame, t):
     ov = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     # hook: the farmer's own figures
-    slam(ov, t, 0.30, 2.45, '50 মণ', 560, 470, 190)
-    if 1.28 <= t <= 2.45:
-        slam(ov, t, 1.28, 2.45, '→', 960, 470, 150, fname='sym')
-        slam(ov, t, 1.28, 2.45, '30 মণ', 1360, 470, 190, fill=C['sun'])
+    slam(ov, t, 0.95, 4.7, '50 মণ', 560, 470, 190)                     # on "পঞ্চাশ"
+    if 3.35 <= t <= 4.7:                                                # on "তিরিশ"
+        slam(ov, t, 3.35, 4.7, '→', 960, 470, 150, fname='sym')
+        slam(ov, t, 3.35, 4.7, '30 মণ', 1360, 470, 190, fill=C['sun'])
     if 0.3 <= t <= 4.6:
         a = prog(t, 0.4, 0.8) * (1 - prog(t, 4.3, 4.6))
         paste(ov, sprite('সংখ্যাগুলো দিনাজপুরের এক কৃষকের নিজের কথা', 'sans', 32, C['straw'], shadow=True), 60, 70, 'lm', alpha=a)
-    for t0, t1, who, q in [(17.25, 20.45, 'দোকানি', '"এইটা নিয়া যান"'), (20.55, 22.8, 'প্রতিবেশী', '"পটাশ দিছিলাম"'),
-                           (22.95, 23.85, 'ভিডিও', '"এইটা দিলেই হয়!"'), (23.95, 26.45, 'আব্বার কথা', '"আব্বা এইটাই দিত"')]:
+    for t0, t1, who, q in [(17.3, 20.45, 'দোকানি', '"এটা নিয়ে যান"'), (20.55, 23.25, 'প্রতিবেশী', '"পটাশ দিয়েছিলাম"'),
+                           (23.35, 24.75, 'ভিডিও', '"এটা দিলেই হবে!"'), (24.85, 27.05, 'আব্বার কথা', '"আব্বা এটাই দিত"')]:
         chip(ov, t, t0, t1, who, 70, 90, 34, bg=C['shyamol'], fg=C['sun'])
         slam(ov, t, t0 + 0.08, t1, q, 70, 185, 72, anchor='lm')
     kinetic(ov, t)
@@ -465,10 +505,10 @@ def punch(img, t):
 
 
 def compose(base_rgb, t):
-    if T.WEB0 <= t < D0:
-        fr = web_scene(t)
-    elif D0 <= t < D0 + 17.5:
+    if D0 <= t < T.PHONE_END:
         fr = phone_scene(t)
+    elif T.S0 <= t < T.SMART_END:
+        fr = smart_scene(t)
     else:
         fr = punch(Image.fromarray(base_rgb), t).convert('RGBA')
     if T.ALERT_IN <= t < T.ALERT_OUT:

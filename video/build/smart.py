@@ -8,13 +8,15 @@ from PIL import Image, ImageFilter, ImageDraw
 
 W, H = 1920, 1080
 S = 1.55                                   # photo scale: the phone is about 1000 px tall on screen
-OX, OY = -586, -32                         # photo offset: the phone sits in the left third
+OX, OY = -261, -32                         # photo offset: the phone sits in the left third, callouts on the right
 
 
 @lru_cache(1)
 def base():
     im = Image.open('assets/smart.png').convert('RGB')
-    im = im.resize((int(im.width * S), int(im.height * S)), Image.LANCZOS)
+    ext = Image.new('RGB', (im.width + 500, im.height))           # the paper backdrop runs on past the photo's right edge
+    ext.paste(im, (0, 0)); ext.paste(im.crop((im.width - 500, 0, im.width, im.height)).transpose(Image.FLIP_LEFT_RIGHT), (im.width, 0))
+    im = ext.resize((int(ext.width * S), int(ext.height * S)), Image.LANCZOS)
     a = np.asarray(im).astype(int)
     g = (a[:, :, 1] > 150) & (a[:, :, 0] < 140) & (a[:, :, 2] < 140) & (a[:, :, 1] - a[:, :, 0] > 60)
     mask = Image.fromarray((g * 255).astype('uint8')).filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(1))
@@ -41,15 +43,16 @@ CHECK = sorted(glob.glob('web/check/0*.png'))
 RESULT = 'web/check/91.png'
 CHAT = sorted(glob.glob('web/chat_rain/*.png'))
 # relative timeline (s): crop check taps, the result card, then the chat
-SEG = dict(whip=0.25, check0=0.25, step=0.2, result=1.75, chat0=2.55, chat1=4.3, end=4.6)
+SEG = dict(whip=0.25, check0=0.25, step=0.2, result=1.65, chat0=2.75, chat1=4.9, end=5.4)   # v5: fitted to N11
 
 
 def screen_at(r):
     if r < SEG['result']:
         i = min(len(CHECK) - 1, max(0, int((r - SEG['check0']) / SEG['step'])))
         return page(CHECK[i]), 'check'
-    if r < SEG['chat0']:
-        return page(RESULT), 'result'
+    if r < SEG['chat0']:                                         # scroll down to the dose card
+        k = min(1.0, (r - SEG['result']) / 0.5); k = 1 - (1 - k) ** 3
+        return page(RESULT, round(0.42 * k, 2)), 'result'
     f = min(1.0, (r - SEG['chat0']) / (SEG['chat1'] - SEG['chat0']))
     i = min(len(CHAT) - 1, int(f ** 0.8 * (len(CHAT) - 1)))
     return page(CHAT[i]), 'chat'

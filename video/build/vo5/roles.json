@@ -1,0 +1,125 @@
+{
+ "N1": {
+  "kind": "own"
+ },
+ "N2": {
+  "kind": "own"
+ },
+ "N3": {
+  "kind": "own"
+ },
+ "N4": {
+  "kind": "own"
+ },
+ "N5": {
+  "kind": "own"
+ },
+ "N6": {
+  "kind": "own"
+ },
+ "N7": {
+  "kind": "own"
+ },
+ "N8": {
+  "kind": "own"
+ },
+ "N9": {
+  "kind": "own"
+ },
+ "N10": {
+  "kind": "own"
+ },
+ "N11": {
+  "kind": "own"
+ },
+ "N12": {
+  "kind": "own"
+ },
+ "N13": {
+  "kind": "own"
+ },
+ "N14": {
+  "kind": "own"
+ },
+ "N15": {
+  "kind": "own"
+ },
+ "N16": {
+  "kind": "own",
+  "src": "N16b"
+ },
+ "N17": {
+  "kind": "own",
+  "src": "N17a"
+ },
+ "M1": {
+  "kind": "own",
+  "pitch": 1.06,
+  "eq": {
+   "warmth": 1.0,
+   "presence": 2.0
+  }
+ },
+ "M2": {
+  "kind": "own",
+  "pitch": 1.06,
+  "eq": {
+   "warmth": 1.0,
+   "presence": 2.0
+  }
+ },
+ "M3": {
+  "kind": "own",
+  "pitch": 1.06,
+  "eq": {
+   "warmth": 1.0,
+   "presence": 2.0
+  }
+ },
+ "M4": {
+  "kind": "own",
+  "pitch": 1.06,
+  "eq": {
+   "warmth": 1.0,
+   "presence": 2.0
+  }
+ },
+ "M5": {
+  "kind": "own",
+  "pitch": 1.06,
+  "eq": {
+   "warmth": 1.0,
+   "presence": 2.0
+  }
+ },
+ "M6": {
+  "kind": "own",
+  "pitch": 1.06,
+  "eq": {
+   "warmth": 1.0,
+   "presence": 2.0
+  }
+ },
+ "C1": {
+  "kind": "sts",
+  "file": "vo5/sts/knox.wav",
+  "t0": 13.31,
+  "t1": 16.14
+ },
+ "C4": {
+  "kind": "sts",
+  "file": "vo5/sts/knox.wav",
+  "t0": 22.85,
+  "t1": 26.01
+ },
+ "C2": {
+  "kind": "sts",
+  "file": "vo5/sts/brooks.wav",
+  "t0": 17.14,
+  "t1": 19.67
+ },
+ "C3": {
+  "kind": "own",
+  "pitch": 0.9
+ }
+}

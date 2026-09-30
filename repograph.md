@@ -4,7 +4,7 @@ Map of the tree. Update after any unit of work so nothing has to be re-explored.
 "?" = not yet known / not yet built.
 
 ## FutureMakers round (September 2026) — read this first
-- `video/` — the Round 1 pitch video. `storyboard/shots.js` is the single source (18 shots, prompts, replicas, cast); `storyboard/build_md.js` regenerates `FINAL_STORYBOARD.md` from it. No app code depends on it. `PLAN_v4.md` is the current video plan; `build/timeline.py` holds all v4 timings (read by `build/final.py` and `build/audio.py`); `build/mg.html` has the line-art scenes; `build/qa_mix.py` checks each voice line is intelligible in the mix.
+- `video/` — the Round 1 pitch video. `PLAN_v5.md` is the current plan and `RECORDING_SHEET_v5.md` the script; `build/timeline.py` holds all v5 timings (read by `build/final.py` and `build/audio.py`); `build/mg.html` has the line-art scenes (`render.js` renders them); `build/smart.py` the smartphone demo; `build/vo5_*.py` turn Jawat's recording into the voice lines (`vo5/` holds their maps, scores, word times; audio not in git); `build/qa_mix.py` checks each line is intelligible in the mix. `storyboard/` is the older storyboard source.
 Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
 - `backend/branding.py`, `frontend/src/branding.js` — the product name: **উর্বরা / Urbora**, tagline স্বপ্ন ফলুক (brand/BRAND-CORE.md is the brand source of truth).
 - `frontend/src/lib/seal.js` (logo master), `lib/engraving.js` (grain pattern), `components/BrandMark.jsx` (BrandMark + Lockup), `components/CropCheck.jsx` + `api/triage.js` → `backend/api/triage.py` (`/api/triage/options`, `/api/triage/check`). Brand files: `brand/scripts/{seal,paddy-engraving,build-web-assets}.mjs`, `export-logos.ps1`.
