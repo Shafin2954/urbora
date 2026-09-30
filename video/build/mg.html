@@ -22,7 +22,7 @@ const p=(t,a,b)=>cl((t-a)/(b-a));                    // linear progress of t acr
 const e=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;          // ease in-out cubic
 const eo=x=>1-Math.pow(1-x,3);                           // ease out cubic
 const back=x=>{const c=1.6;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)}; // ease out with overshoot
-const C={shyamol:'#0D3B2E',sun:'#F2A231',kraft:'#EBD9B4',sepia:'#6B4A1E',straw:'#FAF5EA',paddy:'#A8D65C',ink:'#11201A',gold:'#C98A1E'};
+const C={shyamol:'#0D3B2E',sun:'#F2A231',kraft:'#EBD9B4',sepia:'#6B4A1E',straw:'#FAF5EA',paddy:'#A8D65C',ink:'#11201A',gold:'#C98A1E',terra:'#B8472A'};
 const ASSET={};
 async function load(){
   for(const f of ['field-sepia.svg','field-gold.svg','sweep-l.svg','mark.svg'])ASSET[f]=await (await fetch('assets/'+f)).text();
@@ -67,6 +67,111 @@ function text(x,y,str,{size=60,font='NSansB',weight=500,fill=C.shyamol,anchor='m
 const fadeUp=(t,a)=>({o:eo(p(t,a,a+.5)),dy:(1-eo(p(t,a,a+.5)))*24});
 
 const SCENES={
+/* ---------------- v5 plates (PLAN_v5 §3) ---------------- */
+/* S06c · 4 s · every time: the tiny figure walks to the office and back three times; each trip pops a new problem
+   over the field and a tally mark; the tally is struck through at the end. */
+S06c:{dur:4,draw(t){
+  const R='M170 1080 C 420 930, 300 820, 620 780 S 1000 760, 960 640 S 1180 520, 1430 500';
+  const rp=document.createElementNS('http://www.w3.org/2000/svg','path');rp.setAttribute('d',R);const L=rp.getTotalLength();
+  const loops=3,ph=cl(t/3.3)*loops,lp=Math.min(loops-1,Math.floor(ph)),fr=ph-lp,q=fr<.5?e(fr*2):e((1-fr)*2);
+  const pt=rp.getPointAtLength(L*(.05+.9*q));
+  const BN='০১২৩৪৫৬৭৮৯';
+  const bug=`<ellipse cx="0" cy="0" rx="26" ry="18" fill="${C.sepia}"/><path d="M-18 -10 l-14 -14 M0 -14 l0 -18 M18 -10 l14 -14 M-18 10 l-14 14 M18 10 l14 14" stroke="${C.sepia}" stroke-width="4"/>`;
+  const leaf=`<path d="M-40 20 Q-10 -50 40 -30 Q20 30 -40 20 Z" fill="#D9B44A" stroke="${C.sepia}" stroke-width="4"/><path d="M-40 20 L30 -24" stroke="${C.sepia}" stroke-width="3"/>`;
+  const cloud=`<path d="M-50 10 a28 28 0 0 1 20 -40 a36 36 0 0 1 64 6 a24 24 0 0 1 16 34 z" fill="${C.straw}" stroke="${C.sepia}" stroke-width="4"/><path d="M-30 26 l-8 22 M0 26 l-8 22 M30 26 l-8 22" stroke="#4A7BA7" stroke-width="4"/>`;
+  const icons=[[bug,330,420],[leaf,640,330],[cloud,1000,380]];
+  const pops=icons.map(([g,x,y],i)=>{const k=back(p(t,i*1.1,i*1.1+.35));return k>0?`<g transform="translate(${x} ${y}) scale(${2.1*k})">${g}</g>`:''}).join('');
+  const tally=[0,1,2].map(i=>{const k=eo(p(t,i*1.1+.1,i*1.1+.4));return text(170+i*90,190,BN[i+1],{size:96,font:'NSerifB',weight:700,fill:C.shyamol,o:k,dy:(1-k)*20})}).join('');
+  const strike=e(p(t,3.4,3.8));
+  return `<svg viewBox="0 0 1920 1080">${DEFS}${PAPER}
+   <path d="M0 505 H1920" stroke="${C.sepia}" stroke-width="3" fill="none" filter="url(#rough)"/>
+   ${stalks('field-sepia.svg',-40,560,1100,1)}
+   ${road(R,1)}
+   ${building(1530,500,.95,'কৃষি অফিস',1)}
+   <g transform="translate(${pt.x} ${pt.y-18})" fill="${C.sepia}"><circle cx="0" cy="-30" r="8"/><path d="M-7 -20 h14 l3 26 h-20 z"/><path d="M-5 6 l-5 18 M5 6 l5 18" stroke="${C.sepia}" stroke-width="4"/></g>
+   ${pops}${tally}
+   <path d="M140 150 L430 170" stroke="${C.terra||'#B8472A'}" stroke-width="10" stroke-linecap="round" fill="none" ${dash(strike)}/>
+   </svg>`;
+}},
+/* S07q · 4 s · the question: the ৳ phone (it works) on the left; an empty phone with a paddy leaf draws in on the right;
+   a dotted line tries to join them and stops; a big "?" grows in the gap and pulses. */
+S07q:{dur:4,draw(t){
+  const a=back(p(t,0,.4)),b=back(p(t,.3,.9)),ln=e(p(t,.8,1.6))*.5,qk=back(p(t,1.5,2.1)),pulse=1+.05*Math.sin(Math.max(0,t-2.1)*7);
+  const leafS=`<g transform="translate(0 -10)"><path d="M-30 30 Q-10 -40 34 -34 Q24 26 -30 30 Z" fill="${C.paddy}" stroke="${C.shyamol}" stroke-width="3"/><path d="M-30 30 L26 -26" stroke="${C.shyamol}" stroke-width="3"/></g>`;
+  const Q='M-80 -150 C -82 -232, -10 -258, 36 -244 C 92 -226, 102 -156, 56 -122 C 18 -94, 0 -76, 0 -20';
+  return `<svg viewBox="0 0 1920 1080">${DEFS}${PAPER}
+   ${stalks('sweep-l.svg',-60,620,520,1,.8)}<g transform="translate(1920 0) scale(-1 1)">${stalks('sweep-l.svg',-60,620,520,1,.8)}</g>
+   ${phone(560,520,1.2*a,{kind:'smart',o:cl(a*3),screen:text(0,30,'৳',{size:120,font:'NSerifB',weight:700,fill:C.shyamol})})}
+   <path d="M520 290 l22 24 l44 -52" stroke="${C.shyamol}" stroke-width="10" fill="none" stroke-linecap="round" ${dash(e(p(t,.3,.6)))}/>
+   ${phone(1360,520,1.25*b,{kind:'button',o:cl(b*3),screen:`<g transform="translate(0 -61)">${leafS}</g>`})}
+   <defs><clipPath id="lnclip"><rect x="680" y="480" width="${560*ln}" height="80"/></clipPath></defs>
+   <path d="M690 520 H1230" stroke="${C.sepia}" stroke-width="7" stroke-dasharray="14 18" stroke-linecap="round" fill="none" clip-path="url(#lnclip)"/>
+   <g transform="translate(975 470) scale(${qk*pulse*1.15})" opacity="${cl(qk*2)}"><path d="${Q}" stroke="${C.terra||'#B8472A'}" stroke-width="22" fill="none" stroke-linecap="round" filter="url(#rough)"/><circle cx="0" cy="40" r="15" fill="${C.terra||'#B8472A'}"/></g>
+   </svg>`;
+}},
+/* S08h · 2.5 s · how it reaches you: button phone → signal → Urbora → verified data → an SMS flies back. */
+S08h:{dur:2.5,draw(t){
+  const ph=back(p(t,0,.35)),arcs=[0,1,2].map(i=>eo(p(t,.2+i*.1,.45+i*.1))),sl=back(p(t,.55,.95)),ar=e(p(t,.95,1.3)),bk=back(p(t,1.2,1.55));
+  const f=e(p(t,1.6,2.35)),ex=1560+(420-1560)*f,ey=430-Math.sin(f*Math.PI)*220;
+  const books=`<rect x="-90" y="10" width="180" height="40" rx="6" fill="#E3CC9F" stroke="${C.sepia}" stroke-width="5"/><rect x="-80" y="-34" width="160" height="40" rx="6" fill="${C.straw}" stroke="${C.sepia}" stroke-width="5"/><rect x="-70" y="-78" width="140" height="40" rx="6" fill="#E3CC9F" stroke="${C.sepia}" stroke-width="5"/><path d="M40 -130 l22 24 l44 -52" stroke="${C.shyamol}" stroke-width="10" fill="none" stroke-linecap="round"/>`;
+  const env=`<rect x="-46" y="-30" width="92" height="60" rx="6" fill="${C.straw}" stroke="${C.shyamol}" stroke-width="5"/><path d="M-46 -30 L0 6 L46 -30" stroke="${C.shyamol}" stroke-width="5" fill="none"/>`;
+  return `<svg viewBox="0 0 1920 1080">${DEFS}${PAPER}
+   ${phone(360,560,1.1*ph,{kind:'button',o:cl(ph*3)})}
+   <g fill="none" stroke="${C.sepia}" stroke-width="6" stroke-linecap="round">${arcs.map((k,i)=>`<path d="M${480+i*34} ${470-i*26} q${40+i*20} ${90+i*26} 0 ${180+i*52}" opacity="${k}"/>`).join('')}</g>
+   ${seal(960,520,260,cl(sl*2),Math.max(.01,sl))}
+   <path d="M1110 520 H1400 m-22 -16 l22 16 l-22 16" stroke="${C.sepia}" stroke-width="6" fill="none" stroke-linecap="round" ${dash(ar)}/>
+   <g transform="translate(1560 560) scale(${Math.max(.01,bk)})" opacity="${cl(bk*2)}" filter="url(#rough)">${books}</g>
+   ${f>0&&f<1?`<g transform="translate(${ex} ${ey}) rotate(${-15+30*f})">${env}</g>`:''}
+   ${f>=1?`<g transform="translate(420 440) scale(${1+.3*(1-eo(p(t,2.35,2.5)))})">${env}</g>`:''}
+   </svg>`;
+}},
+/* S12q · 2.2 s · why trust it? An SMS bubble draws in; a magnifying glass sweeps across it; a "?" stamps on it. */
+S12q:{dur:2.2,draw(t){
+  const bq=e(p(t,0,.5)),mx=560+800*e(p(t,.45,1.45)),st=back(p(t,1.45,1.8));
+  const lines=[0,1,2,3].map(i=>`<path d="M720 ${420+i*52} H${1180-(i%2)*120}" stroke="${C.sepia}" stroke-width="10" stroke-linecap="round" ${dash(e(p(t,.2+i*.08,.5+i*.08)))}/>`).join('');
+  return `<svg viewBox="0 0 1920 1080">${DEFS}${PAPER}
+   <path d="M620 330 h680 a30 30 0 0 1 30 30 v250 a30 30 0 0 1 -30 30 h-500 l-70 60 v-60 h-110 a30 30 0 0 1 -30 -30 v-250 a30 30 0 0 1 30 -30z" fill="${C.straw}" stroke="${C.sepia}" stroke-width="7" filter="url(#rough)" ${dash(bq)}/>
+   ${lines}
+   <g transform="translate(${mx} 500)" opacity="${eo(p(t,.4,.6))*(1-e(p(t,1.4,1.6)))}"><circle r="110" fill="#ffffff" fill-opacity=".25" stroke="${C.sepia}" stroke-width="12"/><path d="M78 78 L170 170" stroke="${C.sepia}" stroke-width="26" stroke-linecap="round"/></g>
+   <g transform="translate(1290 330) scale(${Math.max(.01,st)}) rotate(-8)" opacity="${cl(st*2)}"><circle r="92" fill="${C.terra||'#B8472A'}"/>${text(0,52,'?',{size:150,font:'NSerifB',weight:700,fill:C.straw})}</g>
+   </svg>`;
+}},
+/* S14b · 7 s · why it can be trusted (v5): government data → verified source → says so when it doesn't know. */
+S14b:{dur:7,draw(t){
+  const ic=[.3,1.8,3.3].map(a=>e(p(t,a,a+.9)));
+  const bld=`<path d="M-110 70 V-50 H110 V70 Z" ${dash(ic[0])}/><path d="M-130 -50 L0 -120 L130 -50 Z" ${dash(ic[0])}/><path d="M-70 70 V-30 M-25 70 V-30 M25 70 V-30 M70 70 V-30" ${dash(ic[0])}/>`
+   +`<g transform="translate(90 40)"><rect x="-10" y="-10" width="120" height="96" rx="6" fill="${C.straw}" ${dash(ic[0])}/><path d="M-10 22 H110 M-10 54 H110 M30 -10 V86" stroke-width="3" ${dash(ic[0])}/></g>`;
+  const book=`<path d="M0 -60 Q-60 -90 -120 -65 V85 Q-60 60 0 90 Q60 60 120 85 V-65 Q60 -90 0 -60 V90" ${dash(ic[1])}/><path d="M30 0 l26 28 l52 -62" stroke="${C.shyamol}" stroke-width="12" ${dash(e(p(t,2.5,2.9)))}/>`;
+  const bub=`<path d="M-120 -70 h240 a20 20 0 0 1 20 20 v100 a20 20 0 0 1 -20 20 h-150 l-40 36 v-36 h-50 a20 20 0 0 1 -20 -20 v-100 a20 20 0 0 1 20 -20z" ${dash(ic[2])}/>`;
+  const arr=(x,q)=>`<path d="M${x} 420 h120 m-18 -14 l18 14 l-18 14" fill="none" stroke="${C.sepia}" stroke-width="5" stroke-linecap="round" ${dash(q)}/>`;
+  const words=['সরকারি তথ্য','যাচাই করা উৎস','না জানলে সোজা বলে'],wx=[500,960,1420],band=eo(p(t,.5,1.1));
+  return `<svg viewBox="0 0 1920 1080">${DEFS}${PAPER}
+   ${stalks('sweep-l.svg',-60,560,560,e(p(t,0,1.2)),.9)}<g transform="translate(1920 0) scale(-1 1)">${stalks('sweep-l.svg',-60,560,560,e(p(t,0,1.2)),.9)}</g>
+   <g fill="none" stroke="${C.sepia}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#rough)">
+     <g transform="translate(470 420)">${bld}</g><g transform="translate(960 410)">${book}</g><g transform="translate(1430 410)">${bub}</g></g>
+   ${text(1430,428,'জানি না',{size:52,weight:600,fill:C.shyamol,o:eo(p(t,4.0,4.4))})}
+   ${arr(660,e(p(t,1.3,1.7)))}${arr(1130,e(p(t,2.8,3.2)))}
+   <rect x="${960-700*band}" y="600" width="${1400*band}" height="96" rx="10" fill="${C.shyamol}"/>
+   ${words.map((w,i)=>{const f=fadeUp(t,.8+i*1.5);return text(wx[i],666,w,{size:50,fill:C.straw,o:f.o*band,dy:f.dy*.4})}).join('')}
+   </svg>`;
+}},
+/* S16h · 3 s · in everyone's hands: along a drawn field horizon, hands holding phones rise one after another. */
+S16h:{dur:3,draw(t){
+  const N=12;let hands='';
+  for(let i=0;i<N;i++){const x=120+i*(1680/(N-1)),k=back(p(t,.15+i*.12,.6+i*.12)),y=1130-420*k+(i%3)*30,btn=i%3!==1;
+    const ph=btn?`<rect x="-44" y="-190" width="88" height="170" rx="18" fill="#E3CC9F" stroke="${C.sepia}" stroke-width="6"/><rect x="-30" y="-176" width="60" height="58" rx="6" fill="${C.straw}" stroke="${C.sepia}" stroke-width="4"/>${[0,1,2].map(r=>[0,1,2].map(c=>`<circle cx="${-22+c*22}" cy="${-96+r*22}" r="6" fill="${C.sepia}"/>`).join('')).join('')}`
+      :`<rect x="-46" y="-210" width="92" height="190" rx="16" fill="#2A2A2A" stroke="${C.sepia}" stroke-width="6"/><rect x="-38" y="-200" width="76" height="168" rx="8" fill="${C.paddy}"/><path d="M-20 -110 Q0 -150 24 -140 Q16 -100 -20 -110 Z" fill="${C.shyamol}"/>`;
+    const hand=`<path d="M-40 400 L-38 30 Q-60 -10 -48 -40 L48 -40 Q60 -10 38 30 L40 400 Z" fill="#C58B5A" stroke="${C.sepia}" stroke-width="6"/>
+      <path d="M-50 -30 Q-58 -70 -44 -84 M50 -30 Q58 -70 44 -84" stroke="${C.sepia}" stroke-width="6" fill="#C58B5A"/>
+      <path d="M-46 -40 q-14 -30 -2 -52 q10 -8 16 6 l4 40 z" fill="#C58B5A" stroke="${C.sepia}" stroke-width="5"/>`;
+    hands+=`<g transform="translate(${x} ${y}) rotate(${(i%2?5:-5)}) scale(.8)" opacity="${cl(k*3)}">${hand}${ph}<path d="M44 -60 q16 -4 18 -30 q-2 -14 -14 -10" fill="#C58B5A" stroke="${C.sepia}" stroke-width="5"/></g>`}
+  return `<svg viewBox="0 0 1920 1080">${DEFS}${PAPER}
+   <circle cx="1640" cy="220" r="70" fill="${C.sun}" opacity="${eo(p(t,0,.4))}"/>
+   <path d="M0 640 H1920" stroke="${C.sepia}" stroke-width="3" fill="none" filter="url(#rough)" ${dash(e(p(t,0,.5)))}/>
+   ${stalks('field-gold.svg',-40,560,2000,e(p(t,0,.8)),.8)}
+   ${hands}
+   </svg>`;
+}},
 /* S03 · 3 s · one question, many answers. The dry shoot fades into paper; a hand-drawn "?" writes itself; its tail forks
    into four arrows that end on the four answers to come (bottle, tea glass, phone video, sack); push toward the bottle. */
 S03:{dur:3,draw(t){
