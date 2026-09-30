@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
-import { apiUrl, fetchHealth } from './api/client.js'
+import { fetchHealth } from './api/client.js'
 import ChatPanel from './components/ChatPanel.jsx'
 import FinancePanel from './components/FinancePanel.jsx'
 import PlanPanel from './components/PlanPanel.jsx'
@@ -15,8 +15,9 @@ import { useAuth } from './state/useAuth.js'
 import { useCrops } from './state/useCrops.js'
 import { useSettings } from './state/useSettings.js'
 import { translator } from './i18n.js'
-import { BRAND_NAME } from './branding.js'
-import BrandMark from './components/BrandMark.jsx'
+import SiteNav from './components/SiteNav.jsx'
+import { useGuestSessions, newGuestSessionId } from './state/useGuestSessions.js'
+import './shell.css'
 
 /**
  * One responsive page (PRD.md §9): chat primary, with the provenance graph
@@ -75,8 +76,10 @@ export default function App() {
   const t = useMemo(() => translator(settings.language), [settings.language])
   const [settingsOpen, setSettingsOpen] = useState(false)
   const realAuth = useAuth()
-  const [guestMode, setGuestMode] = useState(() => guestRequestedByUrlOrEnv())
-  const [guestSession, setGuestSession] = useState(null)
+  // No Supabase on this deployment: go straight in as a guest rather than dead-end on an error.
+  const [guestMode, setGuestMode] = useState(() => guestRequestedByUrlOrEnv() || !realAuth.configured)
+  const guests = useGuestSessions()
+  const [guestSessionId, setGuestSessionId] = useState(() => newGuestSessionId())
   const auth = guestMode
     ? {
         user: GUEST_USER,
@@ -89,33 +92,63 @@ export default function App() {
       }
     : realAuth
   // Guest mode deliberately has no Supabase token and never touches the
-  // authenticated crop index. /api/chat accepts the generated session id.
+  // authenticated crop index. /api/chat accepts the browser-minted g-<uuid> id.
   const crops = useCrops(guestMode ? null : auth.session)
   const { activeCropId, create: createCrop, update: updateCrop } = crops
-  const startGuestSession = useCallback(() => {
-    setGuestSession({ session_id: crypto.randomUUID(), farm_id: null })
-    setTab('chat')
-  }, [])
+  const [tab, setTab] = useState('chat')
+  const [pending, setPending] = useState(null)
+
   const handleNewChat = useCallback(() => {
-    if (guestMode) return startGuestSession()
-    return createCrop()
-  }, [createCrop, guestMode, startGuestSession])
+    setTab('chat')
+    if (guestMode) { setGuestSessionId(newGuestSessionId()); return undefined }
+    crops.setActiveCropId(null)
+    return undefined
+  }, [crops, guestMode])
   const nameActiveCrop = useCallback((crop) => {
     if (!guestMode && crop && activeCropId) updateCrop(activeCropId, { crop }).catch(() => {})
   }, [activeCropId, guestMode, updateCrop])
   const nameActiveChat = useCallback((title) => {
-    if (!guestMode && title && activeCropId) updateCrop(activeCropId, { title }).catch(() => {})
-  }, [activeCropId, guestMode, updateCrop])
+    if (!title) return
+    if (guestMode) guests.rename(guestSessionId, title)
+    else if (activeCropId) updateCrop(activeCropId, { title }).catch(() => {})
+  }, [activeCropId, guestMode, guestSessionId, guests, updateCrop])
   const chat = useChat({
-    farmId: guestMode ? guestSession?.farm_id : crops.activeCrop?.farm_id,
-    sessionId: guestMode ? guestSession?.session_id : crops.activeCrop?.session_id,
+    farmId: guestMode ? guests.farmId : crops.activeCrop?.farm_id,
+    sessionId: guestMode ? guestSessionId : crops.activeCrop?.session_id,
     accessToken: guestMode ? undefined : auth.session?.access_token,
     language: settings.language,
     onCropName: nameActiveCrop,
     onChatTitle: nameActiveChat,
   })
-  const [health, setHealth] = useState({ state: 'checking', text: 'checking…' })
-  const [tab, setTab] = useState('chat')
+  const { send: chatSend } = chat
+
+  // One entry point for a farmer's message. A guest's chat joins the list on its first
+  // message; an account without an open consultation gets one created first, and the
+  // message goes out as soon as it is ready.
+  const send = useCallback(async (text) => {
+    if (guestMode) {
+      const known = guests.sessions.find((s) => s.id === guestSessionId)
+      guests.touch(guestSessionId, known?.title || String(text).trim().slice(0, 48))
+      return chatSend(text)
+    }
+    if (!crops.activeCrop) {
+      const crop = await createCrop()
+      if (crop) setPending(text)
+      return undefined
+    }
+    return chatSend(text)
+  }, [chatSend, createCrop, crops.activeCrop, guestMode, guestSessionId, guests])
+  // useChat's own effect (declared above) has already switched to the new session by the
+  // time this runs, so the queued message lands in the right conversation.
+  useEffect(() => {
+    if (pending && crops.activeCrop) {
+      const text = pending
+      setPending(null)
+      chatSend(text)
+    }
+  }, [pending, crops.activeCrop, chatSend])
+
+  const [health, setHealth] = useState('checking')
   // The chat and the Finance tab must key on the SAME farm, or the tab's area
   // edit would recompute a projection the agent never made.
   const farmId = chat.farmId
@@ -143,18 +176,16 @@ export default function App() {
   useEffect(() => {
     const controller = new AbortController()
     let timer
-
     const check = async () => {
       try {
-        const body = await fetchHealth(controller.signal)
-        setHealth({ state: 'ok', text: body.status })
+        await fetchHealth(controller.signal)
+        setHealth('ok')
       } catch {
         if (controller.signal.aborted) return
-        setHealth({ state: 'down', text: 'API unreachable' })
+        setHealth('down')
       }
       if (!controller.signal.aborted) timer = setTimeout(check, HEALTH_POLL_MS)
     }
-
     check()
     return () => {
       controller.abort()
@@ -162,148 +193,140 @@ export default function App() {
     }
   }, [])
 
-  const guestButton = (
-    <button
-      type="button"
-      onClick={() => setGuestMode(true)}
-      className="secondary guest-button"
-    >
-      অতিথি হিসেবে দেখুন
-    </button>
+  const status = (
+    <span className={`status status-${health}`} title={t(`status.${health}`)}>
+      <span className="dot" aria-hidden="true" />
+      <span className="status-text">{t(`status.${health}`)}</span>
+    </span>
   )
 
   if (auth.loading) return <main className="auth-screen"><p>{t('app.loading')}</p></main>
-  if (!auth.configured) return <main className="auth-screen"><p className="error">Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.</p>{guestButton}</main>
-  if (!auth.user) return <>
-    <AuthScreen auth={auth} />
-    {guestButton}
-  </>
+  if (!auth.user) return (
+    <div className="shell-auth">
+      <SiteNav active="app">{status}</SiteNav>
+      <AuthScreen auth={auth} onGuest={() => setGuestMode(true)} />
+    </div>
+  )
+
+  const chats = guestMode
+    ? guests.sessions.map((s) => ({ id: s.id, title: s.title, updated: s.updated }))
+    : crops.crops.map((crop) => ({
+        id: crop.id,
+        title: crop.title === 'New consultation' ? '' : crop.title,
+        subtitle: [crop.profile?.district, crop.profile?.area && `${crop.profile.area} ${crop.profile.area_unit ?? ''}`.trim()].filter(Boolean).join(' · '),
+        updated: crop.updated_at,
+        editable: true,
+      }))
+  const activeChatId = guestMode ? guestSessionId : crops.activeCropId
+  const selectChat = (id) => {
+    setTab('chat')
+    if (guestMode) setGuestSessionId(id)
+    else crops.setActiveCropId(id)
+  }
+  const removeChat = (id) => {
+    if (guestMode) {
+      guests.remove(id)
+      if (id === guestSessionId) setGuestSessionId(newGuestSessionId())
+      return undefined
+    }
+    return crops.remove(id)
+  }
+  const hasSide = Boolean(chat.finance || chat.plan || basket || chat.trace.length)
 
   return (
-    <div className="app">
-      {!guestMode && <Sidebar
-        crops={crops.crops}
-        activeCropId={crops.activeCropId}
-        onSelect={crops.setActiveCropId}
+    <div className="app shell">
+      <Sidebar
+        chats={chats}
+        activeId={activeChatId}
+        onSelect={selectChat}
         onCreate={handleNewChat}
+        onDelete={removeChat}
+        crops={guestMode ? [] : crops.crops}
         onUpdate={crops.update}
-        onDelete={crops.remove}
-        onSignOut={auth.signOut}
+        guest={guestMode}
         user={auth.user}
-        t={t}
+        onSignIn={realAuth.configured ? () => setGuestMode(false) : undefined}
+        onSignOut={auth.signOut}
         onOpenSettings={() => setSettingsOpen(true)}
-      />}
+        t={t}
+      />
       {settingsOpen && <SettingsModal settings={settings} t={t} onClose={() => setSettingsOpen(false)} />}
       <div className="app-main">
-      <header className="topbar">
-        <a className="brand" href="#/">
-          <BrandMark size={32} />
-          <h1>{BRAND_NAME}</h1>
-        </a>
-        <nav className="topnav" aria-label="অন্য পাতা">
-          <a href="#/">হোম</a>
-          <a href="#/phone">বাটন ফোন</a>
-          <a href="#/market">বাজার</a>
-        </nav>
-        <div className="health" title={apiUrl('/api/health')}>
-          <span className={`dot dot-${health.state}`} aria-hidden="true" />
-          <span className="mono">{health.text}</span>
+        <SiteNav active="app" brand={false}>
+          {status}
+          {guestMode && <button type="button" className="icon-button" onClick={() => setSettingsOpen(true)} aria-label={t('sidebar.settings')} title={t('sidebar.settings')}>⚙</button>}
+        </SiteNav>
+        {!guestMode && crops.error && <p className="error" role="alert">{crops.error}</p>}
+
+        {/* Tabs appear only once there is something besides the chat to switch to. On a
+            phone they switch panes; on a wide screen the graph sits beside the chat. */}
+        {hasSide && (
+          <nav className="tabs" role="tablist">
+            <button role="tab" aria-selected={tab === 'chat'} className={`tab ${tab === 'chat' ? 'is-active' : ''}`} onClick={() => setTab('chat')}>
+              {t('tab.chat')}
+            </button>
+            {chat.finance && (
+              <button role="tab" aria-selected={tab === 'finance'} className={`tab ${tab === 'finance' ? 'is-active' : ''}`} onClick={() => setTab('finance')}>
+                {t('tab.finance')}
+              </button>
+            )}
+            {chat.plan && (
+              <button role="tab" aria-selected={tab === 'plan'} className={`tab ${tab === 'plan' ? 'is-active' : ''}`} onClick={() => setTab('plan')}>
+                {t('tab.plan')}
+              </button>
+            )}
+            {basket && (
+              <button role="tab" aria-selected={tab === 'checkout'} className={`tab ${tab === 'checkout' ? 'is-active' : ''}`} onClick={() => setTab('checkout')}>
+                {t('tab.checkout')}
+              </button>
+            )}
+            {chat.trace.length > 0 && (
+              <button role="tab" aria-selected={tab === 'trace'} className={`tab tab-trace ${tab === 'trace' ? 'is-active' : ''}`} onClick={() => setTab('trace')}>
+                {t('tab.graph')} ({chat.trace.length})
+              </button>
+            )}
+          </nav>
+        )}
+
+        <div className={`workspace${chat.trace.length ? ' has-trace' : ''}`}>
+          <main className={`pane pane-chat ${tab === 'chat' ? 'is-active' : ''}`}>
+            <ChatPanel
+              messages={chat.messages}
+              inputRequest={chat.inputRequest}
+              streaming={chat.streaming}
+              error={chat.error}
+              onSend={send}
+              onAnswerInput={chat.answerInput}
+              t={t}
+              settings={settings}
+            />
+          </main>
+
+          {chat.finance && (
+            <section className={`pane pane-finance ${tab === 'finance' ? 'is-active' : ''}`} aria-label="Finance">
+              <h2 className="pane-title">{t('pane.finance')}</h2>
+              <FinancePanel finance={chat.finance} farmId={farmId} onFinance={chat.setFinance} />
+            </section>
+          )}
+          {chat.plan && (
+            <section className={`pane pane-plan ${tab === 'plan' ? 'is-active' : ''}`} aria-label="Season plan">
+              <h2 className="pane-title">{t('pane.plan')}</h2>
+              <PlanPanel plan={chat.plan} />
+              <AlertPanel farmId={farmId} alerts={chat.alerts} onAlerts={chat.setAlerts} />
+            </section>
+          )}
+          {basket && (
+            <section className={`pane pane-checkout ${tab === 'checkout' ? 'is-active' : ''}`} aria-label="Checkout">
+              <CheckoutPanel basket={basket} onDone={() => setTab('chat')} />
+            </section>
+          )}
           {chat.trace.length > 0 && (
-            <span className="mono trace-count">{chat.trace.length} calls</span>
+            <aside className={`pane pane-trace ${tab === 'trace' ? 'is-active' : ''}`} aria-label="কাজের চিত্র">
+              <h2 className="pane-title">{t('pane.graph')}</h2>
+              <GraphPanel trace={chat.trace} usage={chat.usage} streaming={chat.streaming} />
+            </aside>
           )}
         </div>
-      </header>
-      {!guestMode && crops.error && <p className="error" role="alert">{crops.error}</p>}
-
-      {/* Tabs are how you switch panes on a phone; on desktop the trace is
-          always visible, so the trace tab hides itself there via CSS. */}
-      <nav className="tabs" role="tablist">
-        <button
-          role="tab"
-          aria-selected={tab === 'chat'}
-          className={`tab ${tab === 'chat' ? 'is-active' : ''}`}
-          onClick={() => setTab('chat')}
-        >
-          {t('tab.chat')}
-        </button>
-        {chat.finance && (
-          <button
-            role="tab"
-            aria-selected={tab === 'finance'}
-            className={`tab ${tab === 'finance' ? 'is-active' : ''}`}
-            onClick={() => setTab('finance')}
-          >
-            {t('tab.finance')}
-          </button>
-        )}
-        {chat.plan && (
-          <button role="tab" aria-selected={tab === 'plan'} className={`tab ${tab === 'plan' ? 'is-active' : ''}`} onClick={() => setTab('plan')}>
-            {t('tab.plan')}
-          </button>
-        )}
-        {basket && (
-          <button role="tab" aria-selected={tab === 'checkout'} className={`tab ${tab === 'checkout' ? 'is-active' : ''}`} onClick={() => setTab('checkout')}>
-            {t('tab.checkout')}
-          </button>
-        )}
-        <button
-          role="tab"
-          aria-selected={tab === 'trace'}
-          className={`tab tab-trace ${tab === 'trace' ? 'is-active' : ''}`}
-          onClick={() => setTab('trace')}
-        >
-          {t('tab.graph')}{chat.trace.length > 0 ? ` (${chat.trace.length})` : ''}
-        </button>
-      </nav>
-
-      {!(guestMode ? guestSession : crops.activeCrop) ? <main className="empty-crop"><h2>{t('start.title')}</h2><p>{crops.error ?? t('start.body')}</p>{guestMode ? <button onClick={handleNewChat}>{t('sidebar.newChat')}</button> : <p className="muted">{t('start.useSidebar')}</p>}</main> : <div className="workspace">
-        <main className={`pane pane-chat ${tab === 'chat' ? 'is-active' : ''}`}>
-          <ChatPanel
-            messages={chat.messages}
-            inputRequest={chat.inputRequest}
-            streaming={chat.streaming}
-            error={chat.error}
-            onSend={chat.send}
-            onAnswerInput={chat.answerInput}
-            onNewChat={guestMode ? handleNewChat : undefined}
-            t={t}
-            settings={settings}
-          />
-        </main>
-
-        {chat.finance && (
-          <section
-            className={`pane pane-finance ${tab === 'finance' ? 'is-active' : ''}`}
-            aria-label="Finance"
-          >
-            <h2 className="pane-title">{t('pane.finance')}</h2>
-            <FinancePanel
-              finance={chat.finance}
-              farmId={farmId}
-              onFinance={chat.setFinance}
-            />
-          </section>
-        )}
-        {chat.plan && (
-          <section className={`pane pane-plan ${tab === 'plan' ? 'is-active' : ''}`} aria-label="Season plan">
-            <h2 className="pane-title">{t('pane.plan')}</h2>
-            <PlanPanel plan={chat.plan} />
-            <AlertPanel farmId={farmId} alerts={chat.alerts} onAlerts={chat.setAlerts} />
-          </section>
-        )}
-        {basket && (
-          <section className={`pane pane-checkout ${tab === 'checkout' ? 'is-active' : ''}`} aria-label="Checkout">
-            <CheckoutPanel basket={basket} onDone={() => setTab('chat')} />
-          </section>
-        )}
-        <aside
-          className={`pane pane-trace ${tab === 'trace' ? 'is-active' : ''}`}
-          aria-label="কাজের চিত্র"
-        >
-          <h2 className="pane-title">{t('pane.graph')}</h2>
-          <GraphPanel trace={chat.trace} usage={chat.usage} streaming={chat.streaming} />
-        </aside>
-      </div>}
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-# LOG4 — GP FutureMakers 2026 round
+﻿# LOG4 — GP FutureMakers 2026 round
 
 Single operator on branch `futuremakers`. Append-only. Plan of record:
 the approved plan summarized in the first entries below (phases 0–8).
@@ -461,3 +461,19 @@ the approved plan summarized in the first entries below (phases 0–8).
 - The audit found claims that were false in v3 and v4 as well: phone numbers are stored raw in `contacts` (only the farm id is hashed); pest doses are not from government guides (stem borer comes from BioProtection Portal, lentil from ApniKheti, mustard from a 2002 trial; only sulphur/zinc are BAMIS); no real voice call has completed a turn; the photo model only knows potato. The form now says all of this truthfully.
 - Product gaps the form promises are listed in its team notes: consent step, spray threshold, `dose_allowed` still giving a dose next to a second candidate, a voice-agent line that calls every source "সরকারি", texting farmers after a correction.
 - Scores: Judge A 7.2 → 7.4 (advance 38% → 55%); Judge B 6.8 → 7.1 (27% → 40%); human-voice 65 → 70 ("looks AI" 60% → 45%).
+
+## [06:40] Web advisor, navigation and market redesigned; button-phone page removed; guest history; account land memory
+**Did:**
+- Shared `components/SiteNav.jsx` (+ `site-nav.css`): হোম / পরামর্শ / ফসলের সমস্যা / বাজার as real pill buttons with icons and a "you are here" state; collapses to a menu on phones. Used by home, web advisor, market, dealer, buyer and monitor pages.
+- Home: header uses SiteNav plus a "প্রশ্ন করুন" button; hero's first button now opens the web advisor (`#/app`); the "পুরো সিস্টেম" try-it section is gone (the team found it jagged and unneeded); footer carries the secondary links (dealer, buyer, phone monitor). New route `#/check` scrolls to the crop check.
+- Web advisor (`App.jsx`, new `shell.css`): full-height sidebar for everyone (new chat, **আগের আলাপ** = previous chats, my crops for accounts, account row with sign-in for guests); welcome screen with six starter questions instead of a blank page; the graph pane and tabs appear only once there is something in them; chat column at reading width. No Supabase on a deployment → straight into guest mode. Sign-in page redesigned with "অতিথি হিসেবে শুরু করুন".
+- Guest history: `state/useGuestSessions.js` keeps the list in localStorage; guest session ids are `g-<uuid>`, one `gf-<uuid>` farm per browser (so land details carry across a guest's chats); `GET /api/guest/sessions/{id}` serves only that id shape and only user/assistant text.
+- Account profile: `POST /api/crops` now copies the land details (district, area, unit, soil, water) of the account's latest consultation into the new one (`crops.carry_land`); season and budget are asked again.
+- Market (`MarketPage.jsx`, `market.css` rewritten): kraft header with the phone-number card, icon tabs, product picker grouped by type in Bangla, ranked dealer cards with the score breakdown as bars, pack stepper and the confirm step, crop cards + cited price guide for selling, status pills for orders/listings. Dealer and buyer pages share the header and nav.
+- Removed the `#/phone` button-phone emulator page (`PhonePage.jsx`, `VoiceCall.jsx`, `phone.css`); monitor styles moved to `pages/monitor.css`. The emulator API routes stay.
+- `scripts/e2e_farmers.mjs` (`npm run e2e`, devDependency `playwright==1.56.1`): three farmers (crop choice in Rajshahi, stem borer in Bogura, potato fertiliser + buying + selling in Dinajpur), messages one by one, screenshot per reply, then reload and reopen each chat from the sidebar; writes `e2e-report/REPORT.md`.
+- Tests: `backend/tests/test_accounts_and_guests.py` (8). Suite 649 passed. Frontend lint clean, build OK.
+**Decision:** Guest chat history is readable by anyone holding its unguessable id (capability link), never an account's session. Profiles: phone numbers were already one farm each (`ph-<hmac>`); web accounts now share land details across consultations without a schema change (the `crops.farm_id` unique constraint stays).
+**Why:** Team review: the web advisor was hard to find and looked empty, the nav was plain text links, the market looked bare, and the simulator was not wanted on the public site.
+**Rejected:** one farm_id per account (needs a Supabase migration dropping the unique constraint); keeping the emulator page behind a hidden link.
+**Impacts:** The end-to-end AI run could not be done in the build container: no `OPENAI_API_KEY` and no Supabase keys there. The harness ran in guest mode and recorded the honest failure; the real run needs `npm run dev` with the keys, then `E2E_EMAIL=… E2E_PASSWORD=… npm run e2e`.

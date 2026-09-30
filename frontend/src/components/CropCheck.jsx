@@ -188,7 +188,7 @@ function Result({ r, onRestart }) {
         <p>এই উত্তর এসেছে যাচাই করা কৃষি তথ্যের সারণি থেকে। AI এখানে আন্দাজ করে না।</p>
         <div className="result-actions">
           <button type="button" className="btn btn-quiet" onClick={onRestart}>আবার শুরু করুন</button>
-          <a className="btn btn-primary" href="/?guest=1#/app">আরও জিজ্ঞেস করুন</a>
+          <a className="btn btn-primary" href="#/app">আরও জিজ্ঞেস করুন</a>
         </div>
       </footer>
     </article>

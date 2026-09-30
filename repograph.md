@@ -65,10 +65,19 @@ Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
   bridge, alert scan) and `backend/api/market.py` (`/api/market/*`).
 - `backend/memory/store.py` — new tables `contacts` (the only raw phone numbers),
   `channel_turns`, `sms_log`, `ussd_sessions`, `alert_sms`.
-- Frontend hash routes (`frontend/src/Root.jsx`): `#/phone` (`pages/PhonePage.jsx`,
-  `VoiceCall.jsx`), `#/monitor` (`components/ChannelMonitor.jsx` → `GraphPanel`),
-  `#/market` (`pages/MarketPage.jsx`), `#/dealer`, `#/buyer`
-  (`pages/PartnerPages.jsx`). API clients `src/api/channels.js`, `src/api/market.js`.
+- Frontend hash routes (`frontend/src/Root.jsx`): `#/app` (web advisor, `App.jsx` +
+  `shell.css`), `#/check` (home scrolled to the crop check), `#/monitor`
+  (`components/ChannelMonitor.jsx` → `GraphPanel`, styles `pages/monitor.css`),
+  `#/market` (`pages/MarketPage.jsx`, `market.css`), `#/dealer`, `#/buyer`
+  (`pages/PartnerPages.jsx`). Shared nav: `components/SiteNav.jsx` (+ `site-nav.css`).
+  API clients `src/api/channels.js`, `src/api/market.js`. The `#/phone` emulator page
+  (PhonePage/VoiceCall/phone.css) was removed 2026-09-30.
+- Web advisor chats: accounts via `/api/crops` (Supabase; a new consultation copies the
+  land details of the account's last one, `crops.carry_land`); guests via
+  `state/useGuestSessions.js` (localStorage list, `g-<uuid>` session ids, one `gf-<uuid>`
+  farm per browser) and `GET /api/guest/sessions/{id}`. Tests `backend/tests/test_accounts_and_guests.py`.
+- `scripts/e2e_farmers.mjs` (`npm run e2e`) — Playwright run of three farmers through the
+  web advisor; writes `e2e-report/REPORT.md` + screenshots.
 - Tests: `backend/tests/test_channels_{core,sms,ussd,voice}.py`,
   `backend/tests/test_market.py`, `tests/test_market_finance.py`. Suite 632 green (2026-09-28).
 - Gone: `data/agristats.db` (0-byte decoy), `NodeInspector.jsx`, `TracePanel.jsx`.

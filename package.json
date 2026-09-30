@@ -10,10 +10,14 @@
     "dev": "node scripts/dev.mjs dev",
     "app": "node scripts/dev.mjs app",
     "build": "npm --prefix frontend run build",
-    "test": "echo \"Run: .venv/Scripts/python -m pytest tests backend/tests -q\""
+    "test": "echo \"Run: .venv/Scripts/python -m pytest tests backend/tests -q\"",
+    "e2e": "node scripts/e2e_farmers.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
 }

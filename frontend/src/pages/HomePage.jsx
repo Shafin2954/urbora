@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import BrandMark, { Lockup } from '../components/BrandMark.jsx'
+import BrandMark from '../components/BrandMark.jsx'
+import SiteNav, { ADVISOR_URL } from '../components/SiteNav.jsx'
 import CropCheck from '../components/CropCheck.jsx'
 import { BRAND_NAME, BRAND_NAME_BN, BRAND_TAGLINE_BN } from '../branding.js'
 import './home.css'
@@ -8,14 +9,13 @@ import './home.css'
 // for every question across the season, not a disease checker. Order: the promise with a real
 // phone cycling through example answers (hero), the eight kinds of help, why farmers need it
 // (story), how to reach it from a button phone, the crop-problem check working right here
-// (CropCheck, the deterministic KB table), trust, market, try-it doors.
+// (CropCheck, the deterministic KB table), trust, market, footer links.
 //
 // Look follows brand/BRAND-CORE.md §5: straw ground, kraft panels with the engraved paddy,
 // Deep Shyamol, turmeric for one CTA, no gradients, no field photos. The two phones in
 // public/img/ are AI-generated product shots (Higgsfield, 2026-09-30) cut out with blank
 // screens; the screens are live HTML laid over them, so they change as you watch or click.
 
-const ADVISOR_URL = '/?guest=1#/app'
 
 // Example conversations for the eight kinds of help. Numbers appear only where they are the
 // system's real output or a cited public figure: the pest dose is the real reply from
@@ -241,29 +241,19 @@ function useMotion(rootRef) {
   }, [rootRef])
 }
 
-export default function HomePage() {
-  const [menu, setMenu] = useState(false)
-  const close = () => setMenu(false)
+export default function HomePage({ scrollTo = null }) {
   const rootRef = useRef(null)
   useMotion(rootRef)
+  // #/check (the nav's "ফসলের সমস্যা") lands here and scrolls to the check.
+  useEffect(() => {
+    if (scrollTo) document.getElementById(scrollTo)?.scrollIntoView({ block: 'start' })
+  }, [scrollTo])
 
   return (
     <div className="home" ref={rootRef}>
-      <header className="home-top">
-        <a className="home-brand" href="#/" aria-label={`${BRAND_NAME_BN}, প্রথম পাতা`}><Lockup size={42} /></a>
-        <nav className={`home-nav ${menu ? 'open' : ''}`} aria-label="পাতার অংশ">
-          <a href="#services" onClick={close}>কী কী পারে</a>
-          <a href="#how" onClick={close}>কীভাবে পাবেন</a>
-          <a href="#check" onClick={close}>সমস্যা চিনুন</a>
-          <a href="#/market" onClick={close}>বাজার</a>
-        </nav>
-        <div className="top-actions">
-          <a className="btn btn-primary btn-small" href="#/phone">ফোনে চেষ্টা করুন</a>
-          <button type="button" className="menu-btn" aria-expanded={menu} aria-label="মেনু" onClick={() => setMenu(!menu)}>
-            <span /><span /><span />
-          </button>
-        </div>
-      </header>
+      <SiteNav active="home">
+        <a className="btn btn-primary btn-small nav-cta" href={ADVISOR_URL}>প্রশ্ন করুন</a>
+      </SiteNav>
 
       <section className="hero">
         <div className="hero-copy-wrap">
@@ -275,8 +265,8 @@ export default function HomePage() {
               কোথায় কিনবেন, কোথায় বেচবেন। {BRAND_NAME_BN} আপনার জমির মাপে উত্তর দেয়, যেকোনো ফোনে, বাংলায়।
             </p>
             <div className="hero-actions">
-              <a className="btn btn-primary" href="#/phone">ফোনে চেষ্টা করুন</a>
-              <a className="btn btn-quiet" href="#services">কী কী পারে দেখুন</a>
+              <a className="btn btn-primary" href={ADVISOR_URL}>এখনই প্রশ্ন করুন</a>
+              <a className="btn btn-quiet" href="#check">ফসলের সমস্যা চিনুন</a>
             </div>
             <ul className="channels" aria-label="তিনভাবে পৌঁছানো যায়">
               <li><Glyph name="call" />কল করে বলুন</li>
@@ -424,38 +414,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="try" aria-labelledby="try-h">
-        <div className="section-inner">
-          <p className="eyebrow">নিজে চালিয়ে দেখুন</p>
-          <h2 id="try-h">পুরো সিস্টেম, এক জায়গায়</h2>
-          <div className="try-grid">
-            <a className="try-card try-main reveal" href="#/phone">
-              <Glyph name="keys" />
-              <b>বাটন ফোন</b>
-              <span>কল, USSD মেনু আর SMS, একটা বাটন ফোনের মতো করে।</span>
-              <em className="tag tag-sim">সিমুলেটর</em>
-            </a>
-            <a className="try-card reveal" href={ADVISOR_URL}>
-              <Glyph name="leaf" />
-              <b>ওয়েবে পরামর্শ</b>
-              <span>লিখে বা বলে প্রশ্ন করুন, পাশে দেখুন কোন তথ্য থেকে কোন উত্তর।</span>
-            </a>
-            <a className="try-card reveal" href="#/market">
-              <Glyph name="cart" />
-              <b>বাজার</b>
-              <span>সার-বীজের দোকান আর ফসল বিক্রির তালিকা।</span>
-              <em className="tag tag-demo">ডেমো</em>
-            </a>
-            <a className="try-card reveal" href="#/monitor">
-              <Glyph name="live" />
-              <b>ফোনে যা চলছে</b>
-              <span>কল আর SMS-এর কথোপকথন, সরাসরি।</span>
-            </a>
-          </div>
-          <p className="partner-links">দোকানদার? <a href="#/dealer">ডিলারের পাতা</a> · ক্রেতা? <a href="#/buyer">ক্রেতার পাতা</a></p>
-        </div>
-      </section>
-
       <footer className="home-foot">
         <div className="section-inner foot-blessing">
           <p className="foot-bless">{BRAND_TAGLINE_BN}</p>
@@ -473,6 +431,10 @@ export default function HomePage() {
             <p>Team Uplift · University of Dhaka · GP FutureMakers 2026</p>
             <p>প্রথম সংস্করণ তৈরি IUT 12th ICT Fest bdapps Agentic AI Hackathon-এ (জুলাই 2026)।</p>
             <p>পাতার ছবিগুলো প্রতীকী, AI দিয়ে তৈরি।</p>
+            <p className="foot-links">
+              <a href={ADVISOR_URL}>পরামর্শ</a> · <a href="#/market">বাজার</a> · <a href="#/dealer">ডিলারের পাতা</a>
+              {' '}· <a href="#/buyer">ক্রেতার পাতা</a> · <a href="#/monitor">ফোনের কথোপকথন</a>
+            </p>
           </div>
         </div>
       </footer>

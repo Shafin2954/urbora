@@ -3,6 +3,48 @@ import InputRequest from './InputRequest.jsx'
 import MarkdownLite from '../lib/markdownLite.jsx'
 import { apiUrl } from '../api/client.js'
 import { useDictation, useSpeech } from '../state/useVoice.js'
+import BrandMark from './BrandMark.jsx'
+
+// Starter questions for an empty chat: one per kind of help, in a farmer's own words. They
+// are questions, never answers, so nothing here can pass for advice the system did not give.
+const STARTERS = {
+  bn: [
+    ['🌱', 'কী চাষ করব', 'রাজশাহীতে ২ বিঘা দোআঁশ জমি, নলকূপ আছে। এবার রবিতে কী চাষ করলে লাভ হবে?'],
+    ['🐛', 'রোগ ও পোকা', 'বোরো ধানের মাঝের ডগা শুকিয়ে যাচ্ছে, কুশি অবস্থা। কী করব?'],
+    ['🧪', 'সার', 'আলুতে কোন সার কতটুকু আর কখন দেব?'],
+    ['🌧', 'আবহাওয়া', 'বগুড়ায় আগামী কয়েক দিন বৃষ্টি হবে? ইউরিয়া দেব কি না?'],
+    ['💰', 'খরচ ও লাভ', '১ বিঘা সরিষা চাষে খরচ আর লাভ কত হতে পারে?'],
+    ['🛒', 'কেনা-বেচা', 'রাজশাহীতে কাছে কোথায় ইউরিয়া পাব, দাম কত?'],
+  ],
+  en: [
+    ['🌱', 'What to grow', 'I have 2 bigha of loam in Rajshahi with a tubewell. What should I grow this rabi season?'],
+    ['🐛', 'Pest or disease', 'The central shoots of my boro rice are drying at tillering. What should I do?'],
+    ['🧪', 'Fertiliser', 'Which fertiliser should I give potato, how much and when?'],
+    ['🌧', 'Weather', 'Will it rain in Bogura in the next few days? Should I apply urea?'],
+    ['💰', 'Cost and profit', 'What would 1 bigha of mustard cost me, and what profit could I expect?'],
+    ['🛒', 'Buy and sell', 'Where near Rajshahi can I buy urea, and at what price?'],
+  ],
+}
+
+function Welcome({ t, language, onSend, disabled }) {
+  return (
+    <div className="welcome">
+      <BrandMark size={64} />
+      <p className="welcome-hello">{t('welcome.hello')}</p>
+      <h2>{t('welcome.title')}</h2>
+      <p className="welcome-body">{t('welcome.body')}</p>
+      <p className="welcome-try">{t('welcome.try')}</p>
+      <div className="starter-grid">
+        {(STARTERS[language] ?? STARTERS.bn).map(([icon, topic, question]) => (
+          <button key={topic} type="button" className="starter" disabled={disabled} onClick={() => onSend(question)}>
+            <span className="starter-icon" aria-hidden="true">{icon}</span>
+            <span className="starter-text"><b>{topic}</b><span>{question}</span></span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 /**
  * A leaf-photo classification, shown with the two things that make it safe to
@@ -53,7 +95,6 @@ export default function ChatPanel({
   error,
   onSend,
   onAnswerInput,
-  onNewChat,
   t,
   settings,
 }) {
@@ -108,8 +149,9 @@ export default function ChatPanel({
   })
 
   // Follow the stream, so the newest tokens stay on screen without scrolling.
+  // (Not on an empty chat: the welcome should open at its top.)
   useEffect(() => {
-    endRef.current?.scrollIntoView({ block: 'end' })
+    if (messages.length || inputRequest) endRef.current?.scrollIntoView({ block: 'end' })
   }, [messages, inputRequest])
 
   const submit = () => {
@@ -121,14 +163,9 @@ export default function ChatPanel({
 
   return (
     <div className="chat">
-      {onNewChat && <div className="chat-head"><button className="secondary" onClick={onNewChat}>{t('sidebar.newChat')}</button></div>}
       <div className="transcript">
         {messages.length === 0 && (
-          <p className="muted empty-hint">
-            {settings.language === 'en'
-              ? 'Ask a question — for example "What should I grow this rabi season?"'
-              : 'প্রশ্ন লিখুন — যেমন “আগামী রবি মৌসুমে কী চাষ করব?”'}
-          </p>
+          <Welcome t={t} language={settings.language} onSend={onSend} disabled={streaming} />
         )}
 
         {messages

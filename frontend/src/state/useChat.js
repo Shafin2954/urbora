@@ -42,14 +42,24 @@ export function useChat({ farmId, sessionId, accessToken, language = 'bn', onCro
   useEffect(() => {
     sessionRef.current = sessionId ?? newId()
     setMessages([]); setTrace([]); setPlan(null); setFinance(null); setAlerts([]); setInputRequest(null); setError(null)
-    if (!sessionId || !accessToken) return undefined
+    // Guest chats (ids minted as g-<uuid> in the browser) load from the guest route;
+    // an account's chats need its Supabase token.
+    const guest = typeof sessionId === 'string' && sessionId.startsWith('g-')
+    if (!sessionId || (!guest && !accessToken)) return undefined
     const controller = new AbortController()
-    fetch(apiUrl(`/api/sessions/${sessionId}`), { headers: { Authorization: `Bearer ${accessToken}` }, signal: controller.signal })
+    const url = guest ? `/api/guest/sessions/${sessionId}` : `/api/sessions/${sessionId}`
+    const headers = guest ? {} : { Authorization: `Bearer ${accessToken}` }
+    fetch(apiUrl(url), { headers, signal: controller.signal })
       .then((response) => response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`)))
-      .then((body) => setMessages((body.messages ?? []).flatMap((message, index) => {
-        if (!['user', 'assistant'].includes(message.role) || typeof message.content !== 'string') return []
-        return [{ id: `history-${index}`, role: message.role, text: message.content }]
-      })))
+      .then((body) => {
+        const history = (body.messages ?? []).flatMap((message, index) => {
+          if (!['user', 'assistant'].includes(message.role) || typeof message.content !== 'string') return []
+          return [{ id: `history-${index}`, role: message.role, text: message.content.replace(/^\s*\[\[CHAT_TITLE:[^\]]*\]\]\s*/, '') }]
+        })
+        // A first message may already be on screen (sent right after the chat was
+        // created); never let the empty history of a new chat wipe it.
+        setMessages((prev) => (prev.length ? prev : history))
+      })
       .catch((err) => { if (!controller.signal.aborted) setError(err.message) })
     return () => controller.abort()
   }, [sessionId, accessToken])

@@ -15,12 +15,19 @@ import httpx
 from fastapi import APIRouter, Header, HTTPException, status
 from pydantic import BaseModel, Field
 
-from backend.memory.store import get_farm, get_session_messages
+import re
+
+from backend.memory.store import get_farm, get_session_messages, save_farm
 from backend.tools.farm_memory import remember_farm
 
 router = APIRouter()
 
 _PROFILE_FIELDS = {"district", "area", "area_unit", "soil_type", "water_source", "budget_bdt", "season"}
+# What carries from an account's last consultation into a new one: the land, which does
+# not change between chats. Season and budget are per-crop, so the farmer states them again.
+_CARRY_FIELDS = ("district", "area", "area_unit", "soil_type", "water_source")
+# Guest chats (no login) use ids of this exact shape, minted in the browser.
+_GUEST_SESSION = re.compile(r"^g-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 
 
 class CropPatch(BaseModel):
@@ -89,6 +96,10 @@ async def list_crops(authorization: str | None = Header(default=None)) -> list[d
 async def create_crop(authorization: str | None = Header(default=None)) -> dict:
     token = _token(authorization)
     user = await _request("GET", "/auth/v1/user", token)
+    # The account's profile: the land details from its most recent consultation that
+    # has them (RLS scopes this to the caller's own rows).
+    previous = await _request("GET", "/rest/v1/crops", token,
+                              params={"select": "farm_id", "order": "updated_at.desc", "limit": "20"})
     row = {
         "user_id": user["id"],
         "farm_id": str(uuid4()),
@@ -96,7 +107,23 @@ async def create_crop(authorization: str | None = Header(default=None)) -> dict:
         "crop": None,
     }
     created = await _request("POST", "/rest/v1/crops", token, json=row)
-    return _merged(created[0])
+    carried = carry_land(created[0]["farm_id"], [r["farm_id"] for r in previous or []])
+    result = _merged(created[0])
+    result["carried_profile"] = carried
+    return result
+
+
+def carry_land(new_farm_id: str, earlier_farm_ids: list[str]) -> dict:
+    """Copy the land details of the newest earlier consultation that has any into the new
+    consultation's farm, so a returning farmer is not asked for them again. Returns what
+    was copied ({} when nothing was known)."""
+    for farm_id in earlier_farm_ids:
+        profile = get_farm(farm_id) or {}
+        land = {key: profile[key] for key in _CARRY_FIELDS if profile.get(key) is not None}
+        if land:
+            save_farm(new_farm_id, land)
+            return land
+    return {}
 
 
 @router.patch("/api/crops/{crop_id}")
@@ -128,3 +155,19 @@ async def session_messages(session_id: str, authorization: str | None = Header(d
     if not rows:
         raise HTTPException(status_code=404, detail="Session not found")
     return {"messages": get_session_messages(session_id)}
+
+
+@router.get("/api/guest/sessions/{session_id}")
+def guest_session_messages(session_id: str) -> dict:
+    """History of a guest chat, for the "previous chats" list of a visitor who has not
+    signed in. Only browser-minted guest ids (g-<uuid4>) are served, never an account's
+    session, and only the farmer's and the advisor's words (no system notes or tool data).
+    The unguessable id is the capability, as with any share link."""
+    if not _GUEST_SESSION.match(session_id):
+        raise HTTPException(status_code=404, detail="Session not found")
+    visible = [
+        {"role": m["role"], "content": m["content"]}
+        for m in get_session_messages(session_id)
+        if m.get("role") in ("user", "assistant") and isinstance(m.get("content"), str) and m["content"]
+    ]
+    return {"messages": visible}
