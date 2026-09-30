@@ -15,3 +15,9 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Netlify serves .webmanifest as octet-stream by default; browsers expect this.
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"

@@ -557,3 +557,8 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** `.replit` sets `CORS_ORIGINS` to the two localhost origins as a shared env var, which overrode the deployment secret, so Replit kept answering the Netlify preflight with "400 Disallowed CORS origin".
 **Rejected:** Leaving it in the Replit secrets UI only (the shared var shadowed it).
 **Impacts:** The Repl must pull `master` and redeploy for this to take effect.
+
+## [22:40] Netlify serves the PWA manifest with its proper type
+**Did:** `netlify.toml` sets `Content-Type: application/manifest+json` for `/manifest.webmanifest`; redeployed.
+**Decision:** none. **Why:** Netlify served it as octet-stream. **Rejected:** none.
+**Impacts:** Supabase email confirmation is on and sign-up passes no redirect, so the Supabase Auth Site URL must be the Netlify URL for confirm links to land on the site.
