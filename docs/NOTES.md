@@ -61,3 +61,7 @@ Ranked by kill-probability. Each has a mitigation. Hit one without a mitigation 
 23. **Holt overclaim.** 9 data points = wide uncertainty. → Damped Holt point estimate as base + residual-sd band, labeled "projection, not guarantee." Never quote the projection without the band in finance views.
 
 24. **Provenance gaps discovered late.** → H12–H15 includes an explicit audit: click every number, confirm provenance renders. A number without provenance must not ship.
+
+## Added after the hackathon
+
+25. **Bangla through `curl` on Windows Git Bash arrives as `???`.** A Bangla string passed as a command-line argument (`curl --data-binary '{"message":"আমি…"}'`) is mangled to question marks before curl sends it. The agent then rightly asks for facts it "was never told", which looks exactly like an intake bug (cost ~20 min on 2026-11-10, LOG4 [17:05]). → Send Bangla test messages from Python (`httpx`, `json=`), or from a UTF-8 file with `curl --data-binary @msg.json`. Check what was stored with `store.get_session_messages(session_id)`.

@@ -612,3 +612,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** Humans and agents could not tell current docs from history, and the README contradicted the app (old name, old call status, wrong venv).
 **Rejected:** Deleting old docs (history and code comments cite them); moving `start.sh`/`pyproject.toml`/`.replit` (Replit needs them at the root).
 **Impacts:** Verified: 650 tests pass (same count as before), frontend builds, a live chat turn runs, brand scripts still import from `frontend/src/lib`. Found during the live check (pre-existing, not caused by the move): the intake guard refused `crop_scorer` with "district, soil, water, season unstated" although the first message stated all four in Bangla and `extract_known_fields` parses them correctly on their own. This is why the agent re-asks known facts. It needs a fix before real farmers.
+
+## [17:05] Correction: the "agent re-asks facts it was told" bug does not exist
+**Did:** Traced the intake-guard refusal from [16:40]. The stored user message was `"??? ????????? ????…"`: my `curl` test from Git Bash had turned the Bangla argument into question marks, so the agent really had no district, soil, water or season. The same message sent as real UTF-8 from Python went straight to `rag_query` ×2 → `crop_scorer` with no questions asked: boro rice first (score 83.22, profit ৳9,362), all five crops ranked from real data. Added the trap as `docs/NOTES.md` #25.
+**Decision:** No code change. These statements are wrong and should be ignored: [13:05] "the agent asked for the district even though the question named Dinajpur", and [16:40] Impacts "the intake guard refused… needs a fix before real farmers". Both came from the mangled curl input.
+**Why:** The guard and the extractor work. The test input was broken.
+**Rejected:** Loosening the intake guard. It would have removed a real protection (LOG4 2026-09-28) to "fix" a test artifact.
+**Impacts:** Send Bangla test messages from Python (`httpx`), never as a curl argument in Git Bash. Today's other channel checks (voice loop, SMS, USSD, missed call) went through Python and are unaffected.
