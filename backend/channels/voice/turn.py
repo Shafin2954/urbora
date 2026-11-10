@@ -28,18 +28,25 @@ log = logging.getLogger("channels.voice")
 NOT_HEARD = "দুঃখিত, আমি শুনতে পাইনি। আবার বলুন।"
 
 
-def spoken_menu(menu: Menu) -> str:
+def spoken_menu(menu: Menu, include_prompt: bool = True) -> str:
     """A menu for the ear: 'দোআঁশ হলে 1 বলুন, এঁটেল হলে 2 বলুন।' The farmer
     may say the digit or the word; Menu.resolve accepts both."""
+    prompt = menu.prompt if include_prompt else ""
     if not menu.options:
-        return menu.prompt
+        return prompt
     choices = ", ".join(f"{label} হলে {i} বলুন" for i, (_, label) in enumerate(menu.options, 1))
-    return f"{menu.prompt} {choices}।"
+    return f"{prompt} {choices}।".strip()
 
 
 def spoken_text(reply: ChannelReply) -> str:
-    parts = [reply.text.strip()] + ([spoken_menu(reply.menu)] if reply.menu else [])
-    return " ".join(p for p in parts if p) or NOT_HEARD
+    # The agent usually asks the question itself; then read only the choices, or
+    # a caller hears it twice (LOG4 2026-11-10). Same rule as display_text for SMS.
+    text = reply.text.strip()
+    menu = ""
+    if reply.menu:
+        question = reply.menu.prompt.split(" (")[0].strip()
+        menu = spoken_menu(reply.menu, include_prompt=question not in text)
+    return " ".join(p for p in (text, menu) if p) or NOT_HEARD
 
 
 def _call_key(call_id: str) -> str:

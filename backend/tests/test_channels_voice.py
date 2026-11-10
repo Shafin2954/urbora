@@ -117,6 +117,15 @@ def test_spoken_menu_reads_the_options_aloud():
     assert turn.spoken_menu(m) == "মাটি কেমন? দোআঁশ হলে 1 বলুন, এঁটেল হলে 2 বলুন।"
 
 
+def test_spoken_text_does_not_ask_the_question_twice():
+    from backend.channels.adapter import ChannelReply
+    m = Menu("soil_type", "মাটি কেমন?", [("loam", "দোআঁশ"), ("clay", "এঁটেল")])
+    asked = ChannelReply("s", "f", "***", text="মাটি কেমন?", menu=m)
+    assert turn.spoken_text(asked) == "মাটি কেমন? দোআঁশ হলে 1 বলুন, এঁটেল হলে 2 বলুন।"
+    silent = ChannelReply("s", "f", "***", text="", menu=m)
+    assert turn.spoken_text(silent) == "মাটি কেমন? দোআঁশ হলে 1 বলুন, এঁটেল হলে 2 বলুন।"
+
+
 def _plan():
     prov = {"value": None, "source_type": "kb", "source_id": "x", "source_title": "x",
             "locator": "x", "retrieved_at": "t", "confidence": "medium"}

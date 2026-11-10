@@ -342,6 +342,11 @@ def _test_dtmf(device: int, seconds: float = 30.0) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Redirected to a file on Windows, stdout is cp1252 and printing a Bangla
+    # transcript killed the bridge mid-call (LOG4 2026-11-10).
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     from backend.env import load
     load()
     ap = argparse.ArgumentParser(description="Bridge real phone calls (Windows Phone Link) to the agent.")
