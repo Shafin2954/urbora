@@ -38,6 +38,22 @@
       "port": 8010
     },
     {
+      "name": "backend-sim",
+      "runtimeExecutable": ".venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "backend.api.main:app",
+        "--port",
+        "8020"
+      ],
+      "port": 8020,
+      "env": {
+        "SMS_PROVIDER": "simulator",
+        "CHANNEL_EMULATOR_ENABLED": "1"
+      }
+    },
+    {
       "name": "frontend-alt",
       "runtimeExecutable": "npm",
       "runtimeArgs": [

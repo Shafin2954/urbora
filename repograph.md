@@ -20,6 +20,10 @@ Branch `futuremakers`, single operator, log in `LOG4.md`, rules in CLAUDE.md v3.
 - `backend/channels/voice/audio.py` (pure audio helpers + VAD segmenter + ADB call-state parser) and
   `voice/phonelink.py` (real calls via Windows Phone Link + Voicemeeter; optional deps in
   `backend/requirements-voice-bridge.txt`); routes `/api/channels/bridge/voice/*`.
+  On the Motorola Edge 50 run it WITHOUT `--auto-answer` and answer in Phone Link (LOG4 2026-11-10 [15:45]).
+  `voice/turn.py::spoken_text` is what a caller hears (reply + menu choices, question said once).
+- `.claude/launch.json` `backend-sim` — a second backend on :8020 with SMS in simulator mode and the
+  emulator routes on, for testing SMS/USSD/missed-call without the phone (LOG4 2026-11-10 [16:10]).
 - `backend/tests/conftest.py` — clears provider env vars so tests stay hermetic.
 - `backend/channels/` — phone channels. `identity.py` (phone → `ph-<hmac>` farm id;
   sessions per phone per day, voice per call), `adapter.py` (`run_channel_turn`:

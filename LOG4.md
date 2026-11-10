@@ -569,3 +569,33 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** Team feedback: white was too contrasting against the straw background and on the green buttons.
 **Rejected:** Dropping text-on-brand contrast further (kept 10.8:1 for sunlight). The old `--ink-faint` fell to 4.2:1 on the deeper straw, so it was darkened to stay AA (5.0:1).
 **Impacts:** Use `var(--on-brand)` for text on `--brand`, never `#fff`. On `futuremakers` only; Replit (master) keeps the old palette until merged.
+
+# 2026-11-10
+
+## [13:05] Back for the AI Builders Congress: new OpenAI key, local run checked
+**Did:** The user put a new OpenAI key into `backend/.env` and `.env.local` themselves (it never went through chat). Created the root `.venv` (Python 3.12) and installed `backend/requirements.txt`. Started backend :8000 and frontend :5000 from `.claude/launch.json`. Sent one Bangla planning question to `/api/chat`: the agent called `ask_farmer`, streamed a Bangla reply, and the `done` event showed usage (14.8k in / 51 out tokens, $0.029).
+**Decision:** none.
+**Why:** The old key had stopped working and this machine had no Python environment.
+**Rejected:** Pasting the key into chat, because it would stay in the transcript.
+**Impacts:** `launch.json` and `scripts/dev.mjs` expect `.venv` at the repo root, but README says `backend/.venv`. The root one is the one that runs. The agent asked for the district even though the question already named Dinajpur. Check that before real farmers use it. Each turn costs about $0.03 on gpt-4o, mostly prompt tokens.
+
+## [15:45] First real calls on the Motorola: audio route fixed, two bridge bugs found
+**Did:** Paired a Motorola Edge 50 (Android 16) with Phone Link, installed Voicemeeter Standard 1.1.3.0 and the voice bridge packages into `.venv`. Measured both legs on a live call: the greeting reached the caller (they heard it), and the caller reached `Stereo Mix` at 12-17% peak. Ran `phonelink --capture "Stereo Mix" --playback "Voicemeeter Input" --auto-answer`.
+- Bug 1, fixed: the bridge printed the Bangla transcript to a redirected stdout (cp1252) and crashed mid-call with `UnicodeEncodeError`. `phonelink.main` now reconfigures stdout/stderr to UTF-8.
+- Bug 2, open: on this Motorola, answering over ADB (`KEYCODE_HEADSETHOOK`) keeps the call on the handset. The Bluetooth log shows SCO audio to the laptop opening and closing within 20 ms; Phone Link carries audio only for calls it answered. The farmer gets silence unless someone taps "transfer". The Samsung A55 (LOG4 [16:40]) did not do this.
+**Decision:** Until bug 2 is fixed, run the bridge without `--auto-answer` and answer in the Phone Link pop-up; the bridge starts the call when ADB reports OFFHOOK.
+**Why:** It is the only route that put audio on the laptop on this phone.
+**Rejected:** An ADB command to move call audio to Bluetooth: `cmd telecom` and `cmd audio` on Android 16 have none.
+**Impacts:** (1) Voicemeeter A1 must be an **MME** device. WDM takes the speakers exclusively and silences every other app, including Phone Link. ~10 min lost. (2) Next step for unattended answering: have the bridge press Phone Link's Accept button through Windows UI Automation, or try the HFP answer from the PC side. (3) The SMS summary after a call fails: `SMS_PROVIDER=smsgate`, but the SMS Gateway app is not installed on this phone (`phone_up` not run).
+
+## [16:10] Phone-free channel check: voice loop, SMS, USSD, missed call, marketplace
+**Did:**
+- Voice without a phone: Sarvam TTS'd a Bangla question → `/bridge/voice/turn` → transcript exact, agent replied, reply audio returned; 7-8 s per turn.
+- Fixed: every spoken menu read its question twice ("জমির মাটি কি ধরনের? জমির মাটি কি ধরনের?") because the agent's text already asks it. `turn.spoken_text` now applies the same "question already in the text" rule as `ChannelReply.display_text` for SMS. New test `test_spoken_text_does_not_ask_the_question_twice`. Suite: 650 passed.
+- Simulator backend (`backend-sim` in `.claude/launch.json`, :8020, `SMS_PROVIDER=simulator`, emulator on): a USSD walk of 9 screens answers instantly and the advice arrives by SMS; an SMS question got a ranking SMS in 6 s; a missed call got the "how to ask" SMS. Test numbers were 017999999xx.
+- Marketplace: `seed_demo` had never run on this machine, so there were no dealers anywhere. Ran it (5 dealers, 3 buyers, all `is_demo`, all in Rajshahi); urea in Rajshahi now ranks three demo offers at ৳1,350/bag. Any other district still returns none.
+- `npm --prefix frontend run build` OK (545 kB JS, 154 kB gzipped).
+**Decision:** none.
+**Why:** Check that every channel works before real farmers are onboarded.
+**Rejected:** Installing the vision extras (~200 MB torch) unasked; photo diagnosis stays `available:false` here.
+**Impacts:** Before real farmers: (1) the ranking SMS puts "লাভ ৳8,632" (full costs) next to "সর্বোচ্চ লাভ ৳45,731 (সব খরচ নয়)" (partial costs), which reads as the top crop being the worst deal. Needs wording or the same cost basis. (2) The potato farm-gate price is dated 2026-04-03. (3) There are no dealers outside Rajshahi, real or demo. (4) `test_voice_turn_then_hang_up_texts_the_plan` fails when its file runs alone with a real `.env.local` (SMS_PROVIDER leaks in). It passes in the full run.
