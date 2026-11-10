@@ -1,4 +1,4 @@
-"""Leaf-photo disease detection route (competition.md Tier 2).
+"""Leaf-photo disease detection route (docs/product/competition.md Tier 2).
 
     POST /api/diagnose/image   multipart form, field name `file`
     GET  /api/diagnose/status  is the model loadable on this machine?

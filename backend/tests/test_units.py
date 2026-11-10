@@ -1,9 +1,9 @@
-"""units.py tests (CLAUDE.md §2.12, NOTES.md #9).
+"""units.py tests (CLAUDE.md §2.12, docs/NOTES.md #9).
 
 These guard the numbers the whole finance engine multiplies by. A silent 0.18%
 drift in a bigha is a silent 0.18% drift in every profit figure on stage.
 
-Run from the repo root:  .venv/Scripts/python -m pytest tests/ -q
+Run from the repo root:  .venv/Scripts/python -m pytest backend/tests -q
 """
 
 import pytest
@@ -27,7 +27,7 @@ from backend.units import (
 
 
 def test_bigha_matches_the_ratified_hectare_figure():
-    """CLAUDE.md §2.11 / NOTES.md #9: 1 bigha = 0.1338 ha."""
+    """CLAUDE.md §2.11 / docs/NOTES.md #9: 1 bigha = 0.1338 ha."""
     assert to_hectares(1, "bigha") == pytest.approx(0.1338, abs=5e-5)
     assert BIGHA_HA == pytest.approx(0.1337803776, rel=1e-12)
 
@@ -70,7 +70,7 @@ def test_mass_round_trip(unit):
 
 
 def test_demo_script_area_change():
-    """PLAN.md §5 step 3 changes the farm from 2 bigha to 3 live."""
+    """docs/archive/hackathon/PLAN.md §5 step 3 changes the farm from 2 bigha to 3 live."""
     assert to_hectares(2, "bigha") == pytest.approx(0.2675607552, rel=1e-9)
     assert to_hectares(3, "bigha") == pytest.approx(0.4013411328, rel=1e-9)
     # The judged behaviour is that outputs move when the input moves.

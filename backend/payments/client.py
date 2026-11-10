@@ -1,7 +1,7 @@
 """Live bdapps HTTP client.
 
 Same method names and return shapes as BdappsSimulator, so the two are
-interchangeable and the mode toggle is a one-line swap (NOTES.md #4 wants that
+interchangeable and the mode toggle is a one-line swap (docs/NOTES.md #4 wants that
 toggle rehearsed, not improvised on stage).
 
 Auth rides in the request body — `applicationId` + `password` on every call,

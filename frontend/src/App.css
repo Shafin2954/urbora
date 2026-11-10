@@ -822,7 +822,7 @@
   max-height: 320px;
 }
 
-/* --- node inspector (overlay, never steals width — LOG3.md [12:50]) --- */
+/* --- node inspector (overlay, never steals width — docs/logs/LOG3.md [12:50]) --- */
 
 .inspector-overlay {
   position: fixed;
@@ -1282,14 +1282,6 @@
   font-size: 1.05rem;
 }
 
-.evidence { display: grid; gap: 12px; }
-.evidence-intro { margin: 0; color: var(--ink-soft); }
-.capability-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; }
-.capability { display: grid; gap: 4px; padding: 10px; border: 1px solid var(--border); background: var(--surface-sunk); color: var(--ink-soft); }
-.capability.is-done { border-color: var(--leaf); color: var(--ink); }
-.capability span, .evidence-card small { color: var(--ink-faint); font-size: .78rem; }
-.evidence-card { border-left: 4px solid var(--leaf); padding: 10px 12px; background: var(--surface-sunk); }
-.evidence-card h3, .evidence-card p { margin: 0 0 6px; }
 .alerts { display: grid; gap: 10px; margin-top: 16px; }
 .alert-card { border-left: 4px solid var(--clay); padding: 10px 12px; background: var(--surface-sunk); }
 .alert-card p { margin: 5px 0 0; }
@@ -1385,7 +1377,6 @@
   .pane-chat.is-active,
   .pane-finance.is-active,
   .pane-plan.is-active,
-  .pane-evidence.is-active,
   .pane-checkout.is-active {
     flex: 1 1 54%;
   }

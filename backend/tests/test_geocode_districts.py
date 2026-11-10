@@ -1,7 +1,7 @@
 """Offline tests for the 64-district table + geocode fallback (NOTES #6).
 
 No network: exercises only the hardcoded table and geocode._fallback.
-Run from repo root: `backend/.venv/Scripts/python -m pytest backend/tests -q`
+Run from repo root: `.venv/Scripts/python -m pytest backend/tests -q`
 """
 
 from backend.tools.districts import ALIASES, DISTRICTS, lookup_district

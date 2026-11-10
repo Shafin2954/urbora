@@ -10,8 +10,8 @@ judgement:
 3. AI-writing tells: em dashes, stock AI vocabulary, "not X but Y" frames,
    bold lead-ins, triplet lists, and flat sentence rhythm.
 
-Usage:  python scripts/form_check.py [path]   (exit code 1 on any hard failure)
-        python scripts/form_check.py --paste [path]   writes ROUND1_PASTE.txt: every answer
+Usage:  python docs/archive/round1/form_check.py [path]   (exit code 1 on any hard failure)
+        python docs/archive/round1/form_check.py --paste [path]   writes ROUND1_PASTE.txt: every answer
         with each paragraph on one line, ready to paste into the form boxes.
 Only the text under "## <answer> (max N words)" headings is checked; Part 0 and
 the team notes are ours, not the form's.
@@ -108,7 +108,7 @@ def tells(body: str) -> dict:
     return t
 
 
-def main(path: str = "ROUND1_FORM.md") -> int:
+def main(path: str = str(Path(__file__).with_name("ROUND1_FORM.md"))) -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     text = Path(path).read_text(encoding="utf-8")
     secs = sections(text)
@@ -159,7 +159,8 @@ def main(path: str = "ROUND1_FORM.md") -> int:
     return 0
 
 
-def paste(path: str = "ROUND1_FORM.md", out: str = "ROUND1_PASTE.txt") -> int:
+def paste(path: str = str(Path(__file__).with_name("ROUND1_FORM.md")),
+          out: str = str(Path(__file__).with_name("ROUND1_PASTE.txt"))) -> int:
     """Unwrap each answer's paragraphs so the form boxes get no stray line breaks."""
     text = Path(path).read_text(encoding="utf-8")
     title = re.search(r"^## Idea title\s*\n+(.+?)\n", text, flags=re.M)

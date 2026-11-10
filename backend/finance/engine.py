@@ -2,21 +2,21 @@
 
 CLAUDE.md §2.1: the LLM never computes. Every taka in the UI is produced by a
 pure function in this module and narrated by the model, never calculated by it.
-Judges test this directly (PLAN.md §5 step 3: change area 2 -> 3 bigha live and
+Judges test this directly (docs/archive/hackathon/PLAN.md §5 step 3: change area 2 -> 3 bigha live and
 watch every number move consistently), so the identities below are enforced by
 tests, not by care.
 
 Shapes come from A's frozen `backend/schemas.py`. This module fills them.
 
 ------------------------------------------------------------------------------
-THE THREE SCENARIOS (PRD.md §8 Tier0.5: "base±band, price±10%")
+THE THREE SCENARIOS (docs/product/PRD.md §8 Tier0.5: "base±band, price±10%")
 ------------------------------------------------------------------------------
   conservative : yield = base − band,  price = base_price × 0.9
   base         : yield = base,         price = base_price
   optimistic   : yield = base + band,  price = base_price × 1.1
 
 `band` is the residual standard deviation from the damped-Holt fit in crop.db.
-NOTES.md #23 is emphatic: nine data points is a wide uncertainty, so the
+docs/NOTES.md #23 is emphatic: nine data points is a wide uncertainty, so the
 projection is never quoted without its band. Pairing the low yield with the low
 price is deliberately the pessimistic corner rather than an expected value — a
 farmer deciding whether they can afford a season needs the bad case named, not
@@ -65,7 +65,7 @@ from backend.schemas import (
     Provenance,
 )
 
-# Scenario multipliers. PRD.md §8 Tier0.5 fixes the ±10% price swing.
+# Scenario multipliers. docs/product/PRD.md §8 Tier0.5 fixes the ±10% price swing.
 PRICE_SWING = Decimal("0.10")
 
 # Display precision. These are what the farmer and the judge actually see, and
@@ -268,7 +268,7 @@ def project(
                 "band = residual std dev of the damped-Holt fit "
                 "(projection, not a guarantee)"
             ),
-            # NOTES.md #23: nine data points is a wide interval. Saying "high"
+            # docs/NOTES.md #23: nine data points is a wide interval. Saying "high"
             # here would be the overclaim the note exists to prevent.
             confidence="medium",
         ),
@@ -287,7 +287,7 @@ def project(
 def min_cost_per_ha(cost_lines: list[CostLine]) -> float:
     """Total per-hectare input cost.
 
-    Used by the scorer's budget exclusion (PRD.md §6 Stage 1): if
+    Used by the scorer's budget exclusion (docs/product/PRD.md §6 Stage 1): if
     min_cost_per_ha × area > budget, the crop is excluded and the agent offers
     a reduced-area replan. Exposed here so that number comes from the same
     place as the projection and cannot drift from it.

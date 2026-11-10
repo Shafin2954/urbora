@@ -1,7 +1,7 @@
 /**
  * The Finance tab — itemised costs, three scenarios, break-even (PRD §8.5).
  *
- * This is where the judged accuracy moment happens (PLAN.md §5 step 3): change
+ * This is where the judged accuracy moment happens (docs/archive/hackathon/PLAN.md §5 step 3): change
  * the area from 2 bigha to 3 and every number moves consistently. So the area
  * editor posts to `/api/finance/recompute` and re-renders from the response —
  * the same pure engine the agent's tool calls, never a recalculation here.

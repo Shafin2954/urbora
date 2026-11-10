@@ -1,4 +1,4 @@
-"""Checkout routes (PLAN.md §2: POST /api/checkout -> CheckoutResult).
+"""Checkout routes (docs/archive/hackathon/PLAN.md §2: POST /api/checkout -> CheckoutResult).
 
 Two endpoints, because CLAUDE.md §2.13 requires a confirmation step before any
 charge:

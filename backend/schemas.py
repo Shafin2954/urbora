@@ -1,8 +1,8 @@
 """
-Urbora shared schemas — THE CONTRACT (PLAN.md §2).
+Urbora shared schemas — THE CONTRACT (docs/archive/hackathon/PLAN.md §2).
 
 Owner: Instance A. Imported by Instance B (api / finance / payments / frontend
-serialization). FROZEN at H1. After the freeze, any change requires a LOG1.md
+serialization). FROZEN at H1. After the freeze, any change requires a docs/logs/LOG1.md
 entry + human A approval + a heads-up to B before merge (CLAUDE.md §0).
 
 Design rules baked in here:

@@ -1,6 +1,6 @@
-"""Finance routes — `POST /api/finance/recompute` (PLAN.md §2).
+"""Finance routes — `POST /api/finance/recompute` (docs/archive/hackathon/PLAN.md §2).
 
-This is the endpoint behind the judged moment in PLAN.md §5 step 3: change the
+This is the endpoint behind the judged moment in docs/archive/hackathon/PLAN.md §5 step 3: change the
 area from 2 bigha to 3 on screen and watch every number move consistently. It
 recomputes through the same pure engine the agent's tool uses, so the live edit
 and the agent's narration can never disagree.

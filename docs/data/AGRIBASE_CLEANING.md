@@ -33,7 +33,7 @@ The validation bounds are deliberately broad plausibility checks, not agronomic 
 
 ## Rebuilding
 
-Run `Get-Content -Raw build_agribase_clean.sql | sqlite3 agribase_clean.db` only after deliberately removing the current generated file and reviewing any changed validation policy. The build fails safely if an existing output file would be overwritten by the normal project command.
+From `data/` (where `crops.db`, the raw source, must sit; it is not in git), run `Get-Content -Raw ../docs/data/build_agribase_clean.sql | sqlite3 agribase_clean.db` only after deliberately removing the current generated file and reviewing any changed validation policy. The build fails safely if an existing output file would be overwritten by the normal project command.
 
 ## Required README wording
 

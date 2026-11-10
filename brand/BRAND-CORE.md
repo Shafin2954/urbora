@@ -2,7 +2,7 @@
 
 **This is the single source of truth** for name, story, tagline, voice and look, for every
 session (website, video, form, deck). Where older files (BRAND.md, VOICE.md, NAMES.md,
-VIDEO_HANDOFF.md) disagree with this page, this page wins.
+video/VIDEO_HANDOFF.md) disagree with this page, this page wins.
 
 Replaced names, never to be used again: Agrosfeer, AgriSense (hackathon), Jigai, Sudin/সুদিন
 (bad homophone), Urbor/উর্বর (a Dhaka agri-fintech is listed as "Urbor" on Crunchbase), Urborota/উর্বরতা
@@ -56,7 +56,7 @@ but the agriculture office is far away. Mobile banking brought the bank to peopl
 Urbora brings the agriculture expert to the farmer's phone. It names the problem and
 gives the exact fix for his own land.
 
-### The four truths the story stands on (from FIELD_INSIGHTS.md)
+### The four truths the story stands on (from docs/product/FIELD_INSIGHTS.md)
 
 1. **The gift is fading.** Hybrids raised yields 15–20 years ago; for ten years the same land
    gives less while costs rise. One farmer: "50 মণ last year, 30 মণ this year" (his figures;

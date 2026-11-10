@@ -4,13 +4,13 @@
   "description": "Farm advice on any phone: a Bangla voice, keypad and SMS agent whose numbers come from tested code and cited sources.",
   "main": "index.js",
   "directories": {
-    "test": "tests"
+    "test": "backend/tests"
   },
   "scripts": {
     "dev": "node scripts/dev.mjs dev",
     "app": "node scripts/dev.mjs app",
     "build": "npm --prefix frontend run build",
-    "test": "echo \"Run: .venv/Scripts/python -m pytest tests backend/tests -q\"",
+    "test": "echo \"Run: .venv/Scripts/python -m pytest backend/tests -q\"",
     "e2e": "node scripts/e2e_farmers.mjs"
   },
   "keywords": [],

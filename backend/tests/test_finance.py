@@ -24,7 +24,7 @@ The numbers below are ARBITRARY TEST FIXTURES, not curated agricultural data.
 Real prices live in data/prices.md with per-row citations; nothing here should
 ever be read as a claim about Bangladeshi agriculture.
 
-Run from the repo root:  .venv/Scripts/python -m pytest tests/ -q
+Run from the repo root:  .venv/Scripts/python -m pytest backend/tests -q
 """
 
 from decimal import ROUND_HALF_UP, Decimal
@@ -188,7 +188,7 @@ def test_scenarios_are_ordered_and_distinct():
 
 
 def test_scenario_definitions_match_the_prd():
-    """base±band on yield, ±10% on price (PRD.md §8 Tier0.5)."""
+    """base±band on yield, ±10% on price (docs/product/PRD.md §8 Tier0.5)."""
     s = make(area_ha=1.0).scenarios
     assert s.base.expected_yield_kg == pytest.approx(4000.0)
     assert s.conservative.expected_yield_kg == pytest.approx(3500.0)
@@ -209,7 +209,7 @@ def test_cost_is_identical_across_scenarios():
 
 
 def test_area_change_scales_everything_linearly():
-    """PLAN.md §5 step 3: change 2 bigha -> 3 bigha live, everything recomputes.
+    """docs/archive/hackathon/PLAN.md §5 step 3: change 2 bigha -> 3 bigha live, everything recomputes.
 
     `rel=1e-5` rather than exact: quantities are rounded to 4dp *before* being
     priced, so that each row multiplies out on screen (engine docstring, rule
@@ -273,7 +273,7 @@ def test_a_yield_in_tonnes_is_refused_not_silently_costed():
 
 
 def test_every_item_carries_provenance():
-    """PRD.md §7 / CLAUDE.md §2.3: a number without provenance must not render."""
+    """docs/product/PRD.md §7 / CLAUDE.md §2.3: a number without provenance must not render."""
     for name in ("conservative", "base", "optimistic"):
         scenario = getattr(make().scenarios, name)
         assert scenario.items, "a scenario with no items would render an empty table"
@@ -291,7 +291,7 @@ def test_assumptions_include_yield_price_and_band():
 
 
 def test_band_assumption_is_labelled_a_projection_not_a_guarantee():
-    """NOTES.md #23: never quote the Holt projection without its band."""
+    """docs/NOTES.md #23: never quote the Holt projection without its band."""
     band = next(a for a in make().assumptions if a.source_id == "finance.engine")
     assert band.source_type == "computed"
     assert band.formula and "not a guarantee" in band.formula
@@ -332,7 +332,7 @@ def test_min_cost_per_ha_matches_the_projection():
 
 
 def test_budget_exclusion_arithmetic():
-    """PRD.md §6 Stage 1 budget filter — the recovery moment in the demo."""
+    """docs/product/PRD.md §6 Stage 1 budget filter — the recovery moment in the demo."""
     area = to_hectares(2, "bigha")
     needed = min_cost_per_ha(COSTS) * area
     assert needed > 5_000       # a 5k budget cannot fund it

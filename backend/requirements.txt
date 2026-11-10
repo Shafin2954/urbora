@@ -1,6 +1,6 @@
 # Agrosfeer backend dependencies — pin EXACT versions on first add (CLAUDE.md rule 7).
-# Python 3.12. Create venv: `python -m venv backend/.venv`
-# Install:    `backend/.venv/Scripts/python -m pip install -r backend/requirements.txt`
+# Python 3.12. Create venv: `python -m venv .venv` (repo root)
+# Install:    `.venv/Scripts/python -m pip install -r backend/requirements.txt`
 
 # ── Instance A core: agent / tools / kb / memory / schemas ──
 openai==2.48.0            # LLM backend (Chat Completions, function tools, streaming) — PROVIDER per human A (deviates from PRD §11)

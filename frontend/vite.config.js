@@ -7,12 +7,12 @@ import { VitePWA } from 'vite-plugin-pwa'
 // Two things here are load-bearing and should not be "tidied up" later:
 //
 // 1. THE /api PROXY. In dev the browser talks only to :5173, and Vite forwards
-//    /api to the FastAPI process. One origin means zero CORS — NOTES.md #13
+//    /api to the FastAPI process. One origin means zero CORS — docs/NOTES.md #13
 //    lists SSE+CORS friction as an hour-eater, and this is how it dies at H0
 //    instead of at H14. It also matches production, where both are served from
 //    one origin, so dev and prod exercise the same request path.
 //
-// 2. NO SERVICE WORKER. PRD.md §9 says manifest-only PWA; NOTES.md #8 says a
+// 2. NO SERVICE WORKER. docs/product/PRD.md §9 says manifest-only PWA; docs/NOTES.md #8 says a
 //    stale SW cache is a stale-JS ghost hunt nobody has time for. So the PWA
 //    plugin here generates a manifest and NOTHING ELSE. See the comments on
 //    injectRegister/devOptions below before changing either.

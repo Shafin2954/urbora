@@ -15,7 +15,7 @@ Units: kg/ha throughout (rule 11 — internal unit is kg). This deviates from PR
 §5's t/ha column naming on purpose, to match the source units and the finance
 engine; documented in LOG1.
 
-Run (repo root):  backend/.venv/Scripts/python -m backend.kb.holt
+Run (repo root):  .venv/Scripts/python -m backend.kb.holt
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_AGRIBASE = _REPO_ROOT / "agribase_clean.db"
+_AGRIBASE = _REPO_ROOT / "data" / "agribase_clean.db"
 _CROPDB = _REPO_ROOT / "data" / "crop.db"
 
 # Fixed, deterministic smoothing params (no optimizer → reproducible in-event).

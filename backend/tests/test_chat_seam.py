@@ -39,7 +39,7 @@ def frames(body: str) -> list[dict]:
 
 
 # A bdapps-shaped tool payload: auth in the body, which is the whole reason
-# redaction exists (NOTES.md #19).
+# redaction exists (docs/NOTES.md #19).
 LEAKY_PARAMS = {
     "applicationId": "APP_000123",
     "password": "9f8e7d6c5b4a39281706f5e4d3c2b1a0",

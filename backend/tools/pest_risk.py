@@ -1,4 +1,4 @@
-"""Pest and disease risk — competition.md Tier 1 item 4.
+"""Pest and disease risk — docs/product/competition.md Tier 1 item 4.
 
     "Predict likely pests and diseases from crop, growth stage, and weather,
      with preventive and treatment options and estimated cost."

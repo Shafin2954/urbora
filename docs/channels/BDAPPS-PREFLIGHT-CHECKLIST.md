@@ -2,7 +2,7 @@
 
 > Run through this **on the hackathon morning, on the actual network you'll use**, before writing any feature code.
 > Goal: prove one real API call returns `"statusCode": "S1000"` so you know auth + IP whitelisting work.
-> Companion to `BDAPPS-API-REFERENCE.md`.
+> Companion to `docs/channels/BDAPPS-API-REFERENCE.md`.
 
 ---
 
@@ -113,4 +113,4 @@ You're clear to build features once **all** of these are true:
 3. Only if you're doing **USSD or receiving SMS**: run a tunnel and paste its `https` URL as the app's **callback URL**.
 4. If it worked last night but fails now → your **IP changed**, re-whitelist.
 
-*Sources: `bdapps-API-DGD v1.1.3.pdf` (E-code table), portal behavior for host provisioning & callback URLs. See `BDAPPS-API-REFERENCE.md` for full endpoint details.*
+*Sources: `bdapps-API-DGD v1.1.3.pdf` (E-code table), portal behavior for host provisioning & callback URLs. See `docs/channels/BDAPPS-API-REFERENCE.md` for full endpoint details.*

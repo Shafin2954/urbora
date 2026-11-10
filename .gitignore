@@ -39,7 +39,7 @@ Thumbs.db
 *.swp
 
 # ── Raw yearbook PDFs (234 MB) — added by B after nearly committing them ──
-# NOTES.md #3 is explicit that raw yearbook data is "hosted publicly, link in
+# docs/NOTES.md #3 is explicit that raw yearbook data is "hosted publicly, link in
 # README", not carried in git. 2016.pdf alone is 53 MB, past GitHub's warning
 # threshold; the set would bloat every clone and slow the one push that has to
 # work before the cutoff. A: if you disagree, this is one line to delete — but
@@ -47,7 +47,7 @@ Thumbs.db
 1. Yearbook/
 *.pdf
 
-# NOTE (B): data/crop.db is deliberately NOT ignored here — PLAN.md §1 leaves
+# NOTE (B): data/crop.db is deliberately NOT ignored here — docs/archive/hackathon/PLAN.md §1 leaves
 # "gitignored or committed with meta timestamp" to A. A decides; B does not.
 
 # ── Session/farm memory store (A) — runtime state, not source, never committed ──

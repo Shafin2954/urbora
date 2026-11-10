@@ -1,6 +1,6 @@
 """Bangladeshi mobile number normalisation for bdapps.
 
-BDAPPS-API-REFERENCE.md gotcha #4: the address format is strict — `tel:88`
+docs/channels/BDAPPS-API-REFERENCE.md gotcha #4: the address format is strict — `tel:88`
 followed by an 11-digit `01[3-9]xxxxxxxx`. Getting it wrong returns `E1325`
 (bad address format), which at a demo looks exactly like "the payment is
 broken" rather than "the phone number had a space in it".
@@ -60,7 +60,7 @@ def to_subscriber_id(raw: str) -> str:
 
 
 def mask(raw: str) -> str:
-    """Last 3 digits only — the display/log form (NOTES.md #19).
+    """Last 3 digits only — the display/log form (docs/NOTES.md #19).
 
     Note this is for OUR display of a number we already hold. Numbers coming
     *back* from bdapps are separately masked by them (gotcha #5) and must be

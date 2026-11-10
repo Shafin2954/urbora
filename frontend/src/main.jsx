@@ -6,7 +6,7 @@ import { BRAND_NAME_BN, BRAND_TAGLINE_BN } from './branding.js'
 
 document.title = `${BRAND_NAME_BN} · ${BRAND_TAGLINE_BN}`
 
-// NOTES.md #8 — a stale service worker serves ghost JS, and you lose an hour
+// docs/NOTES.md #8 — a stale service worker serves ghost JS, and you lose an hour
 // debugging code that isn't running. We never register one (vite.config.js
 // sets injectRegister: null), but localhost:5173 is shared ground: any other
 // Vite project previously run on this port may have left a service worker and
@@ -17,7 +17,7 @@ if (import.meta.env.DEV && 'serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then((registrations) => {
     for (const registration of registrations) {
       registration.unregister()
-      console.warn('[agrisense] evicted a stale service worker — see NOTES.md #8')
+      console.warn('[agrisense] evicted a stale service worker — see docs/NOTES.md #8')
     }
   })
   if ('caches' in window) {

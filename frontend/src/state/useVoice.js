@@ -1,5 +1,5 @@
 /**
- * Voice in and out — competition.md Tier 2, "Bengali or voice interaction for
+ * Voice in and out — docs/product/competition.md Tier 2, "Bengali or voice interaction for
  * low-literacy accessibility".
  *
  * The two halves use different mechanisms, for a reason worth recording.

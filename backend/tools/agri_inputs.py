@@ -11,7 +11,7 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
-_DB = Path(__file__).resolve().parents[2] / "agristats.db"
+_DB = Path(__file__).resolve().parents[2] / "data" / "agristats.db"
 
 _CROP_NAMES = {
     "boro_rice": "Boro", "aman_rice": "Aman", "potato": "Potato",

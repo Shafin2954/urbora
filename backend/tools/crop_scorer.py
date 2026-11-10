@@ -53,13 +53,13 @@ DEFAULT_CANDIDATES: tuple[str, ...] = ("boro_rice", "aman_rice", "potato", "must
 
 # Water-access ranking, higher = more reliable irrigation access. A tubewell
 # (farmer's own lift/shallow pump, on-demand) is strictly better access than a
-# shared canal (scheduled, contested, seasonal) — NOT worse. PRD.md §6's prose
+# shared canal (scheduled, contested, seasonal) — NOT worse. docs/product/PRD.md §6's prose
 # table literally reads "rainfed < tubewell < canal/irrigated", which is
 # backwards from real BD agronomy and, left uncorrected here, silently
 # excluded boro rice — the single most important Rabi crop, overwhelmingly
 # shallow-tubewell irrigated — for every tubewell-only farm (boro's
 # water_min_rank=2 in kb/crop_facts.py was unreachable via tubewell under the
-# old ranks). Fixed 2026-07-25; PRD.md wording still needs a matching
+# old ranks). Fixed 2026-07-25; docs/product/PRD.md wording still needs a matching
 # correction by whoever owns it (out of this instance's directories).
 WATER_RANK: dict[str, int] = {"rainfed": 0, "canal": 1, "tubewell": 2, "irrigated": 2}
 
@@ -607,7 +607,7 @@ def crop_scorer_tool(
     exactly. CLAUDE.md rule 1 forbids the model from ever doing unit arithmetic
     itself; a bare `area_ha` param silently required exactly that (bug found
     2026-07-24: 3 bigha was passed straight through as if it were 3 hectares,
-    a 7.47x profit overstatement — logged in LOG3.md).
+    a 7.47x profit overstatement — logged in docs/logs/LOG3.md).
 
     `finance` is supplied from `data/prices.md` when — and only when — every
     candidate has a cited price and cost (see `PriceCatalog.scorer_finance`).
@@ -768,7 +768,7 @@ def _profit_basis(crops: list[str], finance: dict[str, CropFinance] | None) -> d
 def _risk_basis() -> dict:
     """What `risk_level` on each candidate actually measures — and what it doesn't.
 
-    competition.md Tier 0 item 3 asks for a risk level per crop, and a farmer
+    docs/product/competition.md Tier 0 item 3 asks for a risk level per crop, and a farmer
     hearing "high risk" reasonably assumes it covers the three things that can
     cost them the season: a bad yield, a pest outbreak, and a weather disaster.
     Ours covers exactly one of those. Shipping the bare word would let the model

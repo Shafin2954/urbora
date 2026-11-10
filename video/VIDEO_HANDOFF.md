@@ -6,10 +6,10 @@ in the first session; do not edit `frontend/` or `backend/` from the video sessi
 ## Paste this as the first message of the new session
 
 > You are working on the Round 1 pitch video for our FutureMakers 2026 entry (repo
-> D:\Projects\TeamFixeth_AgriSense, branch futuremakers). Read CLAUDE.md, VIDEO_HANDOFF.md
-> (all of it), FIELD_INSIGHTS.md (a real farmer interview: build the story on it),
+> D:\Projects\TeamFixeth_AgriSense, branch futuremakers). Read CLAUDE.md, video/VIDEO_HANDOFF.md
+> (all of it), docs/product/FIELD_INSIGHTS.md (a real farmer interview: build the story on it),
 > brand/BRAND-CORE.md (name উর্বরা / Urbora, tagline স্বপ্ন ফলুক, story, colours, type;
-> it overrides older brand files), brand/VOICE.md, FUTUREMAKERS_BRIEF.md and ROUND1_FORM.md
+> it overrides older brand files), brand/VOICE.md, docs/archive/round1/FUTUREMAKERS_BRIEF.md and docs/archive/round1/ROUND1_FORM.md
 > first. Another session is rebuilding
 > the website at the same time — do not touch frontend/ or backend/; your files go in
 > `video/`. Step 1: draw storyboard v2 as a published artifact page (sketch panels, one per
@@ -73,7 +73,7 @@ boro leaves": there is no rule for it.
 
 ## Suggested story direction (starting point for v2, not final)
 
-Built on the real interview in FIELD_INSIGHTS.md (a farmer in Dinajpur).
+Built on the real interview in docs/product/FIELD_INSIGHTS.md (a farmer in Dinajpur).
 
 1. Mahmud bhai at the field: the centre shoots are drying. Light and everyday, not tragic.
 2. **Many voices.** The seller: "ভাই, এইটা নিয়া যান, এইবার সবাই এইটাই নিতেছে।" A

@@ -6,7 +6,7 @@ The trace panel shows judges the raw params and raw results of every tool call
 so "show the raw body" and "don't leak credentials" collide head-on. This
 module is where that collision is resolved, once, in one place.
 
-Rules (NOTES.md #19, CLAUDE.md §2.5):
+Rules (docs/NOTES.md #19, CLAUDE.md §2.5):
   - password / appId / key / token / secret   -> "***"
   - phone / subscriberId                       -> last 3 digits only
 

@@ -1,4 +1,4 @@
-"""Speech-to-text for the composer microphone (competition.md Tier 2, voice).
+"""Speech-to-text for the composer microphone (docs/product/competition.md Tier 2, voice).
 
     POST /api/transcribe    multipart audio -> {"text": ...}
     GET  /api/transcribe/status

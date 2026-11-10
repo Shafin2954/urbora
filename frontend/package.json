@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "comment": "Versions are exact, no ^ ranges — CLAUDE.md §2.7 / NOTES.md #15. A caret here is how the demo machine and the venue machine end up on different builds at 3am.",
+  "comment": "Versions are exact, no ^ ranges — CLAUDE.md §2.7 / docs/NOTES.md #15. A caret here is how the demo machine and the venue machine end up on different builds at 3am.",
   "scripts": {
     "dev": "vite",
     "dev:host": "vite --host",

@@ -2,7 +2,7 @@
  * SSE client over fetch.
  *
  * Why not EventSource: EventSource can only issue GET requests, and the real
- * contract (PLAN.md §2) is `POST /api/chat {session_id, farm_id, message}`
+ * contract (docs/archive/hackathon/PLAN.md §2) is `POST /api/chat {session_id, farm_id, message}`
  * -> SSE. Building on EventSource would mean throwing the client away the day
  * /api/chat lands. So the transport is fetch + a streaming body reader from
  * hour zero, and the hello-world endpoint exercises exactly the path the agent

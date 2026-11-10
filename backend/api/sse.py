@@ -2,12 +2,12 @@
 
 Wire format decision (B, H0): every event goes out as a single `data:` line
 holding one JSON object, and the discriminator lives *inside* that JSON as
-`type` — exactly the shape PLAN.md §2 specifies. We do NOT use the SSE
+`type` — exactly the shape docs/archive/hackathon/PLAN.md §2 specifies. We do NOT use the SSE
 `event:` field. One channel, one handler, one switch on `payload.type` in the
 client; adding a second naming system on the wire would only give us two places
 to typo an event name.
 
-Trace redaction (NOTES.md #19) lives in redact.py and is applied *inside* the
+Trace redaction (docs/NOTES.md #19) lives in redact.py and is applied *inside* the
 `tool_call` / `tool_result` constructors below. That is deliberate: there is no
 way to build one of those events without redacting, so no caller can forget.
 Raw bdapps request bodies carry `password` and `applicationId`, and the trace
@@ -96,7 +96,7 @@ def from_agent_event(event: Any) -> dict:
     return dump() if dump is not None else event
 
 
-# --- event constructors (PLAN.md §2 contract) -------------------------------
+# --- event constructors (docs/archive/hackathon/PLAN.md §2 contract) -------------------------------
 # Only the ones H0 needs. The rest land as their features do.
 
 
@@ -108,7 +108,7 @@ def tool_call(call_id: str, name: str, params: Any) -> dict:
     """A tool invocation, params redacted by construction.
 
     `redacted` lists the field paths that were masked. It is additive to the
-    PLAN.md §2 shape — A produces nothing here, the emitter builds the event —
+    docs/archive/hackathon/PLAN.md §2 shape — A produces nothing here, the emitter builds the event —
     and it lets the trace panel show that masking was deliberate rather than
     leaving a judge wondering why a field says `***`.
     """
@@ -163,7 +163,7 @@ async def _with_heartbeat(
 
     Also the place client disconnects are noticed: a farmer on a phone will
     lock the screen mid-plan, and we want the agent loop torn down rather than
-    left burning tokens into a dead socket (NOTES.md #5).
+    left burning tokens into a dead socket (docs/NOTES.md #5).
     """
     iterator = events.__aiter__()
     pending: asyncio.Task | None = None

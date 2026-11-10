@@ -5,7 +5,7 @@ import { streamSSE } from '../api/sse.js'
 /**
  * The one place SSE event semantics live.
  *
- * Every event type in the PLAN.md §2 contract is handled here and nowhere
+ * Every event type in the docs/archive/hackathon/PLAN.md §2 contract is handled here and nowhere
  * else, so components stay dumb renderers. Unknown event types are kept rather
  * than dropped — when A adds an event this hook hasn't learned yet, it must
  * show up in the trace instead of vanishing silently.
@@ -90,7 +90,7 @@ export function useChat({ farmId, sessionId, accessToken, language = 'bn', onCro
           break
 
         case 'input_request':
-          // At most one open question at a time — PRD.md §8 Tier0.1 is explicit
+          // At most one open question at a time — docs/product/PRD.md §8 Tier0.1 is explicit
           // that the agent asks at most one question per turn.
           setInputRequest(event)
           break

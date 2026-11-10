@@ -1,4 +1,4 @@
-"""Market price intelligence — competition.md Tier 2.
+"""Market price intelligence — docs/product/competition.md Tier 2.
 
     "Current and historical prices, plus a sell-now/store/wait recommendation
      with reasoning."
@@ -42,7 +42,7 @@ import statistics
 from datetime import datetime, timezone
 from pathlib import Path
 
-_DB = Path(__file__).resolve().parents[2] / "agristats.db"
+_DB = Path(__file__).resolve().parents[2] / "data" / "agristats.db"
 
 # canonical crop -> (commodity rows in v_prices, what the row is a price FOR)
 _COMMODITY: dict[str, tuple[tuple[str, ...], str]] = {

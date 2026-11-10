@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 /**
- * Renders an `input_request` event (PLAN.md §2) as a widget.
+ * Renders an `input_request` event (docs/archive/hackathon/PLAN.md §2) as a widget.
  *
- * These are accelerators, not a form wizard (PRD.md §8 Tier0.1): the composer
+ * These are accelerators, not a form wizard (docs/product/PRD.md §8 Tier0.1): the composer
  * stays live the whole time, so a farmer who would rather type a sentence
  * always can, and the agent extracts what it needs from free text. The widget
  * only removes typing for the common answer.

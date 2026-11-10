@@ -84,7 +84,7 @@ def build_client(mode: str | None = None):
 def receipt_bn(amount: float, items: list[CheckoutItem], trx_id: str | None) -> str:
     """Bangla SMS receipt, sent with encoding '16' (§4.1).
 
-    Bangla words, Western numerals — NOTES.md #17: computed values stay in
+    Bangla words, Western numerals — docs/NOTES.md #17: computed values stay in
     Western numerals so they can be checked against the screen.
     """
     lines = [f"{BRAND_NAME}: ৳{amount:.2f} কাটা হয়েছে।"]
@@ -125,7 +125,7 @@ class CheckoutService:
             subscriber_id=subscriber_id,
             amount=round(float(amount), 2),
             items=tuple(items),
-            # The exact wording PRD.md §8 Tier2.1 asks for.
+            # The exact wording docs/product/PRD.md §8 Tier2.1 asks for.
             prompt_bn=f"৳{amount:.2f} কাটা হবে — নিশ্চিত?",
             expires_at=_now() + QUOTE_TTL,
         )

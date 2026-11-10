@@ -26,7 +26,7 @@ API_PORT = int(os.getenv("API_PORT", "8000"))
 # Dev normally needs no CORS at all: the Vite dev server proxies /api to this
 # process, so the browser sees a single origin. These origins only matter when
 # something hits the API port directly (curl, a phone on the LAN, a judge
-# poking at :8000). Keeping both is deliberate belt-and-braces — NOTES.md #13
+# poking at :8000). Keeping both is deliberate belt-and-braces — docs/NOTES.md #13
 # lists SSE+CORS friction as an hour-eater, so it dies at H0, not at H14.
 CORS_ORIGINS = _csv(
     "CORS_ORIGINS",

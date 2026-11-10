@@ -1,5 +1,5 @@
 /**
- * bdapps checkout (PRD.md §8 Tier2.1) — basket, confirmation, receipt.
+ * bdapps checkout (docs/product/PRD.md §8 Tier2.1) — basket, confirmation, receipt.
  *
  * One screen, one primary action at a time, because this is the screen where a
  * farmer spends money and the phone may be in sunlight. The three stages are

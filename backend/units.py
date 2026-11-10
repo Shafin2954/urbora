@@ -8,7 +8,7 @@ engine or in crop.db, that is a bug.
 ------------------------------------------------------------------------------
 CONVENTION, AND A DISCREPANCY THAT HAD TO BE RESOLVED
 ------------------------------------------------------------------------------
-CLAUDE.md §2.11 and NOTES.md #9 both state: "1 bigha = 33 decimal = 0.1338 ha".
+CLAUDE.md §2.11 and docs/NOTES.md #9 both state: "1 bigha = 33 decimal = 0.1338 ha".
 Those two halves are not equal, and the difference is real:
 
     33 decimal  = 0.33 acre       = 0.1335463 ha
@@ -28,7 +28,7 @@ decimal and acre on the **exact international acre**.
 
 So "1 bigha = 33 decimal" is treated as the approximation it actually is
 (33.06), while "0.1338 ha" is treated as the definition. Stated in the README
-per NOTES.md #9. Changing this is a one-line edit to BIGHA_HA — but it moves
+per docs/NOTES.md #9. Changing this is a one-line edit to BIGHA_HA — but it moves
 every cost and revenue number, so it is a team decision, not a tidy-up.
 """
 
@@ -64,7 +64,7 @@ AREA_IN_HA: dict[str, float] = {
 # every revenue figure, since prices are quoted per maund.
 #
 # 40 kg is chosen because that is what today's markets and the DAM daily price
-# bulletins (PRD.md §10, the source prices.md is built from) actually mean by
+# bulletins (docs/product/PRD.md §10, the source prices.md is built from) actually mean by
 # "মণ". Pricing a 40 kg maund with a 37.32 kg divisor would overstate revenue
 # by 7% while looking perfectly reasonable on screen.
 #
@@ -134,7 +134,7 @@ class UnknownUnitError(ValueError):
 
     Deliberately loud. Guessing — defaulting an unknown unit to hectares, say —
     would silently produce a farm 7x the real size and a plan to match. A
-    crash at intake is cheap; a confident wrong number is not (NOTES.md #9).
+    crash at intake is cheap; a confident wrong number is not (docs/NOTES.md #9).
     """
 
 
@@ -205,8 +205,8 @@ def mass_units() -> Iterable[str]:
     return tuple(MASS_IN_KG)
 
 
-# Bangla labels for the display edge. PRD.md §9: farmer-facing text is Bangla,
-# but the numeral beside it stays Western (NOTES.md #17).
+# Bangla labels for the display edge. docs/product/PRD.md §9: farmer-facing text is Bangla,
+# but the numeral beside it stays Western (docs/NOTES.md #17).
 UNIT_LABELS_BN: dict[str, str] = {
     "ha": "হেক্টর",
     "bigha": "বিঘা",

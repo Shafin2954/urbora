@@ -1,6 +1,6 @@
 """`POST /api/finance/recompute` — the judged live-edit moment.
 
-PLAN.md §5 step 3: change the area from 2 bigha to 3 on screen, and every
+docs/archive/hackathon/PLAN.md §5 step 3: change the area from 2 bigha to 3 on screen, and every
 number moves consistently. A judge will do exactly that and then check the
 arithmetic, so what is asserted here is coherence under an edit, not fixtures.
 

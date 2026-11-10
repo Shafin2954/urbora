@@ -1,4 +1,4 @@
-# Optional: leaf-photo disease detection (competition.md Tier 2).
+# Optional: leaf-photo disease detection (docs/product/competition.md Tier 2).
 #
 # Kept OUT of requirements.txt on purpose. torch is a ~200 MB download and this
 # is one bonus feature — a judge cloning the repo to check Tier 0 should not pay

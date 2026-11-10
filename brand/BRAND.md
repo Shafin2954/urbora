@@ -17,7 +17,7 @@ from `LOGO-BRIEF.md`. The product name in code still comes from `backend/brandin
 
 ## 1. What the brand is for
 
-**The farmer's problem, in his words** (FIELD_INSIGHTS.md, a farmer in Dinajpur):
+**The farmer's problem, in his words** (docs/product/FIELD_INSIGHTS.md, a farmer in Dinajpur):
 
 - "Every shopkeeper says something different, everyone says something different; everyone is
   confused."

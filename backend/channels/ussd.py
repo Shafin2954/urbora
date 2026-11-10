@@ -11,7 +11,7 @@ this module does three things only:
 3. returns an **action** ("plan", "ask", "problem", "sms", "market") that the
    runtime runs in the background, delivering the result by SMS.
 
-Screen budget (CHANNELS_RESEARCH.md §1): one USSD screen is 160 octets — 182
+Screen budget (docs/channels/CHANNELS_RESEARCH.md §1): one USSD screen is 160 octets — 182
 GSM-7 characters, but only **80 UCS-2 units for Bangla** (vowel signs count
 separately). Every screen, error variants included, is built to fit
 `screen_limit()`; `paged()` splits any option list that would not. The same

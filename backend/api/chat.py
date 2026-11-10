@@ -1,6 +1,6 @@
 """Chat routes: the real /api/chat seam, and a dev harness for UI work.
 
-/api/chat is B's route wrapping A's agent loop (PLAN.md §1: agent is A's,
+/api/chat is B's route wrapping A's agent loop (docs/archive/hackathon/PLAN.md §1: agent is A's,
 routes are B's). The loop is imported lazily, so the API still boots and every
 other route still works if A's module is missing or broken — in that case the
 endpoint degrades honestly with an `error` event rather than pretending.
@@ -90,7 +90,7 @@ async def chat(payload: ChatRequest, request: Request):
 
 # --- dev harness ------------------------------------------------------------
 
-# Every widget kind in the PLAN.md §2 contract, so the UI can be built and
+# Every widget kind in the docs/archive/hackathon/PLAN.md §2 contract, so the UI can be built and
 # reviewed against all of them. Options are labelled as harness values; the
 # real ones come from the agent at runtime.
 _HARNESS_SCRIPT: list[tuple[float, Any]] = [
@@ -157,7 +157,7 @@ async def dev_harness_widgets(payload: ChatRequest, request: Request):
 
     `message` selects a single kind by field name ("district", "soil_type",
     ...); anything else emits all five. Single-kind matters because each
-    input_request replaces the previous one (PRD.md §8: at most one open
+    input_request replaces the previous one (docs/product/PRD.md §8: at most one open
     question), so in an all-five run only the last widget is ever interactable.
     """
 

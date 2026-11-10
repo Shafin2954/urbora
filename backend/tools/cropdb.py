@@ -24,7 +24,7 @@ from backend.branding import BRAND_NAME
 from .districts import lookup_district
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_AGRIBASE = _REPO_ROOT / "agribase_clean.db"
+_AGRIBASE = _REPO_ROOT / "data" / "agribase_clean.db"
 _CROPDB = _REPO_ROOT / "data" / "crop.db"
 
 # canonical crop name (what KB / scorer use) -> agribase_clean.db crop_key.

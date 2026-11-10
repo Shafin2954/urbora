@@ -1,7 +1,7 @@
 """Tests for backend/tools/crop_scorer.py — the deterministic PRD §6 ranker.
 
 Today's real config is crop_facts=None, finance=None, climatology_by_crop=None
-(no curated KB, no finance engine yet — human decision, LOG1.md 2026-07-24).
+(no curated KB, no finance engine yet — human decision, docs/logs/LOG1.md 2026-07-24).
 Most tests exercise that real degraded mode against Rajshahi (real crop.db
 data). A few construct synthetic CropFacts/CropFinance/climatology (test-only,
 never shipped) to prove the future KB/finance-backed code path already works.

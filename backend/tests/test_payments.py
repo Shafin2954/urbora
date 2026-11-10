@@ -8,7 +8,7 @@ What these guard:
   * credentials never reach the trace
   * the E1326 insufficient-balance recovery path actually works
 
-Run from the repo root:  .venv/Scripts/python -m pytest tests/ -q
+Run from the repo root:  .venv/Scripts/python -m pytest backend/tests -q
 """
 
 import pytest
@@ -191,7 +191,7 @@ def test_zero_or_negative_amount_refused(service):
 
 
 def test_insufficient_balance_path(service):
-    """NOTES.md #4 / PRD.md §8 Tier2.1 — E1326 must be demonstrable."""
+    """docs/NOTES.md #4 / docs/product/PRD.md §8 Tier2.1 — E1326 must be demonstrable."""
     service._client.state.set_balance(to_subscriber_id(MOBILE), 10.0)
     service.quote(farm_id="f1", mobile=MOBILE, amount=500.0, items=ITEMS)
     result = service.charge(farm_id="f1", mobile=MOBILE, amount=500.0, items=ITEMS)
@@ -249,7 +249,7 @@ def test_live_client_reports_live_mode():
 def test_receipt_is_bangla_with_western_numerals():
     text = receipt_bn(137.0, ITEMS, "913080108430074")
     assert "কাটা হয়েছে" in text          # Bangla words
-    assert "137.00" in text               # Western numerals (NOTES.md #17)
+    assert "137.00" in text               # Western numerals (docs/NOTES.md #17)
     assert "913080108430074" in text
     assert "ইউরিয়া" in text
 

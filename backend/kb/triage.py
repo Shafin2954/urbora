@@ -8,7 +8,7 @@ a diagnosis (the spirit of CLAUDE.md rule 1), and nothing here is general
 knowledge: a combination with no KB passage returns `coverage="none"`, and the
 farmer is referred to the local SAAO / 16123 instead of being guessed at.
 
-Design and sources: CHANNELS_RESEARCH.md §4 (agronomy review, 2026-09-28).
+Design and sources: docs/channels/CHANNELS_RESEARCH.md §4 (agronomy review, 2026-09-28).
 
 Coverage, per candidate:
   S  the symptom itself is described in the KB passage

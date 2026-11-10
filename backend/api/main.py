@@ -1,9 +1,9 @@
 """Urbora API — FastAPI skeleton.
 
-H0-H1 scope (PLAN.md §3): the app, CORS, and a hello-world SSE endpoint that
+H0-H1 scope (docs/archive/hackathon/PLAN.md §3): the app, CORS, and a hello-world SSE endpoint that
 proves browser -> stream plumbing works. Real routes (/api/chat, /api/farms,
 /api/plan, /api/finance/recompute, /api/checkout) land in later blocks against
-the PLAN.md §2 contract.
+the docs/archive/hackathon/PLAN.md §2 contract.
 
 Run from the repo root:
     .venv/Scripts/python -m uvicorn backend.api.main:app --reload --port 8000
@@ -93,7 +93,7 @@ async def health() -> dict:
 _SELFTEST_SCRIPT: list[tuple[float, dict]] = [
     (0.0, sse.token("SSE self-test: ")),
     # Bangla + Western numerals through the pipe on purpose. If encoding or
-    # framing is going to mangle Bengali (CLAUDE.md §2.10, NOTES.md #17), we
+    # framing is going to mangle Bengali (CLAUDE.md §2.10, docs/NOTES.md #17), we
     # find out at H0 with a 3-line fix, not at H14 on a rendered plan.
     (0.4, sse.token("বাংলা ঠিকমতো আসছে ")),
     (0.4, sse.token("(1234567890). ")),

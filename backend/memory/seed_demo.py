@@ -1,4 +1,4 @@
-"""Seed the rehearsed demo farm (PLAN.md §5 step 1, PRD §15 decision 3).
+"""Seed the rehearsed demo farm (docs/archive/hackathon/PLAN.md §5 step 1, PRD §15 decision 3).
 
 The demo opens on a returning farmer: the agent greets them and recalls their
 farm, which is the Memory behaviour in PRD §4. That needs a profile already in

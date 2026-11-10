@@ -2,7 +2,7 @@
 
 Draft, 2026-09-29. Three versions for the team to choose from. Nothing is shot yet.
 
-**Hard limits (FUTUREMAKERS_BRIEF.md):** MP4, 2:00 or less, 300 MB or less, Bangla or English,
+**Hard limits (docs/archive/round1/FUTUREMAKERS_BRIEF.md):** MP4, 2:00 or less, 300 MB or less, Bangla or English,
 one member may present, screen recordings allowed. All three versions below are planned to run
 about 1:55, which leaves a few seconds of margin.
 

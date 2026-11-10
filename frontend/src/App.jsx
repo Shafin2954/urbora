@@ -20,7 +20,7 @@ import { useGuestSessions, newGuestSessionId } from './state/useGuestSessions.js
 import './shell.css'
 
 /**
- * One responsive page (PRD.md §9): chat primary, with the provenance graph
+ * One responsive page (docs/product/PRD.md §9): chat primary, with the provenance graph
  * alongside.
  *
  * Tabs appear only when they have something real in them. An empty tab reads

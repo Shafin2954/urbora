@@ -34,7 +34,7 @@ are in place.
 
 # PRD v3.1 — AgriSense AI (TeamFixeth_AgriSense)
 
-IUT 12th ICT Fest — Bdapps Agentic AI Hackathon, Final Round. 24h: 24 Jul 09:00 → 25 Jul 09:00, demo 25 Jul 10:00. **This document replaces all earlier PRD versions.** PLAN.md stays authoritative for execution — the §13 amendments of PRD v3 have been folded into PLAN.md directly; do not re-apply. NOTES.md and CLAUDE.md unchanged and binding.
+IUT 12th ICT Fest — Bdapps Agentic AI Hackathon, Final Round. 24h: 24 Jul 09:00 → 25 Jul 09:00, demo 25 Jul 10:00. **This document replaces all earlier PRD versions.** docs/archive/hackathon/PLAN.md stays authoritative for execution — the §13 amendments of PRD v3 have been folded into docs/archive/hackathon/PLAN.md directly; do not re-apply. docs/NOTES.md and CLAUDE.md unchanged and binding.
 
 **Provenance of this document:** merge of PRD v2 + Instance A's PRD v3 (ADR-001), performed by the team. §15 decisions 1–3 are RATIFIED by this merge; decision 4 remains the H3 half-cap check. Restorations from v2 that v3 had dropped: named KB source documents, DAM current-price bulletin, pest checkpoints as Tier 0, Rajshahi as demo district.
 
@@ -244,9 +244,9 @@ Custom agent loop on Claude API (Sonnet, native tool use, env-var model switch o
 
 One README section + the demo's final 30 seconds: crop.db's long/tidy, provenance-per-row design generalizes to an `observations` table covering all 146 crops, livestock, fisheries, prices, weather, and disaster loss across all 14 yearbook editions (2012–2025) — turning AgriSense from one farmer's advisor into Bangladesh's citable agricultural intelligence layer, same rule throughout: every number carries its page. Banks Innovation points and frames Q&A at zero build cost. Anything from this section appearing in code before the demo is a scope bug.
 
-## 13. PLAN.md amendments — APPLIED
+## 13. docs/archive/hackathon/PLAN.md amendments — APPLIED
 
-The eight amendments from PRD v3 §13 have been folded into PLAN.md directly (ownership map, H1 double-freeze, H3–H6 A/B rewrites, scorer test cases, H12 gate additions, demo script changes, README items). PLAN.md is the single execution source; do not re-derive from here.
+The eight amendments from PRD v3 §13 have been folded into docs/archive/hackathon/PLAN.md directly (ownership map, H1 double-freeze, H3–H6 A/B rewrites, scorer test cases, H12 gate additions, demo script changes, README items). docs/archive/hackathon/PLAN.md is the single execution source; do not re-derive from here.
 
 ## 14. Success criteria → 100 pts
 

@@ -1,6 +1,6 @@
 # AgriSense frontend
 
-Vite + React PWA (manifest-only). B-owned per PLAN.md §1.
+Vite + React PWA (manifest-only). B-owned per docs/archive/hackathon/PLAN.md §1.
 
 ## Run
 
@@ -22,11 +22,11 @@ for testing on a real phone.
 **The `/api` proxy is why there is no CORS.** `vite.config.js` forwards `/api`
 to `http://127.0.0.1:8000`, so the browser only ever talks to one origin — in
 dev and in production alike. Point the frontend straight at `:8000` and you have
-re-invented the CORS problem (NOTES.md #13).
+re-invented the CORS problem (docs/NOTES.md #13).
 
 **There is no service worker, on purpose.** `vite-plugin-pwa` runs with
 `injectRegister: null`, so it emits a manifest and nothing else — the app is
-installable and themed, but no SW ever caches our JS (PRD.md §9, NOTES.md #8).
+installable and themed, but no SW ever caches our JS (docs/product/PRD.md §9, docs/NOTES.md #8).
 `src/main.jsx` additionally unregisters any service worker it finds in dev,
 because `localhost:5173` is shared ground with every other Vite project on this
 machine. If the UI ever behaves impossibly, check the console for the eviction

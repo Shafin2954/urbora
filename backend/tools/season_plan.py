@@ -3,7 +3,7 @@
 The LLM chooses neither dates nor tasks. It supplies an explicitly confirmed
 planting/transplant date and narrates this tool's output.
 
-Coverage requirement (competition.md Tier 0 item 4): every crop's calendar
+Coverage requirement (docs/product/competition.md Tier 0 item 4): every crop's calendar
 must run the full named sequence — land preparation, sowing window,
 fertilizer splits by growth stage, irrigation, a weed checkpoint, a
 pest/disease checkpoint (named pest, not generic), and harvest.

@@ -1,4 +1,8 @@
-# NOTES v2 — Caveats. Read before coding. Re-read at every sync.
+# NOTES — known traps, numbered
+
+Code cites these by number ("NOTES #13"); keep the numbers stable and append new ones. Written during the July hackathon, so some mitigations mention hours (H12) and two instances (A/B); the traps themselves still apply.
+
+## Original header: NOTES v2 — Caveats. Read before coding. Re-read at every sync.
 
 Ranked by kill-probability. Each has a mitigation. Hit one without a mitigation here → log it + tell the other person immediately.
 

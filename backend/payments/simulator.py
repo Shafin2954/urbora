@@ -1,12 +1,12 @@
 """bdapps simulator twin.
 
-NOTES.md #4: the simulator is PRIMARY, not a fallback. The portal needs public
+docs/NOTES.md #4: the simulator is PRIMARY, not a fallback. The portal needs public
 receiving URLs we do not have, and the venue IP must be whitelisted (`E1312`),
 so the demo cannot depend on the live path existing. What it *can* depend on is
 a twin that returns the documented shapes exactly.
 
 CLAUDE.md §2.13 — simulator honesty:
-  * shapes match BDAPPS-API-REFERENCE.md field for field
+  * shapes match docs/channels/BDAPPS-API-REFERENCE.md field for field
   * every result is labelled `mode: "simulator"` in code, UI and README
   * simulated output is NEVER presented as live
 
@@ -14,7 +14,7 @@ Every response below is copied from the reference doc, not invented:
   balance  §6.1   debit   §6.3   sms  §4.1   error codes  §8
 
 The demo-able failure is `E1326` (insufficient balance, retryable) — named in
-PRD.md §8 Tier2.1 and NOTES.md #4, and confirmed in the §8 code table.
+docs/product/PRD.md §8 Tier2.1 and docs/NOTES.md #4, and confirmed in the §8 code table.
 
 DOC INCONSISTENCY, flagged rather than silently resolved: the inline note under
 §6.3 says "E1602 insufficient balance (retry-able)" and mentions `E1328`, but

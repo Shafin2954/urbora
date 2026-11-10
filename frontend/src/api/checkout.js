@@ -1,5 +1,5 @@
 /**
- * Checkout API (bdapps CaaS, PRD.md §8 Tier2.1).
+ * Checkout API (bdapps CaaS, docs/product/PRD.md §8 Tier2.1).
  *
  * Two calls, in this order, always:
  *   POST /api/checkout/quote  — prices the basket, charges nothing, returns the

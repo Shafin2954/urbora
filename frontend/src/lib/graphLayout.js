@@ -148,7 +148,7 @@ export function layout({ nodes, edges }, opts = {}) {
  * one step (farm -> finance, twelve nodes apart) drew a straight line straight
  * through every node in between along with its own mid-point label. A serial
  * run of tool calls therefore buried its own earlier calls — which breaks the
- * one thing this panel exists to guarantee (competition.md Tier 0 item 8: a
+ * one thing this panel exists to guarantee (docs/product/competition.md Tier 0 item 8: a
  * judge must be able to see every call).
  *
  * Vertically there is no such conflict. Rows are separated by `step`, labels

@@ -127,7 +127,7 @@ def parse_call_state(dumpsys: str) -> tuple[int, str | None]:
 # regenerates the tone in-band toward the far end (3GPP TS 23.014), so it reaches
 # the answering phone — and Phone Link — as audio. Whether it survives the AMR
 # codec and Bluetooth HFP well enough is unverified until a real call
-# (CHANNELS_RESEARCH.md §1); speech remains the primary input.
+# (docs/channels/CHANNELS_RESEARCH.md §1); speech remains the primary input.
 
 DTMF_ROWS = (697, 770, 852, 941)
 DTMF_COLS = (1209, 1336, 1477)          # the fourth column (A–D) is not on phones

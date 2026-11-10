@@ -1,17 +1,17 @@
-"""Trace redactor tests (CLAUDE.md §2.12, NOTES.md #19).
+"""Trace redactor tests (CLAUDE.md §2.12, docs/NOTES.md #19).
 
-The payload shapes here are copied from BDAPPS-API-REFERENCE.md §6.3 / §5, not
+The payload shapes here are copied from docs/channels/BDAPPS-API-REFERENCE.md §6.3 / §5, not
 invented, so a change in the real request body shape shows up as a test failure
 rather than as a credential on a projector.
 
-Run from the repo root:  .venv/Scripts/python -m pytest tests/ -q
+Run from the repo root:  .venv/Scripts/python -m pytest backend/tests -q
 """
 
 from backend.api import sse
 from backend.api.redact import mask_phone, redact
 
 # --- the payload that actually matters -------------------------------------
-# BDAPPS-API-REFERENCE.md §6.3, direct debit. Auth rides in the body.
+# docs/channels/BDAPPS-API-REFERENCE.md §6.3, direct debit. Auth rides in the body.
 BDAPPS_DEBIT = {
     "externalTrxId": "25609",
     "amount": "5",
@@ -92,7 +92,7 @@ def test_bare_key_field_is_redacted():
     """Spec is /key|token|secret/i, so a bare `key` field is masked.
 
     KNOWN COLLISION, flagged to A: crop.db's `meta` table has a column literally
-    named `key` (PRD.md §5). If meta rows are surfaced through a tool result
+    named `key` (docs/product/PRD.md §5). If meta rows are surfaced through a tool result
     they will come out as `***`. Fix on A's side is `SELECT key AS meta_key`.
     Tested here so the behaviour is documented rather than discovered.
     """

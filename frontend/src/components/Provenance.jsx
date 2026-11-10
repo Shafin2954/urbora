@@ -1,5 +1,5 @@
 /**
- * Tap a number, see where it came from (PRD.md §7, CLAUDE.md §2.3).
+ * Tap a number, see where it came from (docs/product/PRD.md §7, CLAUDE.md §2.3).
  *
  * The rule is "a number without provenance must not render", so this component
  * is built to make violating it hard: `<Value>` takes the number AND its

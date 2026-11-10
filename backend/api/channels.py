@@ -287,7 +287,7 @@ async def bdapps_ussd(request: Request) -> dict:
         sent = _bdapps_ussd_send(session_id, address, screen.text, screen.end)  # local; nothing leaves
         return {"statusCode": "S1000", "statusDetail": "Success", "reply": sent}
     # Live: acknowledge the MO at once and send the screen separately, so the
-    # gateway's request never waits on our outbound call (CHANNELS_RESEARCH.md §1).
+    # gateway's request never waits on our outbound call (docs/channels/CHANNELS_RESEARCH.md §1).
     task = asyncio.create_task(asyncio.to_thread(_bdapps_ussd_send, session_id, address, screen.text, screen.end))
     _background.add(task)
     task.add_done_callback(_background.discard)

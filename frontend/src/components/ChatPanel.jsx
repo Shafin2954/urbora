@@ -79,7 +79,7 @@ function Diagnosis({ result, onAsk }) {
 /**
  * The chat surface: transcript, the open input_request (if any), composer.
  *
- * Bangla-first per PRD.md §9, now switchable to English from settings — the
+ * Bangla-first per docs/product/PRD.md §9, now switchable to English from settings — the
  * chrome via `t`, the advice itself because the agent is told the language. The
  * composer stays enabled while a widget is showing, because widgets are
  * accelerators and free text must always work in parallel.

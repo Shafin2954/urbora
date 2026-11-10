@@ -1,4 +1,4 @@
-"""Plant disease detection from a leaf photo — competition.md Tier 2.
+"""Plant disease detection from a leaf photo — docs/product/competition.md Tier 2.
 
 A PlantVillage-trained image classifier
 (`linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification`, 38 classes,
