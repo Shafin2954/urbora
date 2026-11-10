@@ -7,7 +7,7 @@ them act on it: buy inputs from a nearby dealer and sell the harvest to buyers.
 
 - **Web:** <https://urbora-team-uplift.netlify.app> (frontend on Netlify, API on Replit).
 - **History:** built in July 2026 for the IUT ICT Fest bdapps Agentic AI Hackathon (tag
-  `tier0-stable`; working name AgriSense). The Grameenphone FutureMakers 2026 round added
+  `tier0-stable` in the old repo `TeamFixeth_AgriSense`; working name AgriSense). The Grameenphone FutureMakers 2026 round added
   the phone channels and the marketplaces. Shown next at the AI Builders Congress
   (OpenCloud, Bangladesh), then going to real farmers.
 - The product name lives in one place: `backend/branding.py` / `frontend/src/branding.js`.
@@ -108,6 +108,8 @@ Known traps: [docs/NOTES.md](docs/NOTES.md). Product spec: [docs/product/PRD.md]
 ## Working on this repo
 
 - AI agents: read [AGENTS.md](AGENTS.md) first (`CLAUDE.md` imports it).
-- Work on branch `futuremakers`; merge to `master` only with the full suite green.
+- Work on `main` in the private repo `Shafin2954/urbora`; push only with the full suite green.
+  The hackathon history (`master`, `futuremakers`, tag `tier0-stable`) stays in the old repo
+  `Shafin2954/TeamFixeth_AgriSense`.
 - Log every unit of work in `LOG4.md`; update `docs/MAP.md` when files move or change purpose.
 - Secrets go only in `.env.local` / `.env` / `backend/.env` (all gitignored).

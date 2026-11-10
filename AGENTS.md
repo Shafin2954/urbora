@@ -8,7 +8,7 @@
 
 ## 0. Identity and boundaries
 
-- **Single operator.** One agent works the whole tree, on branch `futuremakers`. If the humans split work again, they will say so; then ask which half you own.
+- **Single operator.** One agent works the whole tree, on branch `main` of the private repo `Shafin2954/urbora`. If the humans split work again, they will say so; then ask which half you own.
 - `backend/schemas.py` is the shared contract. Changes must be additive (new optional fields, new literals) and each one gets a LOG4 entry with the reason.
 - Never point two agents (Claude Code, Codex) at the same directory simultaneously.
 - The product name is not final. Farmer-facing text takes it from `backend/branding.py` / `frontend/src/branding.js`; never hardcode it.
@@ -48,7 +48,7 @@ Format:
 9. **Agent loop guards:** max 12 iterations/turn; token usage + cost per turn in the `done` event and console.
 10. **Bangla-first:** farmer-facing text defaults to Bangla, mirrors user language. Internal reasoning, tool params, RAG queries (always English), trace, code comments: English. Western numerals in tables/computed values.
 11. **Units:** internal = hectares/kg only; local units exist at intake/display edges via units.py. 1 bigha = 33 decimal = 0.1338 ha.
-12. **Tests where they matter:** finance engine (incl. commission/fee/treatment cost), units.py, crop_scorer.py, trace redactor, channel menu state machines, SMS segment budgeting, marketplace ranking and order/offer state transitions. All tests live in `backend/tests/`; run `.venv/Scripts/python -m pytest backend/tests -q` before every merge to master. No coverage theater on UI.
+12. **Tests where they matter:** finance engine (incl. commission/fee/treatment cost), units.py, crop_scorer.py, trace redactor, channel menu state machines, SMS segment budgeting, marketplace ranking and order/offer state transitions. All tests live in `backend/tests/`; run `.venv/Scripts/python -m pytest backend/tests -q` before every push to `main`. No coverage theater on UI.
 13. **Simulator honesty:** bdapps simulator matches documented shapes exactly, labeled `mode:"simulator"` in code, UI, README. Never present simulated as live. Checkout always has a confirmation step before charging.
 14. **Scope order:** existing web flow stays green > channels (SMS, USSD, voice) > marketplaces > polish. Off-plan ideas go to LOG4 as proposals.
 15. **Channels:** phone numbers are PII — stored as salted hashes for identity, redacted to the last 3 digits in every trace and log. A USSD screen never waits on the LLM (answers go async by SMS). SMS/USSD/voice text numbers come from tool outputs through templates, never from model prose. Simulated channels are labeled `simulator` exactly like payments (rule 13).
@@ -56,10 +56,10 @@ Format:
 
 ## 3. Workflow rules
 
-- Work on `futuremakers`; merge to `master` only with the full suite green.
+- Work on `main` (the only branch since the move to `Shafin2954/urbora`, 2026-11-10). Big or risky changes go on a short-lived branch and merge back into `main`.
 - Small commits, imperative messages.
-- Before merging to master: run the test suite (rule 12) + one manual end-to-end chat turn. Broken master is forbidden.
-- `tier0-stable` must stay reachable: it is the known-good hackathon build.
+- Before every push to `main`: run the test suite (rule 12) + one manual end-to-end chat turn. Broken `main` is forbidden.
+- `tier0-stable` must stay reachable: it is the known-good hackathon build. It lives in the old repo `Shafin2954/TeamFixeth_AgriSense` (local remote `agrisense-old`), not in `urbora`.
 - Keep the repo root lean: code goes in its folder, documents go in `docs/` (see `docs/MAP.md`). Superseded documents move to `docs/archive/`; they are not deleted.
 
 ## Frontend rules (anti-slop + farmer-first)

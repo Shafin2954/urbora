@@ -619,3 +619,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The guard and the extractor work. The test input was broken.
 **Rejected:** Loosening the intake guard. It would have removed a real protection (LOG4 2026-09-28) to "fix" a test artifact.
 **Impacts:** Send Bangla test messages from Python (`httpx`), never as a curl argument in Git Bash. Today's other channel checks (voice loop, SMS, USSD, missed call) went through Python and are unaffected.
+
+## [23:49] Repo moved to the private `Shafin2954/urbora`; work branch is now `main`
+**Did:** Created the private GitHub repo `Shafin2954/urbora` and pushed `futuremakers` there (GitHub renamed it `main`). Locally: `origin` = urbora, the old repo kept as remote `agrisense-old`, local branch renamed `main`. Updated the branch rules in `AGENTS.md` and `README.md`.
+**Decision:** One branch, `main`. Run the full suite (and one chat turn for code changes) before every push to it; short-lived branches only for big or risky work. The hackathon history (`master`, `futuremakers`, tag `tier0-stable`) stays in `Shafin2954/TeamFixeth_AgriSense`.
+**Why:** The project continues under the Urbora name for the AI Builders Congress and real farmers; the old repo carries the team-competition history.
+**Rejected:** Copying `master` and the tags into urbora (not asked for; the old repo keeps them reachable).
+**Impacts:** `git push` now goes to urbora. Archived handoffs and logs still name `futuremakers`/`TeamFixeth_AgriSense`; they are history and were left as written.
