@@ -626,3 +626,12 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The project continues under the Urbora name for the AI Builders Congress and real farmers; the old repo carries the team-competition history.
 **Rejected:** Copying `master` and the tags into urbora (not asked for; the old repo keeps them reachable).
 **Impacts:** `git push` now goes to urbora. Archived handoffs and logs still name `futuremakers`/`TeamFixeth_AgriSense`; they are history and were left as written.
+
+# 2026-11-11
+
+## [16:14] Hovered buttons went dark green with dark text (unreadable)
+**Did:** `frontend/src/pages/home.css` (`.topic` service buttons) and `frontend/src/pages/monitor.css` (`.monitor-sessions` conversation list) now set their own hover background.
+**Decision:** Light buttons that sit on the global `button` style must declare `:hover:not(:disabled)` themselves.
+**Why:** `index.css` has `button:hover:not(:disabled) { background: var(--brand-dark) }`, which outranks a plain `.topic:hover`; the text stayed dark ink, so it vanished on hover.
+**Rejected:** Changing the global hover rule (every primary button relies on it).
+**Impacts:** Checked every button and link on home, market, monitor and the guest app with all hover rules forced on: no text under 3:1 contrast now.

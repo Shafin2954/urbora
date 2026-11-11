@@ -148,7 +148,8 @@
   transition: background .2s ease-out, border-color .2s ease-out, color .2s ease-out;
 }
 .topic .glyph { color: var(--sky); }
-.topic:hover { border-color: var(--brand); }
+.topic:hover:not(:disabled) { background: var(--surface); border-color: var(--brand); }
+.topic.on:hover:not(:disabled) { background: var(--brand); }
 .topic.on { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
 .topic.on .glyph { color: var(--gold); }
 .topic:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }

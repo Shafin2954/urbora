@@ -62,6 +62,12 @@
   border: 2px solid var(--brand);
 }
 
+/* The global button:hover paints brand-dark, which hides this dark text. */
+.monitor-sessions button:hover:not(:disabled) {
+  background: var(--brand-tint);
+  border-color: var(--brand);
+}
+
 .monitor-sessions .chip {
   padding: 0 10px;
   min-height: 0;
