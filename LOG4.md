@@ -642,3 +642,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The bars are drawn in brand green and the global button hover painted the button dark green behind them. My earlier scan only checked text colour, not the bars.
 **Rejected:** none.
 **Impacts:** Re-scanned home, app, market and monitor at phone width with the menu open and closed, checking text, icons and inner shapes: no other light button turns dark on hover.
+
+## [17:03] Decision: no SIP / IP-number voice line for now
+**Did:** No code. Researched other ways to put the agent on a phone call: a local 096 IP number with SIP, a GSM-to-SIP gateway box (GoIP), Android-as-SIP-gateway apps, Twilio/Plivo, and an operator IVR.
+**Decision:** Voice stays on the current Windows Phone Link + Voicemeeter bridge. The SIP route waits until there is funding or a competition win.
+**Why:** The team judged the SIP setup too costly for now.
+**Rejected:** Twilio and Plivo (no Bangladesh numbers that take incoming calls). Android-as-gateway apps (need root or work only on specific phones). GoIP (hardware cost; likely 2G-only).
+**Impacts:** Unattended answering on the current bridge stays open (Samsung A55 auto-answered; Motorola needs a click in Phone Link). Revisit SIP with funding: the backend would answer calls directly, with no phone or laptop in the audio path.
