@@ -649,3 +649,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The team judged the SIP setup too costly for now.
 **Rejected:** Twilio and Plivo (no Bangladesh numbers that take incoming calls). Android-as-gateway apps (need root or work only on specific phones). GoIP (hardware cost; likely 2G-only).
 **Impacts:** Unattended answering on the current bridge stays open (Samsung A55 auto-answered; Motorola needs a click in Phone Link). Revisit SIP with funding: the backend would answer calls directly, with no phone or laptop in the audio path.
+
+## [17:34] Samsung voice-call setup handed to another teammate
+**Did:** No code.
+**Decision:** Another teammate takes over the voice bridge on the Samsung phone, including automatic call answering. The Motorola auto-answer work is dropped.
+**Why:** The Samsung A55 already auto-answered in earlier tests, so the gap is only on the Motorola.
+**Rejected:** Fixing auto-answer on the Motorola.
+**Impacts:** Agents: don't start auto-answer work on the voice bridge without asking; check with the humans who owns it.
