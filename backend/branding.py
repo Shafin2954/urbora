@@ -1,7 +1,7 @@
 """Product name, in one place.
 
 The product is উর্বরা / Urbora (renamed from the hackathon's AgriSense, then
-Agrosfeer; final name 2026-09-30, LOG4 and brand/BRAND-CORE.md). Every farmer-facing string reads it from here,
+Agrosfeer; final name 2026-09-30, LOG.md and brand/BRAND-CORE.md). Every farmer-facing string reads it from here,
 so a future rename is a one-line change or an env override.
 
 `BRAND_NAME` / `BRAND_NAME_BN` in the environment win over the defaults. The

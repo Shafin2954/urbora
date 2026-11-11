@@ -1,6 +1,6 @@
 """Refuse to plan on farm facts the farmer never gave (CLAUDE.md rule 2).
 
-Found live on 2026-09-28 (LOG4): an SMS that arrived garbled ("???? ...")
+Found live on 2026-09-28 (LOG.md): an SMS that arrived garbled ("???? ...")
 still produced a crop_scorer call with district=Dinajpur, soil=loam,
 water=irrigated, season=rabi — every one of them invented by the model, and a
 confident ranking came back to the farmer. The prompt already says "ask, don't

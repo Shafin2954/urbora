@@ -19,7 +19,7 @@
 ```
 Continue the Urbora (উর্বরা · "স্বপ্ন ফলুক" · Team Uplift) Round 1 video for GP FutureMakers 2026. Branch futuremakers.
 Read first: CLAUDE.md, video/HANDOFF_v5.md, video/PLAN_v5.md (the plan to build), video/RECORDING_SHEET_v5.md (the script),
-the last LOG4.md entries ([05:30] v4 cut, [10:05] v5 prep), video/build/timeline.py and final.py/audio.py/mg.html/smart.py.
+the last LOG.md entries ([05:30] v4 cut, [10:05] v5 prep), video/build/timeline.py and final.py/audio.py/mg.html/smart.py.
 The asset bundle from HANDOFF_v5.md is unzipped into place.
 
 Build v5 exactly as PLAN_v5.md says, ≤2:00:
@@ -39,7 +39,7 @@ Build v5 exactly as PLAN_v5.md says, ≤2:00:
    with large readable callouts beside the phone; reach shots cut on the exact words; kinetic captions on the
    emphasis lines; English subtitles.
 4. Timeline fitted to the measured voice takes (timeline.py), then audio.py → qa_mix.py → final.py base/frames → mux.
-Show me stills and a 720p preview as you go; log each unit of work in LOG4.md; commit and push to futuremakers.
+Show me stills and a 720p preview as you go; log each unit of work in LOG.md; commit and push to futuremakers.
 Standing rules: hands and objects only, no faces; no 16123; every on-screen number is real system output;
 credits line on the end card (update the music credit to the four Pixabay artists).
 ```

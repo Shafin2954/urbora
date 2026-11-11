@@ -8,7 +8,7 @@ For a Claude Code session that redesigns and ships the web app. The video sessio
 > You are the lead product designer and front-end engineer for our FutureMakers 2026 entry
 > (repo D:\Projects\TeamFixeth_AgriSense, branch futuremakers). Read CLAUDE.md,
 > docs/deploy/WEBSITE_HANDOFF.md (all of it), brand/BRAND.md, brand/VOICE.md, docs/product/FIELD_INSIGHTS.md, then the
-> latest LOG4.md entries and docs/MAP.md. The goal: make the whole site feel professional,
+> latest LOG.md entries and docs/MAP.md. The goal: make the whole site feel professional,
 > calm and trustworthy, like a serious national service people feel close to (GP or bKash
 > level of polish), using the brand kit in brand/. Start with a written plan of screens and
 > changes and show me before large edits. Run `npm run dev` from the repo root and verify
@@ -68,7 +68,7 @@ For a Claude Code session that redesigns and ships the web app. The video sessio
 - `npm run build` must pass, and the test suite
   (`.venv/Scripts/python -m pytest backend/tests -q`) must stay green before merging to
   master.
-- Log every unit of work in LOG4.md and update docs/MAP.md.
+- Log every unit of work in LOG.md and update docs/MAP.md.
 
 ## Open product decision (ask the team)
 

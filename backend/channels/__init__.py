@@ -1,4 +1,4 @@
-"""Channels: the same agent behind SMS, USSD and voice (LOG4, GP FutureMakers).
+"""Channels: the same agent behind SMS, USSD and voice (LOG.md, GP FutureMakers).
 
 The web app talks to `backend.agent.loop.run_turn` over SSE. A button phone
 cannot, so this package turns each phone channel into ordinary agent turns and

@@ -10,7 +10,7 @@ Last full rewrite: 2026-11-10 (repo cleanup; replaces the old `repograph.md`).
 |---|---|
 | `README.md` | Start here: what the product is, how to run it, what is real vs demo |
 | `AGENTS.md` | Rules for every AI agent (`CLAUDE.md` only imports it) |
-| `LOG4.md` | Current work log, append-only. Older logs are in `docs/logs/` |
+| `LOG.md` | Current work log, append-only. Older logs are in `docs/logs/` |
 | `backend/` | Python API, agent, tools, phone channels, marketplaces, all tests |
 | `frontend/` | Vite + React web app (PWA manifest, no service worker) |
 | `data/` | Databases and price tables the backend reads (in git), plus `raw/` for local source PDFs (not in git) |

@@ -42,7 +42,7 @@ class Provenance(BaseModel):
       static_table — hand-curated table (prices.md, FAO-56 Kc, AEZ soil)
       computed     — derived by a pure function (finance engine, holt.py, scorer);
                      `formula` names the method + inputs.
-      listing      — a dealer's dated marketplace listing (LOG4); `source_title`
+      listing      — a dealer's dated marketplace listing (LOG.md); `source_title`
                      names the dealer and says [DEMO] for seeded demo rows.
     """
 

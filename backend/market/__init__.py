@@ -1,1 +1,1 @@
-"""Input and produce marketplaces (LOG4 Phases 6-7)."""
+"""Input and produce marketplaces (LOG.md Phases 6-7)."""

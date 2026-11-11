@@ -207,7 +207,7 @@ async def run_channel_turn(
 
 
 # Tool notes are instructions to the model. A model fed garbage (an SMS loop,
-# LOG4 2026-09-29) copied one into a farmer's SMS; any sentence carrying one of
+# LOG.md 2026-09-29) copied one into a farmer's SMS; any sentence carrying one of
 # these fragments is dropped from phone replies, whatever the model writes.
 _INTERNAL_FRAGMENTS = ("farmer's screen", "widget", "End your turn", "End your \nturn",
                        "do not assume an answer", "next user message", "Authoritative farm_id",

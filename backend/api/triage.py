@@ -1,4 +1,4 @@
-"""Web crop-problem check: the keypad triage table, opened to the website (LOG4 2026-09-30).
+"""Web crop-problem check: the keypad triage table, opened to the website (LOG.md 2026-09-30).
 
     GET  /api/triage/options                 crops, stages, organs, symptoms, extents, weather
     POST /api/triage/check                   the farmer's answers -> KB-bounded candidates

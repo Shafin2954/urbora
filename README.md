@@ -111,5 +111,5 @@ Known traps: [docs/NOTES.md](docs/NOTES.md). Product spec: [docs/product/PRD.md]
 - Work on `main` in the private repo `Shafin2954/urbora`; push only with the full suite green.
   The hackathon history (`master`, `futuremakers`, tag `tier0-stable`) stays in the old repo
   `Shafin2954/TeamFixeth_AgriSense`.
-- Log every unit of work in `LOG4.md`; update `docs/MAP.md` when files move or change purpose.
+- Log every unit of work in `LOG.md`; update `docs/MAP.md` when files move or change purpose.
 - Secrets go only in `.env.local` / `.env` / `backend/.env` (all gitignored).

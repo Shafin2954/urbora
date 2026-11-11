@@ -40,7 +40,7 @@ def loop_reason(local: str, farm_id: str, text: str) -> str | None:
 
     An auto-responder on a SIM can talk to itself: if an answer lands back on the
     gateway phone (the service's own number, or a test SIM in the same phone),
-    it arrives as a new "farmer" message and gets answered again (LOG4
+    it arrives as a new "farmer" message and gets answered again (LOG.md
     2026-09-29 — it happened, three rounds). Three independent guards:
     the sender is one of our own numbers; the text is something we sent;
     the phone is texting faster than a person can.

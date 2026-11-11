@@ -58,7 +58,7 @@ DISTRICT_BN: dict[str, str] = {
 
 
 # Internal instruction to the model, never farmer text. Phone channels scrub it
-# from replies if the model copies it (adapter.scrub_internal; LOG4 2026-09-29).
+# from replies if the model copies it (adapter.scrub_internal; LOG.md 2026-09-29).
 ASK_NOTE = (
     "The question is now on the farmer's screen with a widget. End your "
     "turn here — say nothing further and do not assume an answer. The "

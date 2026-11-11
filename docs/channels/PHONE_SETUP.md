@@ -93,7 +93,7 @@ Pilot, no root, no modem.
    the bridge also finds the Android SDK copy on its own).
 2. Phone: install **Link to Windows**; PC: **Phone Link** → Calls → pair over Bluetooth.
    Make a test call from the PC to confirm call audio plays on the laptop.
-3. Audio route (verified on a real call with **Voicemeeter Standard**, LOG4 [16:40]):
+3. Audio route (verified on a real call with **Voicemeeter Standard**, LOG.md [16:40]):
    caller → Phone Link → **Speakers** → **Stereo Mix** (enable it under Sound → Recording)
    → bridge; bridge → **Voicemeeter Input** (VAIO strip → **B1** only) → **Voicemeeter
    Out B1**, set as the Windows default microphone → Phone Link. Set Voicemeeter's A1 to
@@ -110,7 +110,7 @@ Pilot, no root, no modem.
    **Motorola Edge 50 (and maybe other phones):** answering over ADB keeps the call audio on the
    handset; Phone Link carries audio only for calls it answered itself. Drop `--auto-answer` and
    click Answer in the Phone Link pop-up; the bridge notices the call and takes over. (The Samsung
-   A55 auto-answered fine.) Unattended answering is open work (LOG4 2026-11-10 [15:45]).
+   A55 auto-answered fine.) Unattended answering is open work (LOG.md 2026-11-10 [15:45]).
 5. **Keypad:** during a call the caller may press keys instead of speaking — the USSD menu is
    read aloud ("ফসল পরামর্শ, 1 চাপুন"), numbers end with # or a pause, * repeats. A
    crop-problem answer is spoken on the call and sent by SMS. Check first that key tones

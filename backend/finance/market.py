@@ -4,7 +4,7 @@ The only place marketplace arithmetic happens (CLAUDE.md rule 1), in Decimal,
 same discipline as engine.py: round each line, then sum the rounded lines, so
 the numbers on the farmer's screen and SMS always add up exactly.
 
-Who pays what (business model in the concept note, LOG4):
+Who pays what (business model in the concept note, LOG.md):
 - Input marketplace: the **dealer** pays the commission out of the sale. The
   farmer pays the listed price and nothing more — so a farmer's total never
   moves when the commission rate changes.

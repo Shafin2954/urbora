@@ -50,7 +50,7 @@ def own(lid, pitch=1.0):
     src = f'vo5/src/{lid}.wav'
     if pitch == 1.0: return sf.read(src)[0]
     # Rubber Band (ffmpeg) with shifted formants: a different, lighter man, and the consonants survive
-    # (librosa's phase-vocoder shift cost 0.1 in transcription similarity; this costs none, see LOG4)
+    # (librosa's phase-vocoder shift cost 0.1 in transcription similarity; this costs none, see LOG.md)
     out = f'vo5/tmp_{lid}.wav'
     subprocess.run([FF, '-y', '-loglevel', 'error', '-i', src, '-af', f'rubberband=pitch={pitch}:formant=shifted:pitchq=quality', out], check=True)
     y = sf.read(out)[0]; os.remove(out); return y

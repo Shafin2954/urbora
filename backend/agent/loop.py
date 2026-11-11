@@ -329,7 +329,7 @@ def run_turn_sync(
 
             for tc in res.tool_calls:
                 # Rule 2, structurally: a plan may only rest on farm facts the
-                # farmer actually gave (intake_guard.py; found live, LOG4).
+                # farmer actually gave (intake_guard.py; found live, LOG.md).
                 unstated = intake_guard.unstated_fields(tc.name, tc.args, messages)
                 if unstated:
                     yield ToolCallEvent(id=tc.id, name=tc.name, params=tc.args, ts=_now())
@@ -558,7 +558,7 @@ async def run_turn(
             ),
         })
 
-    # Phone channels (LOG4): same agent, same tools, different screen. Injected
+    # Phone channels (LOG.md): same agent, same tools, different screen. Injected
     # every turn for the same reason as the language note.
     channel_note = CHANNEL_NOTES.get(channel)
     if channel_note:

@@ -1,4 +1,4 @@
-# Optional: real phone calls through Windows Phone Link (LOG4).
+# Optional: real phone calls through Windows Phone Link (LOG.md).
 #
 # Only the laptop running `python -m backend.channels.voice.phonelink` needs
 # these; the API, the tests and every other channel run without them.

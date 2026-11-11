@@ -56,7 +56,7 @@ def _connect() -> sqlite3.Connection:
             updated_at TEXT NOT NULL
         )"""
     )
-    # --- channels (LOG4) ---------------------------------------------------
+    # --- channels (LOG.md) ---------------------------------------------------
     # contacts: the ONE place a phone number is stored, because an SMS reply
     # or alert needs it. Everything else keys on farm_id (a salted hash).
     conn.execute(
@@ -245,7 +245,7 @@ def get_alerts(farm_id: str) -> list[dict]:
         conn.close()
 
 
-# --- channels (LOG4) -------------------------------------------------------
+# --- channels (LOG.md) -------------------------------------------------------
 
 
 def upsert_contact(farm_id: str, msisdn: str, masked: str, channel: str) -> None:

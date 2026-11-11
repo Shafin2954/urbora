@@ -129,7 +129,7 @@ params/result inspector, and that a chronological raw log sits nested
 underneath the graph. **That was true of an earlier build and is not what
 ships.** `App.jsx` renders exactly one trace surface, `GraphPanel.jsx`; two
 components that used to provide node-level and raw-JSON drilldown
-(`NodeInspector.jsx`, `TracePanel.jsx`) were deleted in LOG4 (they had been
+(`NodeInspector.jsx`, `TracePanel.jsx`) were deleted in LOG.md (they had been
 unreachable from the UI since
 `docs/logs/LOG2.md`, "the previous graph was too dense and English-heavy for the
 requested product surface").

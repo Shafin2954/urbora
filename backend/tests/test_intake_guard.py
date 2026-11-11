@@ -1,4 +1,4 @@
-"""The agent may not plan on farm facts the farmer never gave (LOG4, found live)."""
+"""The agent may not plan on farm facts the farmer never gave (LOG.md, found live)."""
 
 import json
 

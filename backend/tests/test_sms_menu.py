@@ -98,7 +98,7 @@ def test_question_screen_takes_free_text_as_the_question(monkeypatch):
     assert seen == [{"kind": "ask", "message": "আমার আলুর পাতা কুঁকড়ে যাচ্ছে"}]
 
 
-# --- the SMS loop guard (LOG4 2026-09-29: the bot answered itself three times) --------
+# --- the SMS loop guard (LOG.md 2026-09-29: the bot answered itself three times) --------
 
 
 def test_our_own_sms_coming_back_is_not_answered(_db):

@@ -1,6 +1,6 @@
 # Video log (Round 1 pitch video)
 
-Kept apart from LOG4.md while other sessions append to it; a one-line summary goes to LOG4
+Kept apart from LOG.md while other sessions append to it; a one-line summary goes to LOG.md
 once the team approves the direction.
 
 # 2026-09-30
@@ -58,4 +58,4 @@ dropped in. Waiting on the user's version pick and line picks.
 **Impacts:** Rebuild: `python3 audio.py <vo_dir> <music_dir>`, `python3 final.py base`, `python3 final.py frames`, then mux. Music credit (Kevin MacLeod, CC BY 4.0) is on the end card and must stay. Higgsfield credits left ≈300.
 
 ## 2026-09-30 v4 cut
-See LOG4 [05:30] and PLAN_v4.md. Timing lives in build/timeline.py; the in-mix intelligibility check is build/qa_mix.py.
+See LOG.md [05:30] and PLAN_v4.md. Timing lives in build/timeline.py; the in-mix intelligibility check is build/qa_mix.py.

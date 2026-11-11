@@ -1,6 +1,6 @@
 # Channels research — verified facts behind the phone channels (2026-09-28)
 
-Collected by three research passes (LOG4 [17:30]). Every claim had a source when it was
+Collected by three research passes (LOG.md [17:30]). Every claim had a source when it was
 written; "unverified" means we looked and found none. Re-check before quoting to judges.
 
 ## 1. USSD limits and timing

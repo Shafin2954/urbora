@@ -1,6 +1,6 @@
 """Bangla speech-to-text and text-to-speech, provider-swappable.
 
-Choice of provider is evidence-led (LOG4 [23:20]):
+Choice of provider is evidence-led (LOG.md [23:20]):
 
 - STT: **Sarvam** by default when `SARVAM_API_KEY` is set. A Sep-2026 Bangla
   benchmark (riverbornai, 1,001 clips) measured Sarvam at 6.9% CER against

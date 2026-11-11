@@ -40,7 +40,7 @@ def spoken_menu(menu: Menu, include_prompt: bool = True) -> str:
 
 def spoken_text(reply: ChannelReply) -> str:
     # The agent usually asks the question itself; then read only the choices, or
-    # a caller hears it twice (LOG4 2026-11-10). Same rule as display_text for SMS.
+    # a caller hears it twice (LOG.md 2026-11-10). Same rule as display_text for SMS.
     text = reply.text.strip()
     menu = ""
     if reply.menu:

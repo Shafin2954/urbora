@@ -1,6 +1,7 @@
-﻿# LOG4 — GP FutureMakers 2026 round
+# LOG — Urbora work log
 
-Single operator on branch `futuremakers`. Append-only. Plan of record:
+Called LOG4.md until 2026-11-11 (code comments and older entries may still say "LOG4"; it is this file).
+Started in the GP FutureMakers 2026 round. Single operator, now on branch `main`. Append-only. Plan of record:
 the approved plan summarized in the first entries below (phases 0–8).
 
 # 2026-09-26
@@ -656,3 +657,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The Samsung A55 already auto-answered in earlier tests, so the gap is only on the Motorola.
 **Rejected:** Fixing auto-answer on the Motorola.
 **Impacts:** Agents: don't start auto-answer work on the voice bridge without asking; check with the humans who owns it.
+
+## [17:38] LOG4.md renamed to LOG.md
+**Did:** `git mv LOG4.md LOG.md`; new header line saying it used to be LOG4. Every live mention (AGENTS.md, README, docs/MAP.md, code comments, other docs) now says LOG.md. `docs/logs/` and `docs/archive/` left as written.
+**Decision:** One running log, `LOG.md`, no number.
+**Why:** The number counted hackathon rounds with several agents writing; now there is one repo, one branch and one log.
+**Rejected:** Rewriting "LOG4" inside past entries (append-only rule).
+**Impacts:** A citation like "LOG4 2026-11-10 [15:45]" in an older entry means this file.

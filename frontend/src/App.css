@@ -1410,7 +1410,7 @@
 .error-detail summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
 .error-detail code { display: block; white-space: pre-wrap; word-break: break-word; }
 
-/* Links to the marketplace and the button-phone emulator (LOG4). */
+/* Links to the marketplace and the button-phone emulator (LOG.md). */
 .topnav {
   display: flex;
   gap: 4px;

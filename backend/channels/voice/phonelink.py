@@ -1,6 +1,6 @@
 """Real phone calls through Windows Phone Link — no root, no modem, no card.
 
-How it works (LOG4): Windows 11 Phone Link makes the laptop the Android
+How it works (LOG.md): Windows 11 Phone Link makes the laptop the Android
 phone's Bluetooth hands-free device, so a call to the phone's SIM plays on the
 PC and takes its microphone from the PC. Voicemeeter (free) turns those into
 two virtual cables:
@@ -89,7 +89,7 @@ class Adb:
 
     def _run(self, *args: str) -> str:
         # Explicit UTF-8: Windows' default cp1252 cannot decode some dumpsys bytes,
-        # which killed the reader thread and crashed the bridge mid-ring (LOG4).
+        # which killed the reader thread and crashed the bridge mid-ring (LOG.md).
         out = subprocess.run(self.base + list(args), capture_output=True, text=True,
                              encoding="utf-8", errors="replace", timeout=10)
         return out.stdout or ""
@@ -343,7 +343,7 @@ def _test_dtmf(device: int, seconds: float = 30.0) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     # Redirected to a file on Windows, stdout is cp1252 and printing a Bangla
-    # transcript killed the bridge mid-call (LOG4 2026-11-10).
+    # transcript killed the bridge mid-call (LOG.md 2026-11-10).
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="replace")

@@ -4,7 +4,7 @@
 hackathon PRD (v3.1), kept as history; where they conflict, this addendum wins.**
 
 **Track:** Digital Inclusion & Education. **Round 1 deliverable:** idea/pitch (concept
-note, LOG4 [00:40]); the build backs the pitch with working flows.
+note, LOG.md [00:40]); the build backs the pitch with working flows.
 
 **Users, widened.** Primary: a Bangladeshi smallholder on **any phone** — including the
 ~3 in 4 rural mobile users without a smartphone (GSMA 2024). Also: input dealers and

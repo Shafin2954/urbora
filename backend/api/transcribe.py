@@ -123,7 +123,7 @@ async def transcribe(
     buffer = io.BytesIO(payload)
     buffer.name = f"speech.{_EXTENSION_FOR.get(_base_type(file.content_type), 'webm')}"
 
-    # Bangla goes to Sarvam when its key is configured (LOG4: 6.9% vs 28.7% CER
+    # Bangla goes to Sarvam when its key is configured (LOG.md: 6.9% vs 28.7% CER
     # on a 1,001-clip Bangla benchmark); English and key-less deployments keep
     # the July-verified gpt-4o-transcribe path below.
     from backend.channels.voice import speech  # noqa: PLC0415

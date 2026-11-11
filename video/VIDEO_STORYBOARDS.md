@@ -152,7 +152,7 @@ instead of illustration.
 
 - **Bangla VO, English subtitles.** A human voice from the team for the narration. The agent's
   own voice in the call is Sarvam TTS, which is real product audio. (Brag's Kokoro TTS has no
-  Bangla voice; LOG4 [02:45].)
+  Bangla voice; LOG.md [02:45].)
 - **Honesty labels on screen:** Mahmud = "নাট্যরূপ / dramatization"; USSD = "simulator";
   dealers/buyers = "demo data"; call and SMS = real. Rule 13: never present simulated as live.
 - **Sources as small on-screen citations** under every statistic (the same sources as the form).
@@ -160,7 +160,7 @@ instead of illustration.
 - **Product name** from `backend/branding.py` (currently Agrosfeer). Do not bake it into ten
   places; keep it in one title layer so a rename is a one-line change.
 - **Numbers inside the video** are the ones the system returns. Nothing is typed by hand.
-- Renderer: HyperFrames through brag (LOG4 [02:45]); FFmpeg for the final mux, 1080p, well
+- Renderer: HyperFrames through brag (LOG.md [02:45]); FFmpeg for the final mux, 1080p, well
   under 300 MB.
 
 ## Decisions the team needs to make
