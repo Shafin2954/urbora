@@ -635,3 +635,10 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** `index.css` has `button:hover:not(:disabled) { background: var(--brand-dark) }`, which outranks a plain `.topic:hover`; the text stayed dark ink, so it vanished on hover.
 **Rejected:** Changing the global hover rule (every primary button relies on it).
 **Impacts:** Checked every button and link on home, market, monitor and the guest app with all hover rules forced on: no text under 3:1 contrast now.
+
+## [16:15] Same hover bug on the hamburger menu button
+**Did:** `frontend/src/components/site-nav.css`: `.site-nav-menu:hover:not(:disabled)` now keeps a light tint, so the three dark-green bars stay visible.
+**Decision:** none (same rule as the entry above).
+**Why:** The bars are drawn in brand green and the global button hover painted the button dark green behind them. My earlier scan only checked text colour, not the bars.
+**Rejected:** none.
+**Impacts:** Re-scanned home, app, market and monitor at phone width with the menu open and closed, checking text, icons and inner shapes: no other light button turns dark on hover.

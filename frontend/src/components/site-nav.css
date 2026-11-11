@@ -30,6 +30,8 @@
   flex-direction: column; justify-content: center; align-items: center; gap: 5px;
 }
 .site-nav-menu span { display: block; width: 18px; height: 2px; background: var(--brand); border-radius: 2px; }
+/* The global button:hover paints brand-dark, which hides the dark bars. */
+.site-nav-menu:hover:not(:disabled) { background: var(--brand-tint); border-color: var(--brand); }
 
 @media (max-width: 820px) {
   .site-nav { padding: 8px 16px; gap: 12px; }
