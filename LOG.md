@@ -664,3 +664,12 @@ the approved plan summarized in the first entries below (phases 0–8).
 **Why:** The number counted hackathon rounds with several agents writing; now there is one repo, one branch and one log.
 **Rejected:** Rewriting "LOG4" inside past entries (append-only rule).
 **Impacts:** A citation like "LOG4 2026-11-10 [15:45]" in an older entry means this file.
+
+# 2026-11-20
+
+## [18:53] Add the reproducible YieldMax training notebook
+**Did:** Added the Kaggle/Colab notebook, team run guide, validation metrics and row-level forecasts under `ml/yieldmax/`. Linked the workflow from the README and updated the project map.
+**Decision:** Keep both learned estimators and the last-observed and Holt benchmarks visible. The last-observed benchmark led on the recorded holdout.
+**Why:** Teammates can fit the estimators from a pinned dataset and demonstrate fresh inference before choosing whether to integrate one into the advisor.
+**Rejected:** Committing a serialized model, since the notebook can generate the fitted artifact during its export step.
+**Impacts:** The experiment runs on CPU with separate one- and two-year estimators. Its output describes district-level planning. The advisor, schemas and deployment configuration are outside this change.

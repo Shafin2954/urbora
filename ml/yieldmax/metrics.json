@@ -1,0 +1,409 @@
+{
+  "horizons": {
+    "1": {
+      "validation_years": [
+        2022,
+        2023
+      ],
+      "validation_latest_eligible_edition": 2023,
+      "holdout_years": [
+        2024,
+        2025
+      ],
+      "selection": "Lowest validation macro-WAPE among the two fitted ML estimators.",
+      "validation_selected_ml": "ridge_shrunk",
+      "validation": {
+        "last_observation": {
+          "rows": 178,
+          "mae_kg_ha": 83.03135955056182,
+          "macro_wape_pct": 7.432643483947233,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 82,
+              "mae_kg_ha": 71.83352439024391,
+              "rmse_kg_ha": 153.21353480550457,
+              "mean_actual_kg_ha": 1050.7168658536584,
+              "wape_pct": 6.836620475477237
+            },
+            "rapeseed_mustard": {
+              "rows": 96,
+              "mae_kg_ha": 92.59617708333333,
+              "rmse_kg_ha": 156.0716154112365,
+              "mean_actual_kg_ha": 1153.3195104166668,
+              "wape_pct": 8.028666492417228
+            }
+          }
+        },
+        "urbora_holt": {
+          "rows": 178,
+          "mae_kg_ha": 128.30692696629214,
+          "macro_wape_pct": 11.564357214518175,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 82,
+              "mae_kg_ha": 118.47025609756099,
+              "rmse_kg_ha": 215.10086007337318,
+              "mean_actual_kg_ha": 1050.7168658536584,
+              "wape_pct": 11.275183633919251
+            },
+            "rapeseed_mustard": {
+              "rows": 96,
+              "mae_kg_ha": 136.70908333333333,
+              "rmse_kg_ha": 191.76367790156021,
+              "mean_actual_kg_ha": 1153.3195104166668,
+              "wape_pct": 11.853530795117097
+            }
+          }
+        },
+        "ridge_shrunk": {
+          "rows": 178,
+          "mae_kg_ha": 85.40601854703421,
+          "macro_wape_pct": 7.663637484145971,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 82,
+              "mae_kg_ha": 75.63330674086049,
+              "rmse_kg_ha": 151.96012716800115,
+              "mean_actual_kg_ha": 1050.7168658536584,
+              "wape_pct": 7.198257608572026
+            },
+            "rapeseed_mustard": {
+              "rows": 96,
+              "mae_kg_ha": 93.7535432148076,
+              "rmse_kg_ha": 158.0173983732377,
+              "mean_actual_kg_ha": 1153.3195104166668,
+              "wape_pct": 8.129017359719917
+            }
+          }
+        },
+        "hist_gradient_boosting": {
+          "rows": 178,
+          "mae_kg_ha": 95.19961485621249,
+          "macro_wape_pct": 8.57543413938399,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 82,
+              "mae_kg_ha": 87.43245527514452,
+              "rmse_kg_ha": 155.44890863419928,
+              "mean_actual_kg_ha": 1050.7168658536584,
+              "wape_pct": 8.32121936142233
+            },
+            "rapeseed_mustard": {
+              "rows": 96,
+              "mae_kg_ha": 101.83406366504137,
+              "rmse_kg_ha": 150.32885005471252,
+              "mean_actual_kg_ha": 1153.3195104166668,
+              "wape_pct": 8.82964891734565
+            }
+          }
+        }
+      },
+      "holdout": {
+        "last_observation": {
+          "rows": 176,
+          "mae_kg_ha": 49.34555681818183,
+          "macro_wape_pct": 4.389253060184555,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 82,
+              "mae_kg_ha": 54.935085365853666,
+              "rmse_kg_ha": 97.89046683915552,
+              "mean_actual_kg_ha": 1099.0150609756097,
+              "wape_pct": 4.998574388697375
+            },
+            "rapeseed_mustard": {
+              "rows": 94,
+              "mae_kg_ha": 44.469585106382986,
+              "rmse_kg_ha": 88.48505224222062,
+              "mean_actual_kg_ha": 1176.4652978723404,
+              "wape_pct": 3.7799317316717347
+            }
+          }
+        },
+        "urbora_holt": {
+          "rows": 176,
+          "mae_kg_ha": 79.35224431818183,
+          "macro_wape_pct": 7.069030514205187,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 82,
+              "mae_kg_ha": 89.61181707317074,
+              "rmse_kg_ha": 135.75891663852457,
+              "mean_actual_kg_ha": 1099.0150609756097,
+              "wape_pct": 8.153829756766134
+            },
+            "rapeseed_mustard": {
+              "rows": 94,
+              "mae_kg_ha": 70.40240425531914,
+              "rmse_kg_ha": 107.85351266515508,
+              "mean_actual_kg_ha": 1176.4652978723404,
+              "wape_pct": 5.984231271644239
+            }
+          }
+        },
+        "ridge_shrunk": {
+          "rows": 176,
+          "mae_kg_ha": 51.788424167044326,
+          "macro_wape_pct": 4.61727325753862,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 82,
+              "mae_kg_ha": 58.92877527835291,
+              "rmse_kg_ha": 101.01376095581756,
+              "mean_actual_kg_ha": 1099.0150609756097,
+              "wape_pct": 5.361962485394976
+            },
+            "rapeseed_mustard": {
+              "rows": 94,
+              "mae_kg_ha": 45.55960724015812,
+              "rmse_kg_ha": 83.95229265708457,
+              "mean_actual_kg_ha": 1176.4652978723404,
+              "wape_pct": 3.8725840296822636
+            }
+          }
+        },
+        "hist_gradient_boosting": {
+          "rows": 176,
+          "mae_kg_ha": 67.10877571770885,
+          "macro_wape_pct": 5.916569327353242,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 82,
+              "mae_kg_ha": 68.45081810262003,
+              "rmse_kg_ha": 114.66076116771615,
+              "mean_actual_kg_ha": 1099.0150609756097,
+              "wape_pct": 6.228378530304704
+            },
+            "rapeseed_mustard": {
+              "rows": 94,
+              "mae_kg_ha": 65.93805789257355,
+              "rmse_kg_ha": 98.58869693292183,
+              "mean_actual_kg_ha": 1176.4652978723404,
+              "wape_pct": 5.604760124401779
+            }
+          }
+        }
+      },
+      "selected_ml_band_coverage_pct": 84.6590909090909,
+      "final_training_examples": 476
+    },
+    "2": {
+      "validation_years": [
+        2023
+      ],
+      "validation_latest_eligible_edition": 2023,
+      "holdout_years": [
+        2025
+      ],
+      "selection": "Lowest validation macro-WAPE among the two fitted ML estimators.",
+      "validation_selected_ml": "ridge_shrunk",
+      "validation": {
+        "last_observation": {
+          "rows": 88,
+          "mae_kg_ha": 115.64531818181818,
+          "macro_wape_pct": 10.1988949816334,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 41,
+              "mae_kg_ha": 106.79421951219513,
+              "rmse_kg_ha": 202.58842144550238,
+              "mean_actual_kg_ha": 1075.521487804878,
+              "wape_pct": 9.929529137549862
+            },
+            "rapeseed_mustard": {
+              "rows": 47,
+              "mae_kg_ha": 123.36648936170214,
+              "rmse_kg_ha": 181.1351520576761,
+              "mean_actual_kg_ha": 1178.481234042553,
+              "wape_pct": 10.468260825716937
+            }
+          }
+        },
+        "urbora_holt": {
+          "rows": 88,
+          "mae_kg_ha": 178.3992840909091,
+          "macro_wape_pct": 15.626005626445593,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 41,
+              "mae_kg_ha": 153.43100000000004,
+              "rmse_kg_ha": 269.50876495602506,
+              "mean_actual_kg_ha": 1075.521487804878,
+              "wape_pct": 14.26573078638812
+            },
+            "rapeseed_mustard": {
+              "rows": 47,
+              "mae_kg_ha": 200.18012765957448,
+              "rmse_kg_ha": 268.46123307931833,
+              "mean_actual_kg_ha": 1178.481234042553,
+              "wape_pct": 16.986280466503064
+            }
+          }
+        },
+        "ridge_shrunk": {
+          "rows": 88,
+          "mae_kg_ha": 107.52214729015418,
+          "macro_wape_pct": 9.5411052030755,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 41,
+              "mae_kg_ha": 105.47581929017977,
+              "rmse_kg_ha": 178.90245533382415,
+              "mean_actual_kg_ha": 1075.521487804878,
+              "wape_pct": 9.806946721766966
+            },
+            "rapeseed_mustard": {
+              "rows": 47,
+              "mae_kg_ha": 109.3072419284297,
+              "rmse_kg_ha": 149.51270783563885,
+              "mean_actual_kg_ha": 1178.481234042553,
+              "wape_pct": 9.275263684384031
+            }
+          }
+        },
+        "hist_gradient_boosting": {
+          "rows": 88,
+          "mae_kg_ha": 146.1517472398237,
+          "macro_wape_pct": 13.08349959395246,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 41,
+              "mae_kg_ha": 155.45640246912035,
+              "rmse_kg_ha": 228.9801165314244,
+              "mean_actual_kg_ha": 1075.521487804878,
+              "wape_pct": 14.454048964321888
+            },
+            "rapeseed_mustard": {
+              "rows": 47,
+              "mae_kg_ha": 138.0349203376713,
+              "rmse_kg_ha": 187.73232962113218,
+              "mean_actual_kg_ha": 1178.481234042553,
+              "wape_pct": 11.712950223583032
+            }
+          }
+        }
+      },
+      "holdout": {
+        "last_observation": {
+          "rows": 88,
+          "mae_kg_ha": 82.50938636363638,
+          "macro_wape_pct": 7.1560574297167365,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 42,
+              "mae_kg_ha": 85.1332857142857,
+              "rmse_kg_ha": 143.4160768855364,
+              "mean_actual_kg_ha": 1133.1687142857143,
+              "wape_pct": 7.512851761703368
+            },
+            "rapeseed_mustard": {
+              "rows": 46,
+              "mae_kg_ha": 80.11365217391307,
+              "rmse_kg_ha": 124.46581510756802,
+              "mean_actual_kg_ha": 1178.2696304347828,
+              "wape_pct": 6.799263097730105
+            }
+          }
+        },
+        "urbora_holt": {
+          "rows": 88,
+          "mae_kg_ha": 123.713125,
+          "macro_wape_pct": 10.801916884231384,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 42,
+              "mae_kg_ha": 141.07933333333335,
+              "rmse_kg_ha": 204.9797734350299,
+              "mean_actual_kg_ha": 1133.1687142857143,
+              "wape_pct": 12.449984857044152
+            },
+            "rapeseed_mustard": {
+              "rows": 46,
+              "mae_kg_ha": 107.85702173913049,
+              "rmse_kg_ha": 154.29833312386867,
+              "mean_actual_kg_ha": 1178.2696304347828,
+              "wape_pct": 9.153848911418615
+            }
+          }
+        },
+        "ridge_shrunk": {
+          "rows": 88,
+          "mae_kg_ha": 93.09827922321102,
+          "macro_wape_pct": 8.05240773447198,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 42,
+              "mae_kg_ha": 91.96393692885903,
+              "rmse_kg_ha": 148.8869909996482,
+              "mean_actual_kg_ha": 1133.1687142857143,
+              "wape_pct": 8.115643837451682
+            },
+            "rapeseed_mustard": {
+              "rows": 46,
+              "mae_kg_ha": 94.1339830571846,
+              "rmse_kg_ha": 120.20298527386083,
+              "mean_actual_kg_ha": 1178.2696304347828,
+              "wape_pct": 7.98917163149228
+            }
+          }
+        },
+        "hist_gradient_boosting": {
+          "rows": 88,
+          "mae_kg_ha": 99.47872649757028,
+          "macro_wape_pct": 8.64886143372459,
+          "by_crop": {
+            "lentil_masur": {
+              "rows": 42,
+              "mae_kg_ha": 106.55555087784354,
+              "rmse_kg_ha": 170.54883163899575,
+              "mean_actual_kg_ha": 1133.1687142857143,
+              "wape_pct": 9.40332622446342
+            },
+            "rapeseed_mustard": {
+              "rows": 46,
+              "mae_kg_ha": 93.01727815036423,
+              "rmse_kg_ha": 117.17584467667153,
+              "mean_actual_kg_ha": 1178.2696304347828,
+              "wape_pct": 7.894396642985763
+            }
+          }
+        }
+      },
+      "selected_ml_band_coverage_pct": 85.22727272727273,
+      "final_training_examples": 385
+    }
+  },
+  "source": {
+    "repository_commit": "68dfdcd731ddcd4f451ea801ea629056c377536d",
+    "data_sha256": {
+      "agristats.db": "ba81185a45969d893e409c781ffb658810f2cf446bc5583cbd6b4e4fb43e8ff5",
+      "agribase_clean.db": "168ffa3a7438566fde315eed29a84974cdff2fa7db38eb50ba278268ef156f25"
+    },
+    "table": "agristats.db::fact_crop_production",
+    "edition": 2025,
+    "published_row_review": "Individual rows await reconciliation against the original yearbook PDFs."
+  },
+  "environment": {
+    "python": "3.12.10",
+    "scikit_learn": "1.9.1",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0"
+  },
+  "audit": {
+    "quality_counts": {
+      "candidate_rows": 3326,
+      "out_of_scope_year": 714,
+      "noncanonical_district": 422,
+      "missing_or_outside_plausibility_filter": 70,
+      "flagged_extract_outlier": 368,
+      "agreeing_same_edition_duplicates": 0,
+      "accepted_edition_rows": 1752
+    },
+    "acceptance": "Exact canonical district names, consecutive crop-year label, edition no earlier than harvest, unflagged complete rows, minimum 10 hectares, crop bounds, and yield arithmetic within 1.5%.",
+    "duplicates": "Within an edition, keep the published value closest to the median if the spread is at most 1%.",
+    "vintage": "Take the newest eligible observation edition no later than the cutoff for each crop/district/harvest.",
+    "unique_district_crop_year_observations": 730,
+    "districts_in_snapshot": 59
+  }
+}
