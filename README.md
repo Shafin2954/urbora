@@ -105,6 +105,14 @@ Known traps: [docs/NOTES.md](docs/NOTES.md). Product spec: [docs/product/PRD.md]
 - Five crops: boro rice, aman rice, potato, mustard, lentil. Wheat and maize are absent on
   purpose (no usable yield series), and the agent says so.
 
+## YieldMax ML research notebook
+
+[Train and test the YieldMax models](ml/yieldmax/README.md) on CPU in Colab or Kaggle.
+The notebook fits ridge regression and histogram gradient-boosted trees on pinned
+district yield records, then predicts for inputs you choose. The evaluation reports
+both learned models and the last-observed and Holt benchmarks. This notebook is a
+research workflow that runs independently of the hosted advisor.
+
 ## Working on this repo
 
 - AI agents: read [AGENTS.md](AGENTS.md) first (`CLAUDE.md` imports it).

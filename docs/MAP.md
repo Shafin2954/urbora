@@ -14,6 +14,7 @@ Last full rewrite: 2026-11-10 (repo cleanup; replaces the old `repograph.md`).
 | `backend/` | Python API, agent, tools, phone channels, marketplaces, all tests |
 | `frontend/` | Vite + React web app (PWA manifest, no service worker) |
 | `data/` | Databases and price tables the backend reads (in git), plus `raw/` for local source PDFs (not in git) |
+| `ml/yieldmax/` | Reproducible yield training notebook, team run instructions, metrics and row-level backtest evidence |
 | `docs/` | Everything written for people: spec, research, deploy notes, history |
 | `scripts/` | `dev.mjs` (run API + web together), `e2e_farmers.mjs` (Playwright run of three farmers) |
 | `supabase/` | Supabase CLI config + migrations for web accounts (`crops` table, RLS) |
